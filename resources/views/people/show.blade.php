@@ -1,0 +1,2 @@
+@extends('layouts.app')
+@section('content')<section class="space-y-4"><div class="glass rounded-3xl p-5"><h1 class="text-2xl font-black">{{ $person->full_name }}</h1><p class="mt-2 text-sm text-slate-500">{{ $person->mobile }}</p><a class="mt-4 inline-block tap rounded-2xl bg-white/80 px-4 py-3 font-bold" href="{{ route('people.edit',$person) }}">ویرایش</a></div><div class="rounded-3xl bg-white/85 p-4 dark:bg-slate-900"><h2 class="mb-3 font-black">تراکنش‌های مرتبط</h2>@include('transactions.partials.list',['transactions'=>$person->transactions])</div></section>@endsection

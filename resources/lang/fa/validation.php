@@ -1,0 +1,33 @@
+<?php
+
+return [
+    'accepted' => ':attribute باید پذیرفته شود.',
+    'confirmed' => 'تکرار :attribute هم‌خوان نیست.',
+    'date' => ':attribute باید تاریخ معتبر باشد.',
+    'digits' => ':attribute باید :digits رقم باشد.',
+    'email' => ':attribute باید ایمیل معتبر باشد.',
+    'exists' => ':attribute معتبر نیست.',
+    'file' => ':attribute باید فایل معتبر باشد.',
+    'in' => ':attribute معتبر نیست.',
+    'integer' => ':attribute باید عدد صحیح باشد.',
+    'max' => ':attribute نباید بیشتر از :max باشد.',
+    'min' => ':attribute باید حداقل :min باشد.',
+    'mimes' => 'نوع فایل :attribute معتبر نیست.',
+    'numeric' => ':attribute باید عدد باشد.',
+    'required' => ':attribute الزامی است.',
+    'string' => ':attribute باید متن باشد.',
+    'unique' => ':attribute قبلا ثبت شده است.',
+    'attributes' => [
+        'name' => 'نام',
+        'email' => 'ایمیل',
+        'mobile' => 'موبایل',
+        'password' => 'رمز عبور',
+        'amount' => 'مبلغ',
+        'account_id' => 'حساب',
+        'category_id' => 'دسته‌بندی',
+        'person_id' => 'شخص',
+        'transaction_date' => 'تاریخ تراکنش',
+        'due_date' => 'تاریخ سررسید',
+        'title' => 'عنوان',
+    ],
+];

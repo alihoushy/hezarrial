@@ -1,0 +1,13 @@
+{
+    "name": "هزار ریال",
+    "short_name": "هزار ریال",
+    "start_url": "/",
+    "display": "standalone",
+    "dir": "rtl",
+    "lang": "fa",
+    "theme_color": "#f7f8fb",
+    "background_color": "#f7f8fb",
+    "icons": [
+        {"src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+    ]
+}
