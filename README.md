@@ -24,6 +24,16 @@
 
 ## نصب
 
+اگر `nvm` نصب نیست، ابتدا Node Version Manager را نصب کنید. نسخه فعلی nvm در زمان نگارش `v0.40.4` است:
+
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
+source ~/.bashrc
+nvm install 20.19.0
+```
+
+اگر shell شما `zsh` است، به جای `source ~/.bashrc` از `source ~/.zshrc` استفاده کنید.
+
 ```bash
 composer install
 nvm use
