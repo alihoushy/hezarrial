@@ -22,6 +22,31 @@ class ReportService
         $income = Transaction::forUser($user)->where('type', TransactionType::Income)->whereBetween('transaction_date', [$start, $end])->sum('amount');
         $expense = Transaction::forUser($user)->where('type', TransactionType::Expense)->whereBetween('transaction_date', [$start, $end])->sum('amount');
 
+        $transactions = Transaction::forUser($user)
+            ->whereBetween('transaction_date', [$start, $end])
+            ->get(['type', 'amount', 'transaction_date', 'category_id']);
+
+        $days = collect(Carbon::parse($start)->daysUntil(Carbon::parse($end)->addDay()))
+            ->map(fn (Carbon $date) => $date->toDateString());
+
+        $sumForDay = fn (string $date, TransactionType $type): float => (float) $transactions
+            ->filter(fn (Transaction $transaction) => $transaction->transaction_date?->toDateString() === $date && $transaction->type === $type)
+            ->sum('amount');
+
+        $trend = [
+            'labels' => $days->map(fn (string $date) => Carbon::parse($date)->format('m/d'))->values(),
+            'income' => $days->map(fn (string $date) => $sumForDay($date, TransactionType::Income))->values(),
+            'expense' => $days->map(fn (string $date) => $sumForDay($date, TransactionType::Expense))->values(),
+        ];
+
+        $categorySpending = Transaction::forUser($user)
+            ->with('category')
+            ->where('type', TransactionType::Expense)
+            ->whereBetween('transaction_date', [$start, $end])
+            ->get()
+            ->groupBy(fn ($transaction) => $transaction->category?->name ?? 'بدون دسته')
+            ->map(fn ($rows) => (float) $rows->sum('amount'));
+
         return [
             'income' => (float) $income,
             'expense' => (float) $expense,
@@ -33,7 +58,14 @@ class ReportService
             'installments' => LoanInstallment::forUser($user)->where('status', 'pending')->whereDate('due_date', '<=', Carbon::now()->addDays(30))->orderBy('due_date')->limit(5)->get(),
             'checks' => Check::forUser($user)->where('status', 'pending')->whereDate('due_date', '<=', Carbon::now()->addDays(30))->orderBy('due_date')->limit(5)->get(),
             'debts' => Debt::forUser($user)->whereIn('status', ['open', 'partially_settled', 'overdue'])->orderByRaw('due_date is null, due_date asc')->limit(5)->get(),
-            'category_spending' => Transaction::forUser($user)->with('category')->where('type', TransactionType::Expense)->whereBetween('transaction_date', [$start, $end])->get()->groupBy(fn ($t) => $t->category?->name ?? 'بدون دسته')->map->sum('amount'),
+            'category_spending' => $categorySpending,
+            'charts' => [
+                'income_expense' => $trend,
+                'category_spending' => [
+                    'labels' => $categorySpending->keys()->values(),
+                    'values' => $categorySpending->values(),
+                ],
+            ],
         ];
     }
 }

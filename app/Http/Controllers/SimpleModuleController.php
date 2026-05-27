@@ -14,6 +14,7 @@ use App\Models\LoanInstallment;
 use App\Models\Person;
 use App\Models\Reminder;
 use App\Services\Accounting\CheckService;
+use App\Services\Accounting\BudgetService;
 use App\Services\Accounting\DebtService;
 use App\Services\Accounting\LoanService;
 use Illuminate\Http\RedirectResponse;
@@ -31,7 +32,25 @@ class SimpleModuleController extends Controller
         Person::create([...$data, 'user_id' => auth()->id(), 'avatar_color' => '#5b8def']);
         return redirect()->route('people.index')->with('status', 'شخص ذخیره شد.');
     }
-    public function showPerson(Person $person): View { $this->authorize('view', $person); return view('people.show', ['person' => $person->load('debts', 'transactions')]); }
+    public function showPerson(Person $person): View
+    {
+        $this->authorize('view', $person);
+        $person->load(['debts', 'transactions.account', 'transactions.category']);
+
+        $payable = (float) $person->debts->where('type.value', 'payable')->whereIn('status.value', ['open', 'partially_settled', 'overdue'])->sum('remaining_amount');
+        $receivable = (float) $person->debts->where('type.value', 'receivable')->whereIn('status.value', ['open', 'partially_settled', 'overdue'])->sum('remaining_amount');
+
+        return view('people.show', [
+            'person' => $person,
+            'summary' => [
+                'payable' => $payable,
+                'receivable' => $receivable,
+                'net' => $receivable - $payable,
+                'open_items' => $person->debts->whereIn('status.value', ['open', 'partially_settled', 'overdue'])->values(),
+                'settled_items' => $person->debts->where('status.value', 'settled')->values(),
+            ],
+        ]);
+    }
     public function editPerson(Person $person): View { $this->authorize('update', $person); return view('people.form', compact('person')); }
     public function updatePerson(Request $request, Person $person): RedirectResponse
     {
@@ -75,7 +94,16 @@ class SimpleModuleController extends Controller
     public function bounceCheck(Check $check): RedirectResponse { $this->authorize('update', $check); $check->update(['status' => 'bounced']); return back(); }
     public function cancelCheck(Check $check): RedirectResponse { $this->authorize('update', $check); $check->update(['status' => 'cancelled']); return back(); }
 
-    public function budgets(): View { return view('budgets.index', ['budgets' => Budget::forUser(auth()->user())->latest()->get(), 'categories' => Category::forUser(auth()->user())->where('type', 'expense')->get()]); }
+    public function budgets(BudgetService $budgetService): View
+    {
+        $budgets = Budget::forUser(auth()->user())->with('category')->latest()->get();
+
+        return view('budgets.index', [
+            'budgets' => $budgets,
+            'progress' => $budgets->mapWithKeys(fn (Budget $budget) => [$budget->id => $budgetService->progress($budget)]),
+            'categories' => Category::forUser(auth()->user())->where('type', 'expense')->get(),
+        ]);
+    }
     public function storeBudget(Request $request): RedirectResponse
     {
         Budget::create([...$request->validate(['title' => ['required', 'string', 'max:160'], 'amount' => ['required', 'numeric', 'min:0.01'], 'start_date' => ['required', 'date'], 'end_date' => ['nullable', 'date'], 'category_id' => ['nullable', Rule::exists('categories', 'id')->where('user_id', auth()->id())]]), 'user_id' => auth()->id(), 'period' => 'monthly', 'is_active' => true]);
