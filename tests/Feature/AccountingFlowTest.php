@@ -49,7 +49,7 @@ class AccountingFlowTest extends TestCase
             'transaction_date' => '2026-05-26',
         ])->assertRedirect(route('transactions.index'));
 
-        $this->assertSame('130000.00', $this->bank->fresh()->current_balance);
+        $this->assertEquals(130000.0, (float) $this->bank->fresh()->current_balance);
     }
 
     public function test_transfer_creates_two_linked_transactions(): void
@@ -62,8 +62,8 @@ class AccountingFlowTest extends TestCase
             'transaction_date' => '2026-05-26',
         ])->assertRedirect(route('transactions.index'));
 
-        $this->assertSame('75000.00', $this->bank->fresh()->current_balance);
-        $this->assertSame('25000.00', $this->cash->fresh()->current_balance);
+        $this->assertEquals(75000.0, (float) $this->bank->fresh()->current_balance);
+        $this->assertEquals(25000.0, (float) $this->cash->fresh()->current_balance);
         $this->assertDatabaseCount('transactions', 2);
     }
 
@@ -74,6 +74,6 @@ class AccountingFlowTest extends TestCase
         $result = app(AccountBalanceService::class)->recalculate($this->bank, true);
 
         $this->assertSame(99990.0, $result['difference']);
-        $this->assertSame('100000.00', $this->bank->fresh()->current_balance);
+        $this->assertEquals(100000.0, (float) $this->bank->fresh()->current_balance);
     }
 }

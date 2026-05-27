@@ -23,9 +23,14 @@ class ExportAndBackupTest extends TestCase
         $category = Category::create(['user_id' => $user->id, 'name' => 'حقوق', 'type' => 'income']);
         Transaction::create(['user_id' => $user->id, 'account_id' => $account->id, 'category_id' => $category->id, 'type' => 'income', 'amount' => 1000, 'transaction_date' => '2026-05-26']);
 
-        $this->actingAs($user)->get(route('exports.transactions.csv'))
-            ->assertOk()
-            ->assertSee("'=SUM(A1:A2)", false);
+        $response = $this->actingAs($user)->get(route('exports.transactions.csv'));
+
+        $response->assertOk();
+        ob_start();
+        $response->sendContent();
+        $content = ob_get_clean();
+
+        $this->assertStringContainsString("'=SUM(A1:A2)", $content);
     }
 
     public function test_backup_is_stored_on_private_disk(): void
