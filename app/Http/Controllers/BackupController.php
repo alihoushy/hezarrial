@@ -34,7 +34,7 @@ class BackupController extends Controller
         return Storage::disk('local')->download($backup->file_path, $backup->file_name);
     }
 
-    public function restore(Request $request, AuditLogService $audit): RedirectResponse
+    public function restore(Request $request, BackupService $backups, AuditLogService $audit): RedirectResponse
     {
         $request->validate([
             'password' => ['required'],
@@ -45,14 +45,12 @@ class BackupController extends Controller
             return back()->withErrors(['password' => 'رمز عبور درست نیست.']);
         }
 
-        $payload = json_decode($request->file('backup')->get(), true);
-        if (($payload['schema_version'] ?? null) !== 1) {
-            return back()->withErrors(['backup' => 'نسخه فایل پشتیبان پشتیبانی نمی‌شود.']);
-        }
+        $payload = json_decode($request->file('backup')->get(), true, flags: JSON_THROW_ON_ERROR);
+        $restored = $backups->restore($request->user(), $payload);
 
-        $audit->record('backup.restore.requested', null, [], ['schema_version' => 1]);
+        $audit->record('backup.restored', null, [], ['schema_version' => 1, 'restored' => $restored]);
 
-        return back()->with('status', 'فایل پشتیبان معتبر است. بازیابی کامل داده‌ها در گام تایید نهایی انجام می‌شود.');
+        return back()->with('status', 'بازیابی پشتیبان با موفقیت انجام شد.');
     }
 
     public function destroy(Backup $backup): RedirectResponse

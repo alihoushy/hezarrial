@@ -8,6 +8,7 @@ use App\Models\Transaction;
 use App\Models\User;
 use App\Services\Backup\BackupService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -42,5 +43,28 @@ class ExportAndBackupTest extends TestCase
 
         Storage::disk('local')->assertExists($backup->file_path);
         $this->assertStringStartsWith('backups/'.$user->id, $backup->file_path);
+    }
+
+    public function test_backup_restore_replaces_current_financial_data(): void
+    {
+        Storage::fake('local');
+        $user = User::create(['name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password')]);
+        $account = Account::create(['user_id' => $user->id, 'name' => 'بانک اصلی', 'type' => 'bank', 'opening_balance' => 0, 'current_balance' => 0]);
+        $category = Category::create(['user_id' => $user->id, 'name' => 'حقوق', 'type' => 'income']);
+        Transaction::create(['user_id' => $user->id, 'account_id' => $account->id, 'category_id' => $category->id, 'type' => 'income', 'amount' => 1000, 'transaction_date' => '2026-05-26']);
+        $backup = app(BackupService::class)->create($user);
+        $content = Storage::disk('local')->get($backup->file_path);
+
+        $account->update(['name' => 'حساب اشتباه']);
+
+        $this->actingAs($user)->post(route('backups.restore'), [
+            'password' => 'password-password',
+            'backup' => UploadedFile::fake()->createWithContent('backup.json', $content),
+        ])->assertRedirect();
+
+        $this->assertDatabaseHas('accounts', ['user_id' => $user->id, 'name' => 'بانک اصلی']);
+        $this->assertDatabaseMissing('accounts', ['user_id' => $user->id, 'name' => 'حساب اشتباه']);
+        $this->assertDatabaseHas('transactions', ['user_id' => $user->id, 'amount' => 1000]);
+        $this->assertDatabaseHas('audit_logs', ['user_id' => $user->id, 'action' => 'backup.restored']);
     }
 }

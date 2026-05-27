@@ -2,23 +2,77 @@
 
 namespace App\Services\Backup;
 
+use App\Models\Account;
+use App\Models\AppSetting;
 use App\Models\Backup;
+use App\Models\Budget;
+use App\Models\Category;
+use App\Models\Check;
+use App\Models\Debt;
+use App\Models\Loan;
+use App\Models\LoanInstallment;
+use App\Models\Person;
+use App\Models\RecurringTransaction;
+use App\Models\Reminder;
+use App\Models\SmsPattern;
+use App\Models\Transaction;
 use App\Models\User;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class BackupService
 {
+    private const DATASETS = [
+        'accounts' => Account::class,
+        'categories' => Category::class,
+        'people' => Person::class,
+        'transactions' => Transaction::class,
+        'debts' => Debt::class,
+        'loans' => Loan::class,
+        'loan_installments' => LoanInstallment::class,
+        'checks' => Check::class,
+        'budgets' => Budget::class,
+        'recurring_transactions' => RecurringTransaction::class,
+        'reminders' => Reminder::class,
+        'sms_patterns' => SmsPattern::class,
+        'app_settings' => AppSetting::class,
+    ];
+
+    private const DELETE_ORDER = [
+        Reminder::class,
+        SmsPattern::class,
+        RecurringTransaction::class,
+        Budget::class,
+        Check::class,
+        LoanInstallment::class,
+        Loan::class,
+        Debt::class,
+        Transaction::class,
+        Person::class,
+        Category::class,
+        Account::class,
+        AppSetting::class,
+    ];
+
     public function create(User $user): Backup
     {
         $payload = [
             'schema_version' => 1,
             'created_at' => now()->toISOString(),
             'user' => $user->only(['name', 'email', 'mobile', 'settings']),
-            'accounts' => $user->accounts()->withTrashed()->get(),
-            'categories' => $user->categories()->withTrashed()->get(),
-            'people' => $user->people()->withTrashed()->get(),
-            'transactions' => $user->transactions()->withTrashed()->get(),
         ];
+
+        foreach (self::DATASETS as $key => $model) {
+            $query = $model::query()->where('user_id', $user->id);
+            if (method_exists($model, 'bootSoftDeletes')) {
+                $query->withTrashed();
+            }
+
+            $payload[$key] = $query->orderBy('id')->get();
+        }
 
         $fileName = 'hezarrial-backup-'.$user->id.'-'.now()->format('Ymd-His').'.json';
         $path = 'backups/'.$user->id.'/'.$fileName;
@@ -34,5 +88,53 @@ class BackupService
             'is_encrypted' => false,
             'created_at' => now(),
         ]);
+    }
+
+    public function restore(User $user, array $payload): array
+    {
+        if (($payload['schema_version'] ?? null) !== 1) {
+            throw ValidationException::withMessages(['backup' => 'نسخه فایل پشتیبان پشتیبانی نمی‌شود.']);
+        }
+
+        return DB::transaction(function () use ($user, $payload): array {
+            Schema::disableForeignKeyConstraints();
+
+            try {
+                foreach (self::DELETE_ORDER as $model) {
+                    $model::query()->where('user_id', $user->id)->forceDelete();
+                }
+
+                $restored = [];
+
+                foreach (self::DATASETS as $key => $model) {
+                    $table = (new $model())->getTable();
+                    $columns = Schema::getColumnListing($table);
+                    $rows = collect($payload[$key] ?? [])
+                        ->map(function (array $row) use ($columns, $user): array {
+                            $row['user_id'] = $user->id;
+
+                            return Arr::only($row, $columns);
+                        })
+                        ->values();
+
+                    if ($rows->isNotEmpty()) {
+                        DB::table($table)->insert($rows->all());
+                    }
+
+                    $restored[$key] = $rows->count();
+                }
+
+                $user->forceFill([
+                    'name' => $payload['user']['name'] ?? $user->name,
+                    'email' => $payload['user']['email'] ?? $user->email,
+                    'mobile' => $payload['user']['mobile'] ?? $user->mobile,
+                    'settings' => $payload['user']['settings'] ?? $user->settings,
+                ])->save();
+
+                return $restored;
+            } finally {
+                Schema::enableForeignKeyConstraints();
+            }
+        });
     }
 }
