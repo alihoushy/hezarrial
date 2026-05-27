@@ -31,4 +31,5 @@ class User extends Authenticatable
     public function people() { return $this->hasMany(Person::class); }
     public function transactions() { return $this->hasMany(Transaction::class); }
     public function backups() { return $this->hasMany(Backup::class); }
+    public function smsPatterns() { return $this->hasMany(SmsPattern::class); }
 }

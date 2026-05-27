@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Import;
+use App\Models\SmsPattern;
 use App\Services\Import\SmsParserService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,7 +13,10 @@ class ImportController extends Controller
 {
     public function index(): View
     {
-        return view('imports.index', ['imports' => Import::forUser(auth()->user())->latest()->get()]);
+        return view('imports.index', [
+            'imports' => Import::forUser(auth()->user())->latest()->get(),
+            'smsPatterns' => SmsPattern::forUser(auth()->user())->latest()->get(),
+        ]);
     }
 
     public function csv(Request $request): RedirectResponse
@@ -26,9 +30,16 @@ class ImportController extends Controller
 
     public function smsPreview(Request $request, SmsParserService $parser): View
     {
-        $request->validate(['sms_text' => ['required', 'string', 'max:2000']]);
+        $request->validate([
+            'sms_text' => ['required', 'string', 'max:2000'],
+            'sms_pattern_id' => ['nullable', 'exists:sms_patterns,id'],
+        ]);
 
-        return view('imports.sms-preview', ['parsed' => $parser->parse($request->sms_text)]);
+        $pattern = $request->filled('sms_pattern_id')
+            ? SmsPattern::forUser($request->user())->findOrFail($request->sms_pattern_id)
+            : null;
+
+        return view('imports.sms-preview', ['parsed' => $parser->parse($request->sms_text, $pattern)]);
     }
 
     public function smsConfirm(Request $request): RedirectResponse
@@ -37,5 +48,31 @@ class ImportController extends Controller
         Import::create(['user_id' => auth()->id(), 'type' => 'sms_text', 'status' => 'completed', 'total_rows' => 1, 'imported_rows' => 0]);
 
         return redirect()->route('imports.index')->with('status', 'پیش‌نمایش پیامک تایید شد. ساخت تراکنش نهایی از فرم تراکنش انجام می‌شود.');
+    }
+
+    public function storeSmsPattern(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:160'],
+            'bank_name' => ['nullable', 'string', 'max:120'],
+            'pattern' => ['required', 'string', 'max:2000'],
+            'debit_keywords' => ['nullable', 'string', 'max:500'],
+            'credit_keywords' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        SmsPattern::create([
+            ...$data,
+            'user_id' => auth()->id(),
+            'debit_keywords' => $this->keywords($data['debit_keywords'] ?? ''),
+            'credit_keywords' => $this->keywords($data['credit_keywords'] ?? ''),
+            'is_active' => true,
+        ]);
+
+        return back()->with('status', 'الگوی پیامک ذخیره شد.');
+    }
+
+    private function keywords(string $value): array
+    {
+        return collect(explode(',', $value))->map(fn ($item) => trim($item))->filter()->values()->all();
     }
 }

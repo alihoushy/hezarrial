@@ -12,6 +12,7 @@ use App\Models\Loan;
 use App\Models\Person;
 use App\Models\RecurringTransaction;
 use App\Models\Reminder;
+use App\Models\SmsPattern;
 use App\Models\Transaction;
 use App\Policies\UserOwnedPolicy;
 use Illuminate\Support\Facades\Gate;
@@ -33,7 +34,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        foreach ([Account::class, Backup::class, Budget::class, Category::class, Check::class, Debt::class, Loan::class, Person::class, RecurringTransaction::class, Reminder::class, Transaction::class] as $model) {
+        foreach ([Account::class, Backup::class, Budget::class, Category::class, Check::class, Debt::class, Loan::class, Person::class, RecurringTransaction::class, Reminder::class, SmsPattern::class, Transaction::class] as $model) {
             Gate::policy($model, UserOwnedPolicy::class);
         }
 

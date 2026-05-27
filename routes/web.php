@@ -89,6 +89,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/imports/csv', [ImportController::class, 'csv'])->name('imports.csv');
     Route::post('/imports/sms-preview', [ImportController::class, 'smsPreview'])->name('imports.sms-preview');
     Route::post('/imports/sms-confirm', [ImportController::class, 'smsConfirm'])->name('imports.sms-confirm');
+    Route::post('/imports/sms-patterns', [ImportController::class, 'storeSmsPattern'])->name('imports.sms-patterns.store');
 
     Route::get('/settings', [SettingsController::class, 'edit'])->name('settings.index');
     Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');
