@@ -105,6 +105,19 @@ php artisan route:list
 php artisan test
 ```
 
+## CI/CD و Docker
+
+پروژه شامل Dockerfile production، compose فایل VPS، و GitHub Actions برای CI/CD است:
+
+```text
+Dockerfile
+compose.prod.yaml
+.github/workflows/ci-cd.yml
+docs/ci-cd.md
+```
+
+راهنمای کامل آماده‌سازی VPS، secrets، deploy، rollback و تست local Docker در [docs/ci-cd.md](docs/ci-cd.md) آمده است.
+
 Add the Laravel scheduler on production so reminders for recurring transactions are created daily:
 
 ```cron
