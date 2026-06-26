@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'sms_ingest' => [
+        'token' => env('SMS_INGEST_TOKEN'),
+        'user_id' => env('SMS_INGEST_USER_ID', 1),
+    ],
+
 ];
