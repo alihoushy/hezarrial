@@ -9,7 +9,18 @@ COPY public ./public
 COPY vite.config.js ./
 RUN npm run build
 
-FROM composer:2 AS vendor
+# Built on the same PHP version as the runtime stage: the `composer:2` image
+# floats to the newest PHP, and phpspreadsheet caps at <8.5, so resolving there
+# breaks whenever that image moves ahead of the runtime.
+FROM php:8.3-cli-bookworm AS vendor
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git unzip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
+
 WORKDIR /app
 COPY composer.json composer.lock ./
 COPY app ./app
@@ -20,12 +31,22 @@ COPY public ./public
 COPY resources ./resources
 COPY routes ./routes
 COPY artisan ./
+# gd and zip are compiled into the runtime stage only. This stage installs from
+# the lock file, so package versions are already pinned and skipping the two
+# extension checks cannot change what gets downloaded.
+#
+# --no-scripts because post-autoload-dump boots Laravel to run package:discover,
+# which needs storage/ that this stage never copies. The entrypoint runs
+# package:discover at container start, where storage/ exists.
 RUN composer install \
     --no-dev \
     --no-interaction \
     --prefer-dist \
     --optimize-autoloader \
-    --no-progress
+    --no-progress \
+    --no-scripts \
+    --ignore-platform-req=ext-gd \
+    --ignore-platform-req=ext-zip
 
 FROM php:8.3-fpm-bookworm AS runtime
 
@@ -36,13 +57,18 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         ca-certificates \
         curl \
+        libfreetype6-dev \
         libicu-dev \
+        libjpeg62-turbo-dev \
+        libpng-dev \
         libzip-dev \
         nginx \
         supervisor \
         unzip \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j"$(nproc)" \
         bcmath \
+        gd \
         intl \
         opcache \
         pcntl \

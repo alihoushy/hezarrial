@@ -17,6 +17,8 @@ vendor
 public/build
 public/hot
 public/storage
+bootstrap/cache/*
+!bootstrap/cache/.gitignore
 storage/*.key
 storage/app/private/*
 storage/app/public/*
