@@ -24,10 +24,12 @@ interface ConfirmActionProps {
     method?: Method;
     data?: RequestPayload;
     destructive?: boolean;
+    /** Runs after the request succeeds, e.g. to close a sheet the trigger lives in. */
+    onSuccess?: () => void;
 }
 
 /** Asks before running an action, and stays open with a spinner until it finishes. */
-export function ConfirmAction({ children, title, description, confirmLabel, href, method = 'post', data, destructive = false }: ConfirmActionProps) {
+export function ConfirmAction({ children, title, description, confirmLabel, href, method = 'post', data, destructive = false, onSuccess }: ConfirmActionProps) {
     const [open, setOpen] = useState(false);
     const [processing, setProcessing] = useState(false);
 
@@ -37,6 +39,7 @@ export function ConfirmAction({ children, title, description, confirmLabel, href
             data,
             preserveScroll: true,
             onStart: () => setProcessing(true),
+            onSuccess: () => onSuccess?.(),
             onFinish: () => {
                 setProcessing(false);
                 setOpen(false);
