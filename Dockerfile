@@ -6,7 +6,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
 COPY resources ./resources
 COPY public ./public
-COPY vite.config.js ./
+COPY vite.config.ts tsconfig.json ./
 RUN npm run build
 
 # Built on the same PHP version as the runtime stage: the `composer:2` image
