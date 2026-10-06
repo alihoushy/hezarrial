@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { DirectionProvider } from '@/components/ui/direction';
 import { Toaster } from '@/components/ui/sonner';
 import AppLayout from '@/layouts/app-layout';
+import AuthLayout from '@/layouts/auth-layout';
 
 const APP_NAME = 'هزار ریال';
 
@@ -24,7 +25,7 @@ router.on('networkError', () => {
 createInertiaApp({
     title: (title) => (title ? `${title} · ${APP_NAME}` : APP_NAME),
     pages: './pages',
-    layout: (name) => (name.startsWith('auth/') || name === 'error' ? null : AppLayout),
+    layout: (name) => (name === 'error' ? null : name.startsWith('auth/') ? AuthLayout : AppLayout),
     progress: {
         color: 'var(--color-brand)',
         delay: 250,
