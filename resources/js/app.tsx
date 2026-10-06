@@ -22,6 +22,17 @@ router.on('networkError', () => {
     toast.error('ارتباط با سرور برقرار نشد. اتصال اینترنت را بررسی کنید.');
 });
 
+// Pages are code-split, so the first tap on a tab would wait for its chunk on a slow
+// connection. Fetch the tab pages once the browser is idle (Vite dedupes the chunks).
+const tabPages = import.meta.glob(['./pages/dashboard.tsx', './pages/transactions/index.tsx', './pages/accounts/index.tsx', './pages/settings/index.tsx', './pages/transactions/form.tsx']);
+const warmUp = () => Object.values(tabPages).forEach((load) => void load());
+
+if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(warmUp, { timeout: 4000 });
+} else {
+    setTimeout(warmUp, 2000);
+}
+
 createInertiaApp({
     title: (title) => (title ? `${title} · ${APP_NAME}` : APP_NAME),
     pages: './pages',
