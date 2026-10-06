@@ -1,12 +1,14 @@
 # هزار ریال
 
-یک اپلیکیشن خصوصی حسابداری شخصی فارسی، RTL و موبایل‌اول برای استفاده روی iPhone، ساخته‌شده با Laravel 13، Blade، Livewire، Tailwind CSS و MySQL/MariaDB.
+یک اپلیکیشن خصوصی حسابداری شخصی فارسی، RTL و موبایل‌اول برای استفاده روی iPhone، ساخته‌شده با Laravel 13، Inertia، React، shadcn/ui، Tailwind CSS و MySQL/MariaDB.
 
 ## معماری
 
 - Laravel 13 / PHP 8.3+
-- Blade + Livewire 4 installed, with server-rendered mobile-first UI
-- Tailwind CSS 4 + Vite
+- Inertia 3 + React 19 + TypeScript: controllers return `Inertia::render()`, pages live in `resources/js/pages`
+- [shadcn/ui](https://ui.shadcn.com) (Vega preset, Radix, RTL) in `resources/js/components/ui`, with the Vazirmatn font and a mobile-first light theme
+- Tailwind CSS 4 + Vite; charts with Recharts (loaded on demand)
+- Loading states: deferred props with skeletons, instant page visits, infinite-scroll lists
 - MySQL 8 یا MariaDB 10.11+
 - Eloquent models, migrations, policies, form requests, services
 - Accounting logic lives in services, not controllers:
@@ -44,6 +46,8 @@ php artisan migrate --seed
 npm run build
 php artisan serve
 ```
+
+برای توسعه با hot reload به‌جای `npm run build` از `npm run dev` استفاده کنید. کامپوننت جدید shadcn را با `npx shadcn@latest add <name>` اضافه کنید؛ چون `rtl: true` در `components.json` فعال است، کلاس‌ها خودکار به حالت منطقی (`start`/`end`) تبدیل می‌شوند. بعد از ساخت یا تغییر route، نام‌ها از طریق Ziggy (`route('...')`) در React در دسترس‌اند.
 
 Node 20.19+ is required by the Laravel 13 Vite toolchain. The current workspace had Node 18.19.1, so asset build cannot complete until Node is upgraded.
 
