@@ -124,6 +124,10 @@ Add the Laravel scheduler on production so reminders for recurring transactions 
 * * * * * cd /path/to/hezarrial && php artisan schedule:run >> /dev/null 2>&1
 ```
 
+## هاست اشتراکی (بدون SSH)
+
+برای استقرار روی هاست اشتراکی، بسته آماده آپلود با `deploy/shared-hosting/build.sh` ساخته می‌شود و کارهای دوره‌ای و بعد از آپلود (migrate، کش‌ها، تراکنش‌های تکرارشونده) به فایل‌های PHP پوشه `cron/` تبدیل شده‌اند که از Cron Jobs پنل اجرا می‌شوند. راهنمای کامل: [docs/shared-hosting.md](docs/shared-hosting.md).
+
 ## تست‌ها
 
 تست‌های واحد بدون دیتابیس:
