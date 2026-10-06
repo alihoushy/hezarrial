@@ -2,20 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Presenters\Present;
 use App\Models\Import;
 use App\Models\SmsPattern;
 use App\Services\Import\SmsParserService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class ImportController extends Controller
 {
-    public function index(): View
+    public function index(): Response
     {
-        return view('imports.index', [
-            'imports' => Import::forUser(auth()->user())->latest()->get(),
-            'smsPatterns' => SmsPattern::forUser(auth()->user())->latest()->get(),
+        return Inertia::render('imports/index', [
+            'imports' => Import::forUser(auth()->user())->latest()->limit(20)->get()->map(Present::import(...)),
+            'smsPatterns' => SmsPattern::forUser(auth()->user())->latest()->get()->map(Present::smsPattern(...)),
         ]);
     }
 
@@ -28,7 +30,7 @@ class ImportController extends Controller
         return back()->with('status', 'فایل دریافت شد. مرحله نگاشت ستون‌ها در ادامه تکمیل می‌شود.');
     }
 
-    public function smsPreview(Request $request, SmsParserService $parser): View
+    public function smsPreview(Request $request, SmsParserService $parser): Response
     {
         $request->validate([
             'sms_text' => ['required', 'string', 'max:2000'],
@@ -39,7 +41,7 @@ class ImportController extends Controller
             ? SmsPattern::forUser($request->user())->findOrFail($request->sms_pattern_id)
             : null;
 
-        return view('imports.sms-preview', ['parsed' => $parser->parse($request->sms_text, $pattern)]);
+        return Inertia::render('imports/sms-preview', ['parsed' => $parser->parse($request->sms_text, $pattern)]);
     }
 
     public function smsConfirm(Request $request): RedirectResponse
