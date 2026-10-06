@@ -83,7 +83,8 @@ export function createFormatters(settings: Settings): Formatters {
     const dateFormat = new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long', day: 'numeric' });
     const shortFormat = new Intl.DateTimeFormat(locale, { month: 'long', day: 'numeric' });
     const weekdayShort = new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'long', day: 'numeric' });
-    const longFormat = new Intl.DateTimeFormat(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    // ICU's Persian pattern for weekday + full date is "year month day, weekday", so join the parts ourselves.
+    const weekdayOnly = new Intl.DateTimeFormat(locale, { weekday: 'long' });
     const dayFormat = new Intl.DateTimeFormat(locale, { day: 'numeric' });
     const dateTimeFormat = new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
@@ -112,7 +113,7 @@ export function createFormatters(settings: Settings): Formatters {
 
             return weekdayShort.format(date);
         }),
-        longDate: withDate((date) => longFormat.format(date)),
+        longDate: withDate((date) => `${weekdayOnly.format(date)} ${dateFormat.format(date)}`),
         dayOfMonth: withDate((date) => dayFormat.format(date)),
         dateTime: (value) => {
             if (!value) return '—';

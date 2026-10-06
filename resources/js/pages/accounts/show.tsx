@@ -44,9 +44,11 @@ export default function AccountShow({ account, transactions }: Props) {
                             {[type.label, account.bank_name, account.card_last_four ? `•••• ${format.digits(account.card_last_four)}` : null].filter(Boolean).join(' · ')}
                         </div>
                         <p className="mt-3 text-sm text-white/60">موجودی فعلی</p>
-                        <p className="text-[2rem] leading-tight font-extrabold tabular-nums">
-                            {account.current_balance < 0 ? '−' : ''}
-                            {format.money(Math.abs(account.current_balance))}
+                        <p className="text-[2rem] leading-tight font-extrabold">
+                            <span className="tabular-nums" dir="ltr">
+                                {account.current_balance < 0 ? '−' : ''}
+                                {format.money(Math.abs(account.current_balance))}
+                            </span>
                             <span className="ms-1.5 text-sm font-medium text-white/60">{format.unit}</span>
                         </p>
                         <p className="mt-2 text-xs text-white/50">

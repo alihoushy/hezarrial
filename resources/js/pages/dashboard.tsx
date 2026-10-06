@@ -85,8 +85,11 @@ function BalanceHero({ summary }: { summary: Summary }) {
         <section className="relative overflow-hidden rounded-3xl bg-linear-to-br from-zinc-900 via-zinc-900 to-teal-900 p-5 text-white shadow-lg">
             <div className="pointer-events-none absolute -top-16 -end-10 size-48 rounded-full bg-teal-400/20 blur-3xl" />
             <p className="text-sm text-white/70">موجودی کل حساب‌ها</p>
-            <p className="mt-1 text-[2rem] leading-tight font-extrabold tabular-nums">
-                {format.money(summary.total_balance)}
+            <p className="mt-1 text-[2rem] leading-tight font-extrabold">
+                <span className="tabular-nums" dir="ltr">
+                    {summary.total_balance < 0 ? '−' : ''}
+                    {format.money(Math.abs(summary.total_balance))}
+                </span>
                 <span className="ms-1.5 text-sm font-medium text-white/60">{format.unit}</span>
             </p>
             {format.secondary(summary.total_balance) && <p className="text-xs text-white/50">{format.secondary(summary.total_balance)}</p>}
@@ -109,9 +112,12 @@ function BalanceHero({ summary }: { summary: Summary }) {
             </div>
             <p className="mt-3 text-xs text-white/60">
                 خالص این ماه:{' '}
-                <span className={cn('font-semibold tabular-nums', summary.net >= 0 ? 'text-emerald-300' : 'text-rose-300')}>
-                    {summary.net < 0 ? '−' : ''}
-                    {format.money(Math.abs(summary.net))} {format.unit}
+                <span className={cn('font-semibold', summary.net >= 0 ? 'text-emerald-300' : 'text-rose-300')}>
+                    <span className="tabular-nums" dir="ltr">
+                        {summary.net < 0 ? '−' : ''}
+                        {format.money(Math.abs(summary.net))}
+                    </span>{' '}
+                    {format.unit}
                 </span>
             </p>
         </section>

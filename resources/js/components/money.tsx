@@ -30,7 +30,8 @@ export function Money({ amount, tone = 'none', showSign = false, withSecondary =
             )}
         >
             <span className="whitespace-nowrap">
-                <span className="tabular-nums">
+                {/* An isolated LTR run keeps the sign on the left of the digits instead of drifting to the end. */}
+                <span className="tabular-nums" dir="ltr">
                     {sign}
                     {format.money(Math.abs(amount))}
                 </span>
