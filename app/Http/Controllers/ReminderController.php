@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Presenters\Present;
 use App\Models\Reminder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class ReminderController extends Controller
 {
-    public function index(): View
+    public function index(): Response
     {
-        return view('reminders.index', ['reminders' => Reminder::forUser(auth()->user())->orderBy('due_date')->get()]);
+        return Inertia::render('reminders/index', [
+            'reminders' => Reminder::forUser(auth()->user())->orderBy('due_date')->get()->map(Present::reminder(...)),
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
