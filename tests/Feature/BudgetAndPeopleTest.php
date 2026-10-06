@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Services\Accounting\BudgetService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
 class BudgetAndPeopleTest extends TestCase
@@ -42,9 +43,12 @@ class BudgetAndPeopleTest extends TestCase
         Debt::create(['user_id' => $user->id, 'person_id' => $person->id, 'type' => 'receivable', 'original_amount' => 80000, 'remaining_amount' => 80000, 'status' => 'open']);
 
         $this->actingAs($user)->get(route('people.show', $person))
-            ->assertOk()
-            ->assertSee('بدهی من')
-            ->assertSee('طلب من')
-            ->assertSee('80,000');
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->component('people/show')
+                ->where('person.full_name', 'علی رضایی')
+                ->where('summary.payable', 20000)
+                ->where('summary.receivable', 80000)
+                ->where('summary.net', 60000)
+                ->has('openItems', 2));
     }
 }
