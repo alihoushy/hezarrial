@@ -2,6 +2,7 @@ import '@inertiajs/core';
 import type { route as routeFn } from 'ziggy-js';
 
 export type CurrencyDisplay = 'rial' | 'toman' | 'both';
+export type Theme = 'system' | 'light' | 'dark';
 
 export interface User {
     id: number;
@@ -13,6 +14,7 @@ export interface User {
 export interface Settings {
     currency_display: CurrencyDisplay;
     persian_digits: boolean;
+    theme: Theme;
 }
 
 export interface SharedProps {

@@ -51,6 +51,7 @@ class HandleInertiaRequests extends Middleware
             'settings' => fn () => [
                 'currency_display' => $user?->settings['currency_display'] ?? 'both',
                 'persian_digits' => (bool) ($user?->settings['persian_digits'] ?? true),
+                'theme' => in_array($user?->settings['theme'] ?? null, ['light', 'dark'], true) ? $user->settings['theme'] : 'system',
             ],
             // Plain (non-Inertia) form posts such as file downloads need the
             // current token; the one in the initial HTML goes stale on login.

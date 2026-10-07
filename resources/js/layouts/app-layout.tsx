@@ -2,6 +2,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { ArrowLeftRightIcon, EllipsisIcon, HouseIcon, PlusIcon, WalletIcon, type LucideIcon } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { ResponsiveModal } from '@/components/responsive-modal';
+import { useTheme } from '@/hooks/use-theme';
 import { transactionTypes } from '@/lib/labels';
 import { cn } from '@/lib/utils';
 import type { TransactionType } from '@/types';
@@ -103,6 +104,7 @@ function TabBar() {
 
 export default function AppLayout({ children }: { children: ReactNode }) {
     const { component } = usePage();
+    useTheme();
     const showTabBar = !PAGES_WITHOUT_TAB_BAR.has(component);
 
     return (

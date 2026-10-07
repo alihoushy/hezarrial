@@ -2,6 +2,8 @@ import { usePage } from '@inertiajs/react';
 import { useMemo } from 'react';
 import type { CurrencyDisplay, Settings } from '@/types';
 
+type DisplaySettings = Pick<Settings, 'currency_display' | 'persian_digits'>;
+
 const PERSIAN_DIGITS = '۰۱۲۳۴۵۶۷۸۹';
 
 export function toPersianDigits(value: string): string {
@@ -44,7 +46,7 @@ function sameDay(a: Date, b: Date): boolean {
 }
 
 export interface Formatters {
-    settings: Settings;
+    settings: DisplaySettings;
     /** Plain number in the user's digits, e.g. ۱۲٬۵۰۰. */
     number: (value: number, fractionDigits?: number) => string;
     /** Amount converted to the preferred unit, without the unit label. */
@@ -69,7 +71,7 @@ export interface Formatters {
     fileSize: (bytes: number) => string;
 }
 
-export function createFormatters(settings: Settings): Formatters {
+export function createFormatters(settings: DisplaySettings): Formatters {
     const persian = settings.persian_digits;
     // fa-IR uses the Persian (Solar Hijri) calendar; -nu-latn keeps ASCII digits.
     const locale = persian ? 'fa-IR' : 'fa-IR-u-nu-latn';

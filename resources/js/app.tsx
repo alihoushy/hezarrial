@@ -6,6 +6,7 @@ import { DirectionProvider } from '@/components/ui/direction';
 import { Toaster } from '@/components/ui/sonner';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
+import PlainLayout from '@/layouts/plain-layout';
 
 const APP_NAME = 'هزار ریال';
 
@@ -36,7 +37,7 @@ if ('requestIdleCallback' in window) {
 createInertiaApp({
     title: (title) => (title ? `${title} · ${APP_NAME}` : APP_NAME),
     pages: './pages',
-    layout: (name) => (name === 'error' ? null : name.startsWith('auth/') ? AuthLayout : AppLayout),
+    layout: (name) => (name === 'error' ? PlainLayout : name.startsWith('auth/') ? AuthLayout : AppLayout),
     progress: {
         color: 'var(--color-brand)',
         delay: 250,

@@ -174,6 +174,28 @@ class InertiaPagesTest extends TestCase
             ->assertInertia(fn (AssertableInertia $page) => $page->component('categories/form')->has('errors.name'));
     }
 
+    public function test_saved_theme_is_shared_and_applied_before_first_paint(): void
+    {
+        $this->actingAs($this->user)->get(route('dashboard'))
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('settings.theme', 'system'));
+
+        $this->actingAs($this->user)->put(route('settings.update'), [
+            'currency_display' => 'both',
+            'theme' => 'dark',
+            'recurring_mode' => 'suggestion',
+        ])->assertRedirect();
+
+        $this->get(route('dashboard'))
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('settings.theme', 'dark'));
+
+        // The server renders the class itself, so a dark user never sees a light flash.
+        $this->get(route('dashboard'))->assertSee('<html lang="fa" dir="rtl" class="dark">', false);
+
+        $this->user->forceFill(['settings' => ['theme' => 'neon']])->save();
+        $this->get(route('dashboard'))
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('settings.theme', 'system'));
+    }
+
     public function test_forbidden_and_missing_pages_render_the_error_component(): void
     {
         $other = User::create(['name' => 'دیگری', 'email' => 'other@example.com', 'password' => Hash::make('password-password')]);
