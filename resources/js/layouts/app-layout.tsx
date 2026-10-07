@@ -3,6 +3,7 @@ import { ArrowLeftRightIcon, EllipsisIcon, HouseIcon, PlusIcon, WalletIcon, type
 import { useState, type ReactNode } from 'react';
 import { ResponsiveModal } from '@/components/responsive-modal';
 import { useTheme } from '@/hooks/use-theme';
+import { useLocale } from '@/lib/i18n';
 import { transactionTypes } from '@/lib/labels';
 import { cn } from '@/lib/utils';
 import type { TransactionType } from '@/types';
@@ -104,6 +105,7 @@ function TabBar() {
 
 export default function AppLayout({ children }: { children: ReactNode }) {
     const { component } = usePage();
+    useLocale();
     useTheme();
     const showTabBar = !PAGES_WITHOUT_TAB_BAR.has(component);
 

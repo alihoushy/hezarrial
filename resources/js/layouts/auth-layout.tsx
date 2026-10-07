@@ -1,8 +1,10 @@
 import type { ReactNode } from 'react';
 import { useTheme } from '@/hooks/use-theme';
+import { useLocale } from '@/lib/i18n';
 
 /** Centred, tab-bar-free layout for sign-in and first-run setup. */
 export default function AuthLayout({ children }: { children: ReactNode }) {
+    useLocale();
     useTheme();
 
     return (

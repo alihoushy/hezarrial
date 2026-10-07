@@ -1,9 +1,11 @@
 import type { ComponentProps, ReactNode } from 'react';
 import { JalaliDatePicker } from '@/components/jalali-date-picker';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field';
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
 import { Spinner } from '@/components/ui/spinner';
+import { useFormat } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
 interface FormFieldProps {
@@ -57,9 +59,18 @@ interface DateInputProps {
     'aria-invalid'?: boolean;
 }
 
-/** Persian calendar picker; the form value stays an ISO date. */
-export function DateInput({ onChange, ...props }: DateInputProps) {
-    return <JalaliDatePicker {...props} onChange={(value) => onChange({ target: { value } })} />;
+/**
+ * Persian uses the Jalali calendar sheet; other languages use the device's own
+ * (Gregorian) date picker. Either way the form value is an ISO date.
+ */
+export function DateInput({ onChange, clearable, ...props }: DateInputProps) {
+    const { locale } = useFormat();
+
+    if (locale === 'fa') {
+        return <JalaliDatePicker {...props} clearable={clearable} onChange={(value) => onChange({ target: { value } })} />;
+    }
+
+    return <Input type="date" dir="ltr" className="text-start" {...props} onChange={onChange} />;
 }
 
 export function SubmitButton({ processing, children, className, ...props }: ComponentProps<typeof Button> & { processing?: boolean }) {

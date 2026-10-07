@@ -2,8 +2,7 @@ import '../css/app.css';
 
 import { createInertiaApp, router } from '@inertiajs/react';
 import { toast } from 'sonner';
-import { DirectionProvider } from '@/components/ui/direction';
-import { Toaster } from '@/components/ui/sonner';
+import { Providers } from '@/components/providers';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import PlainLayout from '@/layouts/plain-layout';
@@ -43,16 +42,5 @@ createInertiaApp({
         delay: 250,
         showSpinner: false,
     },
-    withApp: (app) => (
-        <DirectionProvider dir="rtl">
-            {app}
-            <Toaster
-                dir="rtl"
-                position="top-center"
-                offset={{ top: 'calc(env(safe-area-inset-top) + 12px)' }}
-                mobileOffset={{ top: 'calc(env(safe-area-inset-top) + 12px)' }}
-                toastOptions={{ classNames: { toast: 'cn-toast font-sans' } }}
-            />
-        </DirectionProvider>
-    ),
+    withApp: (app) => <Providers>{app}</Providers>,
 });
