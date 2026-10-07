@@ -8,20 +8,21 @@ import { PersonAvatar } from '@/components/person-avatar';
 import { ListSkeleton } from '@/components/skeletons';
 import { Button } from '@/components/ui/button';
 import type { Person } from '@/types';
+import { t } from '@/lib/i18n';
 
 type PersonWithBalance = Person & { balance: number };
 
 export default function PeopleIndex({ people }: { people?: PersonWithBalance[] }) {
     return (
         <>
-            <Head title="اشخاص" />
+            <Head title={t('اشخاص')} />
             <PageHeader
-                title="اشخاص"
+                title={t('اشخاص')}
                 back={route('settings.index')}
                 backComponent="settings/index"
                 actions={
                     <Button size="icon" variant="ghost" className="rounded-full" asChild>
-                        <Link href={route('people.create')} component="people/form" aria-label="شخص جدید">
+                        <Link href={route('people.create')} component="people/form" aria-label={t('شخص جدید')}>
                             <PlusIcon className="size-6" />
                         </Link>
                     </Button>
@@ -33,12 +34,12 @@ export default function PeopleIndex({ people }: { people?: PersonWithBalance[] }
                 ) : people.length === 0 ? (
                     <EmptyState
                         icon={UsersIcon}
-                        title="هنوز شخصی ثبت نشده"
-                        description="اشخاص را برای ثبت طلب، بدهی و چک اضافه کنید."
+                        title={t('هنوز شخصی ثبت نشده')}
+                        description={t('اشخاص را برای ثبت طلب، بدهی و چک اضافه کنید.')}
                         action={
                             <Button asChild>
                                 <Link href={route('people.create')} component="people/form">
-                                    افزودن شخص
+                                    {t('افزودن شخص')}
                                 </Link>
                             </Button>
                         }
@@ -57,7 +58,7 @@ export default function PeopleIndex({ people }: { people?: PersonWithBalance[] }
                                     person.balance !== 0 ? (
                                         <>
                                             <Money amount={Math.abs(person.balance)} tone={person.balance > 0 ? 'income' : 'expense'} className="text-sm font-semibold" />
-                                            <span className="text-xs text-muted-foreground">{person.balance > 0 ? 'طلبکارم' : 'بدهکارم'}</span>
+                                            <span className="text-xs text-muted-foreground">{person.balance > 0 ? t('طلبکارم') : t('بدهکارم')}</span>
                                         </>
                                     ) : undefined
                                 }

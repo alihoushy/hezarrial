@@ -6,16 +6,17 @@ import { ListSkeleton } from '@/components/skeletons';
 import { GroupedTransactions } from '@/components/transaction-list';
 import { Button } from '@/components/ui/button';
 import type { Paginated, Transaction } from '@/types';
+import { t } from '@/lib/i18n';
 
 export default function TransactionsIndex({ transactions }: { transactions?: Paginated<Transaction> }) {
     return (
         <>
-            <Head title="تراکنش‌ها" />
+            <Head title={t('تراکنش‌ها')} />
             <PageHeader
-                title="تراکنش‌ها"
+                title={t('تراکنش‌ها')}
                 actions={
                     <Button size="icon" variant="ghost" className="rounded-full" asChild>
-                        <Link href={route('transactions.create')} component="transactions/form" aria-label="ثبت تراکنش">
+                        <Link href={route('transactions.create')} component="transactions/form" aria-label={t('ثبت تراکنش')}>
                             <PlusIcon className="size-6" />
                         </Link>
                     </Button>
@@ -27,12 +28,12 @@ export default function TransactionsIndex({ transactions }: { transactions?: Pag
                 ) : transactions.data.length === 0 ? (
                     <EmptyState
                         icon={ReceiptTextIcon}
-                        title="هنوز تراکنشی ثبت نشده"
-                        description="اولین درآمد یا هزینه خود را ثبت کنید تا اینجا نمایش داده شود."
+                        title={t('هنوز تراکنشی ثبت نشده')}
+                        description={t('اولین درآمد یا هزینه خود را ثبت کنید تا اینجا نمایش داده شود.')}
                         action={
                             <Button asChild>
                                 <Link href={route('transactions.create')} component="transactions/form">
-                                    ثبت تراکنش
+                                    {t('ثبت تراکنش')}
                                 </Link>
                             </Button>
                         }

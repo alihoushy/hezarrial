@@ -8,6 +8,7 @@ import { FieldGroup } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import type { Category, CategoryOption, CategoryType } from '@/types';
+import { t } from '@/lib/i18n';
 
 const SWATCHES = ['#14b8a6', '#10b981', '#3b82f6', '#6366f1', '#a855f7', '#ec4899', '#ef4444', '#f97316', '#eab308', '#64748b'];
 
@@ -37,46 +38,46 @@ export default function CategoryForm({ category, parents = [] }: Props) {
 
     return (
         <>
-            <Head title={editing ? 'ویرایش دسته‌بندی' : 'دسته‌بندی جدید'} />
-            <PageHeader title={editing ? 'ویرایش دسته‌بندی' : 'دسته‌بندی جدید'} back={route('categories.index')} backComponent="categories/index" />
+            <Head title={editing ? t('ویرایش دسته‌بندی') : t('دسته‌بندی جدید')} />
+            <PageHeader title={editing ? t('ویرایش دسته‌بندی') : t('دسته‌بندی جدید')} back={route('categories.index')} backComponent="categories/index" />
             <PageBody className="pt-5">
                 <form onSubmit={submit} noValidate>
                     <FieldGroup className="gap-6">
-                        <FormField label="نام" htmlFor="name" error={form.errors.name}>
+                        <FormField label={t('نام')} htmlFor="name" error={form.errors.name}>
                             <Input
                                 id="name"
                                 autoFocus={!editing}
                                 value={form.data.name}
                                 onChange={(event) => form.setData('name', event.target.value)}
-                                placeholder="مثلاً: خوراک"
+                                placeholder={t('مثلاً: خوراک')}
                                 aria-invalid={form.errors.name ? true : undefined}
                             />
                         </FormField>
 
-                        <FormField label="نوع" htmlFor="type" error={form.errors.type}>
+                        <FormField label={t('نوع')} htmlFor="type" error={form.errors.type}>
                             <SelectField
                                 id="type"
                                 value={form.data.type}
                                 onChange={(event) => form.setData('type', event.target.value as CategoryType)}
                                 options={[
-                                    { value: 'expense', label: 'هزینه' },
-                                    { value: 'income', label: 'درآمد' },
+                                    { value: 'expense', label: t('هزینه') },
+                                    { value: 'income', label: t('درآمد') },
                                 ]}
                             />
                         </FormField>
 
-                        <FormField label="دسته والد" htmlFor="parent_id" optional error={form.errors.parent_id}>
+                        <FormField label={t('دسته والد')} htmlFor="parent_id" optional error={form.errors.parent_id}>
                             <SelectField
                                 id="parent_id"
                                 value={form.data.parent_id}
                                 onChange={(event) => form.setData('parent_id', event.target.value)}
-                                placeholder="ندارد"
+                                placeholder={t('ندارد')}
                                 options={parents.map((parent) => ({ value: parent.id, label: parent.name }))}
                             />
                         </FormField>
 
-                        <FormField label="رنگ" error={form.errors.color}>
-                            <div className="flex flex-wrap gap-3" role="radiogroup" aria-label="رنگ">
+                        <FormField label={t('رنگ')} error={form.errors.color}>
+                            <div className="flex flex-wrap gap-3" role="radiogroup" aria-label={t('رنگ')}>
                                 {SWATCHES.map((color) => (
                                     <button
                                         key={color}
@@ -94,19 +95,19 @@ export default function CategoryForm({ category, parents = [] }: Props) {
 
                         <div className="flex flex-col gap-2.5 pt-2">
                             <SubmitButton size="lg" processing={form.processing}>
-                                ذخیره
+                                {t('ذخیره')}
                             </SubmitButton>
                             {category && (
                                 <ConfirmAction
-                                    title="بایگانی دسته‌بندی؟"
-                                    description="دسته‌بندی از فهرست حذف می‌شود ولی تراکنش‌های قبلی آن باقی می‌ماند."
-                                    confirmLabel="بایگانی"
+                                    title={t('بایگانی دسته‌بندی؟')}
+                                    description={t('دسته‌بندی از فهرست حذف می‌شود ولی تراکنش‌های قبلی آن باقی می‌ماند.')}
+                                    confirmLabel={t('بایگانی')}
                                     href={route('categories.destroy', category.id)}
                                     method="delete"
                                     destructive
                                 >
                                     <Button type="button" size="lg" variant="destructive">
-                                        بایگانی دسته‌بندی
+                                        {t('بایگانی دسته‌بندی')}
                                     </Button>
                                 </ConfirmAction>
                             )}

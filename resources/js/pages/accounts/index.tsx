@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { useFormat } from '@/lib/format';
 import { accountTypes } from '@/lib/labels';
 import type { Account } from '@/types';
+import { t } from '@/lib/i18n';
 
 function AccountRow({ account }: { account: Account }) {
     const format = useFormat();
@@ -25,10 +26,10 @@ function AccountRow({ account }: { account: Account }) {
             title={
                 <span className="flex items-center gap-2">
                     {account.name}
-                    {!account.is_active && <Badge variant="secondary">غیرفعال</Badge>}
+                    {!account.is_active && <Badge variant="secondary">{t('غیرفعال')}</Badge>}
                 </span>
             }
-            subtitle={details || type.label}
+            subtitle={details || t(type.label)}
             trailing={<Money amount={account.current_balance} className="text-[0.95rem] font-semibold" />}
             chevron
         />
@@ -42,12 +43,12 @@ export default function AccountsIndex({ accounts }: { accounts?: Account[] }) {
 
     return (
         <>
-            <Head title="حساب‌ها" />
+            <Head title={t('حساب‌ها')} />
             <PageHeader
-                title="حساب‌ها"
+                title={t('حساب‌ها')}
                 actions={
                     <Button size="icon" variant="ghost" className="rounded-full" asChild>
-                        <Link href={route('accounts.create')} component="accounts/form" aria-label="حساب جدید">
+                        <Link href={route('accounts.create')} component="accounts/form" aria-label={t('حساب جدید')}>
                             <PlusIcon className="size-6" />
                         </Link>
                     </Button>
@@ -62,12 +63,12 @@ export default function AccountsIndex({ accounts }: { accounts?: Account[] }) {
                 ) : accounts.length === 0 ? (
                     <EmptyState
                         icon={LandmarkIcon}
-                        title="هنوز حسابی ندارید"
-                        description="حساب بانکی، کارت، کیف پول یا پول نقد خود را اضافه کنید."
+                        title={t('هنوز حسابی ندارید')}
+                        description={t('حساب بانکی، کارت، کیف پول یا پول نقد خود را اضافه کنید.')}
                         action={
                             <Button asChild>
                                 <Link href={route('accounts.create')} component="accounts/form">
-                                    افزودن حساب
+                                    {t('افزودن حساب')}
                                 </Link>
                             </Button>
                         }
@@ -75,7 +76,7 @@ export default function AccountsIndex({ accounts }: { accounts?: Account[] }) {
                 ) : (
                     <>
                         <section className="rounded-3xl bg-card p-5 ring-1 ring-foreground/5">
-                            <p className="text-sm text-muted-foreground">جمع موجودی {format.number(active.length)} حساب فعال</p>
+                            <p className="text-sm text-muted-foreground">{t('جمع موجودی :count حساب فعال', { count: format.number(active.length) })}</p>
                             <Money amount={total} withSecondary className="mt-1 text-[1.75rem] font-extrabold" />
                         </section>
 

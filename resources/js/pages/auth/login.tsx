@@ -5,6 +5,7 @@ import { PasswordInput } from '@/components/password-input';
 import { FieldGroup } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { toLatinDigits } from '@/lib/format';
+import { t } from '@/lib/i18n';
 
 export default function Login() {
     const form = useForm({ login: '', password: '' });
@@ -18,15 +19,15 @@ export default function Login() {
 
     return (
         <>
-            <Head title="ورود" />
+            <Head title={t('ورود')} />
             <div className="flex flex-col gap-6 rounded-3xl bg-card p-6 ring-1 ring-foreground/5">
                 <div className="flex flex-col gap-1">
-                    <h1 className="text-xl font-extrabold">ورود امن</h1>
-                    <p className="text-sm text-muted-foreground">برای مدیریت مالی شخصی وارد شوید.</p>
+                    <h1 className="text-xl font-extrabold">{t('ورود امن')}</h1>
+                    <p className="text-sm text-muted-foreground">{t('برای مدیریت مالی شخصی وارد شوید.')}</p>
                 </div>
                 <form onSubmit={submit} noValidate>
                     <FieldGroup className="gap-5">
-                        <FormField label="ایمیل یا موبایل" htmlFor="login" error={form.errors.login}>
+                        <FormField label={t('ایمیل یا موبایل')} htmlFor="login" error={form.errors.login}>
                             <Input
                                 id="login"
                                 dir="ltr"
@@ -41,7 +42,7 @@ export default function Login() {
                                 aria-invalid={form.errors.login ? true : undefined}
                             />
                         </FormField>
-                        <FormField label="رمز عبور" htmlFor="password" error={form.errors.password}>
+                        <FormField label={t('رمز عبور')} htmlFor="password" error={form.errors.password}>
                             <PasswordInput
                                 id="password"
                                 autoComplete="current-password"
@@ -51,7 +52,7 @@ export default function Login() {
                             />
                         </FormField>
                         <SubmitButton size="lg" processing={form.processing}>
-                            ورود
+                            {t('ورود')}
                         </SubmitButton>
                     </FieldGroup>
                 </form>
