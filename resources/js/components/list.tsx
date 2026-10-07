@@ -3,6 +3,7 @@ import { ChevronLeftIcon, type LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Badge } from '@/components/ui/badge';
 import type { Tone } from '@/lib/labels';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 /** An inset, grouped list card in the style of iOS settings. */
@@ -81,7 +82,7 @@ const toneClasses: Record<Tone, string> = {
 export function StatusBadge({ label, tone }: { label: string; tone: Tone }) {
     return (
         <Badge variant="secondary" className={cn('font-medium', toneClasses[tone])}>
-            {label}
+            {t(label)}
         </Badge>
     );
 }

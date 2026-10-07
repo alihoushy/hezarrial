@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, type ComponentProps } from 'react';
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
 import { toLatinDigits, toPersianDigits, useFormat } from '@/lib/format';
 import { cn } from '@/lib/utils';
+import { t } from '@/lib/i18n';
 
 interface AmountInputProps extends Omit<ComponentProps<'input'>, 'value' | 'onChange' | 'size'> {
     /** Raw amount in rial as an ASCII string, e.g. "-12500" or "". */
@@ -26,7 +27,7 @@ function group(raw: string, persian: boolean): string {
     }
 
     const negative = raw.startsWith('-');
-    const grouped = raw.replace('-', '').replace(/\B(?=(\d{3})+(?!\d))/g, persian ? '٬' : ',');
+    const grouped = raw.replace('-', '').replace(/\B(?=(\d{3})+(?!\d))/g, persian ? t('٬') : ',');
     const text = (negative ? '-' : '') + grouped;
 
     return persian ? toPersianDigits(text) : text;
@@ -90,25 +91,24 @@ export function AmountInput({ value, onValueChange, allowNegative = false, size 
                     {...props}
                 />
                 <InputGroupAddon align="inline-end" className="text-muted-foreground">
-                    ریال
+                    {t('ریال')}
                 </InputGroupAddon>
                 {allowNegative && (
                     <InputGroupAddon align="inline-start">
                         <InputGroupButton
                             size="xs"
                             variant={negative ? 'secondary' : 'ghost'}
-                            aria-label="تغییر علامت"
+                            aria-label={t('تغییر علامت')}
                             onClick={() => onValueChange(negative ? value.slice(1) : `-${value}`)}
                         >
-                            {negative ? 'منفی' : '±'}
+                            {negative ? t('منفی') : '±'}
                         </InputGroupButton>
                     </InputGroupAddon>
                 )}
             </InputGroup>
             {absolute > 0 && (
                 <p className="px-1 text-xs text-muted-foreground">
-                    معادل {negative ? 'منفی ' : ''}
-                    {format.number(Math.round(absolute / 10))} تومان
+                    {t(negative ? 'معادل منفی :amount تومان' : 'معادل :amount تومان', { amount: format.number(Math.round(absolute / 10)) })}
                 </p>
             )}
         </div>

@@ -1,6 +1,7 @@
 import { Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, XAxis } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
 import { todayIso, useFormat } from '@/lib/format';
+import { t } from '@/lib/i18n';
 
 export interface Charts {
     daily: { date: string; income: number; expense: number }[];
@@ -24,22 +25,22 @@ export function MonthTrend({ daily }: { daily: Charts['daily'] }) {
         });
 
     const config = {
-        income: { label: 'درآمد', color: 'var(--income)' },
-        expense: { label: 'هزینه', color: 'var(--expense)' },
+        income: { label: t('درآمد'), color: 'var(--income)' },
+        expense: { label: t('هزینه'), color: 'var(--expense)' },
     } satisfies ChartConfig;
 
     return (
         <div className="rounded-2xl bg-card p-4 ring-1 ring-foreground/5">
             <div className="mb-3 flex items-center justify-between">
-                <h3 className="font-bold">روند این ماه</h3>
+                <h3 className="font-bold">{t('روند این ماه')}</h3>
                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1.5">
                         <span className="size-2 rounded-full bg-income" />
-                        درآمد
+                        {t('درآمد')}
                     </span>
                     <span className="flex items-center gap-1.5">
                         <span className="size-2 rounded-full bg-expense" />
-                        هزینه
+                        {t('هزینه')}
                     </span>
                 </div>
             </div>
@@ -99,15 +100,15 @@ export function CategorySpending({ categories }: { categories: Charts['categorie
     if (categories.length === 0) {
         return (
             <div className="rounded-2xl bg-card p-4 ring-1 ring-foreground/5">
-                <h3 className="font-bold">هزینه بر اساس دسته</h3>
-                <p className="py-6 text-center text-sm text-muted-foreground">این ماه هنوز هزینه‌ای ثبت نشده است.</p>
+                <h3 className="font-bold">{t('هزینه بر اساس دسته')}</h3>
+                <p className="py-6 text-center text-sm text-muted-foreground">{t('این ماه هنوز هزینه‌ای ثبت نشده است.')}</p>
             </div>
         );
     }
 
     return (
         <div className="rounded-2xl bg-card p-4 ring-1 ring-foreground/5">
-            <h3 className="mb-2 font-bold">هزینه بر اساس دسته</h3>
+            <h3 className="mb-2 font-bold">{t('هزینه بر اساس دسته')}</h3>
             <div className="flex items-center gap-4">
                 <ChartContainer config={{}} className="aspect-square h-32 shrink-0">
                     <PieChart>
@@ -123,7 +124,7 @@ export function CategorySpending({ categories }: { categories: Charts['categorie
                         <li key={category.name} className="flex items-center gap-2 text-sm">
                             <span className="size-2.5 shrink-0 rounded-full" style={{ background: colorOf(index) }} />
                             <span className="min-w-0 flex-1 truncate">{category.name}</span>
-                            <span className="shrink-0 text-xs text-muted-foreground tabular-nums">{format.number(total ? Math.round((category.value / total) * 100) : 0)}٪</span>
+                            <span className="shrink-0 text-xs text-muted-foreground tabular-nums">{t(':percent٪', { percent: format.number(total ? Math.round((category.value / total) * 100) : 0) })}</span>
                         </li>
                     ))}
                 </ul>

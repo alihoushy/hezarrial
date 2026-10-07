@@ -7,6 +7,7 @@ import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
 import { Spinner } from '@/components/ui/spinner';
 import { useFormat } from '@/lib/format';
 import { cn } from '@/lib/utils';
+import { t } from '@/lib/i18n';
 
 interface FormFieldProps {
     label: ReactNode;
@@ -23,7 +24,7 @@ export function FormField({ label, htmlFor, error, description, optional, classN
         <Field data-invalid={error ? true : undefined} className={cn('gap-2', className)}>
             <FieldLabel htmlFor={htmlFor} className="text-foreground">
                 {label}
-                {optional && <span className="text-xs font-normal text-muted-foreground">(اختیاری)</span>}
+                {optional && <span className="text-xs font-normal text-muted-foreground">{t('(اختیاری)')}</span>}
             </FieldLabel>
             {children}
             {description && !error && <FieldDescription className="text-xs">{description}</FieldDescription>}

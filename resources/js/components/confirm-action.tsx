@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
+import { t } from '@/lib/i18n';
 
 interface ConfirmActionProps {
     /** The element that opens the confirmation (rendered as the trigger). */
@@ -56,7 +57,7 @@ export function ConfirmAction({ children, title, description, confirmLabel, href
                     {description && <AlertDialogDescription>{description}</AlertDialogDescription>}
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel disabled={processing}>انصراف</AlertDialogCancel>
+                    <AlertDialogCancel disabled={processing}>{t('انصراف')}</AlertDialogCancel>
                     <Button variant={destructive ? 'destructive' : 'default'} disabled={processing} onClick={confirm}>
                         {processing && <Spinner />}
                         {confirmLabel}
