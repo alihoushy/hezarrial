@@ -104,26 +104,26 @@
     --tab-bar-height: calc(4.25rem + env(safe-area-inset-bottom));
 }
 
-/* Dark tokens are kept for the next phase; nothing switches to them yet. */
+/* Dark: the same cool hue as the light palette, with cards lifted off a near-black ground. */
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
+    --background: oklch(0.145 0.006 264.5);
+    --foreground: oklch(0.965 0.003 264.5);
+    --card: oklch(0.2 0.007 264.5);
+    --card-foreground: oklch(0.965 0.003 264.5);
+    --popover: oklch(0.225 0.008 264.5);
+    --popover-foreground: oklch(0.965 0.003 264.5);
+    --primary: oklch(0.93 0.004 264.5);
+    --primary-foreground: oklch(0.2 0.007 264.5);
+    --secondary: oklch(0.27 0.009 264.5);
+    --secondary-foreground: oklch(0.965 0.003 264.5);
+    --muted: oklch(0.25 0.008 264.5);
+    --muted-foreground: oklch(0.72 0.012 264.5);
+    --accent: oklch(0.27 0.009 264.5);
+    --accent-foreground: oklch(0.965 0.003 264.5);
     --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
+    --border: oklch(1 0 0 / 9%);
+    --input: oklch(1 0 0 / 14%);
+    --ring: oklch(0.6 0.012 264.5);
     --income: oklch(0.7 0.14 162);
     --expense: oklch(0.7 0.17 17);
     --warning: oklch(0.78 0.15 70);
@@ -142,6 +142,15 @@
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.556 0 0);
+}
+
+/* Native controls (date wheels, scrollbars, autofill) follow the theme. */
+:root {
+    color-scheme: light;
+}
+
+.dark {
+    color-scheme: dark;
 }
 
 @layer base {

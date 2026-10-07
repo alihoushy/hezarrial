@@ -82,7 +82,7 @@ function BalanceHero({ summary }: { summary: Summary }) {
     const format = useFormat();
 
     return (
-        <section className="relative overflow-hidden rounded-3xl bg-linear-to-br from-zinc-900 via-zinc-900 to-teal-900 p-5 text-white shadow-lg">
+        <section className="relative overflow-hidden rounded-3xl bg-linear-to-br from-zinc-900 via-zinc-900 to-teal-900 p-5 text-white shadow-lg ring-1 ring-white/10">
             <div className="pointer-events-none absolute -top-16 -end-10 size-48 rounded-full bg-teal-400/20 blur-3xl" />
             <p className="text-sm text-white/70">موجودی کل حساب‌ها</p>
             <p className="mt-1 text-[2rem] leading-tight font-extrabold">

@@ -38,7 +38,7 @@ export default function AccountShow({ account, transactions }: Props) {
             />
             <PageBody>
                 {account && type ? (
-                    <section className="rounded-3xl bg-linear-to-br from-zinc-900 to-teal-900 p-5 text-white shadow-lg">
+                    <section className="rounded-3xl bg-linear-to-br from-zinc-900 to-teal-900 p-5 text-white shadow-lg ring-1 ring-white/10">
                         <div className="flex items-center gap-2 text-sm text-white/75">
                             <type.icon className="size-4" />
                             {[type.label, account.bank_name, account.card_last_four ? `•••• ${format.digits(account.card_last_four)}` : null].filter(Boolean).join(' · ')}
