@@ -59,7 +59,7 @@ class SimpleModuleController extends Controller
         $data = $request->validate(['full_name' => ['required', 'string', 'max:160'], 'mobile' => ['nullable', 'string', 'max:30'], 'description' => ['nullable', 'string', 'max:1000']]);
         Person::create([...$data, 'user_id' => auth()->id(), 'avatar_color' => '#5b8def']);
 
-        return redirect()->route('people.index')->with('status', 'شخص ذخیره شد.');
+        return redirect()->route('people.index')->with('status', __('شخص ذخیره شد.'));
     }
 
     public function showPerson(Person $person): Response
@@ -96,7 +96,7 @@ class SimpleModuleController extends Controller
         $this->authorize('update', $person);
         $person->update($request->validate(['full_name' => ['required', 'string', 'max:160'], 'mobile' => ['nullable', 'string', 'max:30'], 'description' => ['nullable', 'string', 'max:1000']]));
 
-        return redirect()->route('people.show', $person)->with('status', 'شخص به‌روز شد.');
+        return redirect()->route('people.show', $person)->with('status', __('شخص به‌روز شد.'));
     }
 
     public function deletePerson(Person $person): RedirectResponse
@@ -104,7 +104,7 @@ class SimpleModuleController extends Controller
         $this->authorize('delete', $person);
         $person->delete();
 
-        return redirect()->route('people.index')->with('status', 'شخص حذف شد.');
+        return redirect()->route('people.index')->with('status', __('شخص حذف شد.'));
     }
 
     public function debts(): Response
@@ -122,7 +122,7 @@ class SimpleModuleController extends Controller
     {
         Debt::create([...$request->validated(), 'user_id' => auth()->id(), 'remaining_amount' => $request->original_amount, 'status' => 'open']);
 
-        return back()->with('status', 'مورد طلب/بدهی ثبت شد.');
+        return back()->with('status', __('مورد طلب/بدهی ثبت شد.'));
     }
 
     public function settleDebt(SettlementRequest $request, Debt $debt, DebtService $service): RedirectResponse
@@ -130,7 +130,7 @@ class SimpleModuleController extends Controller
         $this->authorize('update', $debt);
         $service->settle($debt, $request->validated());
 
-        return back()->with('status', 'تسویه ثبت شد.');
+        return back()->with('status', __('تسویه ثبت شد.'));
     }
 
     public function loans(): Response
@@ -146,7 +146,7 @@ class SimpleModuleController extends Controller
         $data = $request->validate(['account_id' => ['required', Rule::exists('accounts', 'id')->where('user_id', auth()->id())], 'title' => ['required', 'string', 'max:160'], 'principal_amount' => ['required', 'numeric', 'min:0.01'], 'total_payable_amount' => ['required', 'numeric', 'min:0.01'], 'installment_amount' => ['required', 'numeric', 'min:0.01'], 'installment_count' => ['required', 'integer', 'min:1', 'max:240'], 'start_date' => ['required', 'date'], 'lender_name' => ['nullable', 'string', 'max:160']]);
         $service->create(auth()->user(), $data + ['period' => 'monthly']);
 
-        return back()->with('status', 'وام و برنامه اقساط ساخته شد.');
+        return back()->with('status', __('وام و برنامه اقساط ساخته شد.'));
     }
 
     public function showLoan(Loan $loan): Response
@@ -166,7 +166,7 @@ class SimpleModuleController extends Controller
         abort_unless($installment->loan_id === $loan->id, 404);
         $service->payInstallment($installment, $request->validate(['account_id' => ['required', Rule::exists('accounts', 'id')->where('user_id', auth()->id())], 'transaction_date' => ['nullable', 'date']]));
 
-        return back()->with('status', 'قسط پرداخت شد.');
+        return back()->with('status', __('قسط پرداخت شد.'));
     }
 
     public function checks(): Response
@@ -184,7 +184,7 @@ class SimpleModuleController extends Controller
     {
         Check::create([...$request->validate(['type' => ['required', 'in:payable,receivable'], 'amount' => ['required', 'numeric', 'min:0.01'], 'due_date' => ['required', 'date'], 'check_number' => ['nullable', 'string', 'max:80'], 'bank_name' => ['nullable', 'string', 'max:120'], 'person_id' => ['nullable', Rule::exists('people', 'id')->where('user_id', auth()->id())], 'account_id' => ['nullable', Rule::exists('accounts', 'id')->where('user_id', auth()->id())]]), 'user_id' => auth()->id(), 'status' => 'pending']);
 
-        return back()->with('status', 'چک ثبت شد.');
+        return back()->with('status', __('چک ثبت شد.'));
     }
 
     public function passCheck(Request $request, Check $check, CheckService $service): RedirectResponse
@@ -192,7 +192,7 @@ class SimpleModuleController extends Controller
         $this->authorize('update', $check);
         $service->pass($check, $request->validate(['account_id' => ['required', Rule::exists('accounts', 'id')->where('user_id', auth()->id())]]));
 
-        return back()->with('status', 'چک پاس شد.');
+        return back()->with('status', __('چک پاس شد.'));
     }
 
     public function bounceCheck(Check $check): RedirectResponse
@@ -200,7 +200,7 @@ class SimpleModuleController extends Controller
         $this->authorize('update', $check);
         $check->update(['status' => 'bounced']);
 
-        return back()->with('status', 'چک برگشتی ثبت شد.');
+        return back()->with('status', __('چک برگشتی ثبت شد.'));
     }
 
     public function cancelCheck(Check $check): RedirectResponse
@@ -208,7 +208,7 @@ class SimpleModuleController extends Controller
         $this->authorize('update', $check);
         $check->update(['status' => 'cancelled']);
 
-        return back()->with('status', 'چک باطل شد.');
+        return back()->with('status', __('چک باطل شد.'));
     }
 
     public function budgets(BudgetService $budgetService): Response
@@ -226,7 +226,7 @@ class SimpleModuleController extends Controller
     {
         Budget::create([...$request->validate(['title' => ['required', 'string', 'max:160'], 'amount' => ['required', 'numeric', 'min:0.01'], 'start_date' => ['required', 'date'], 'end_date' => ['nullable', 'date'], 'category_id' => ['nullable', Rule::exists('categories', 'id')->where('user_id', auth()->id())]]), 'user_id' => auth()->id(), 'period' => 'monthly', 'is_active' => true]);
 
-        return back()->with('status', 'بودجه ثبت شد.');
+        return back()->with('status', __('بودجه ثبت شد.'));
     }
 
     private function accountOptions(): Collection

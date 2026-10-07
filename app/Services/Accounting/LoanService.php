@@ -26,7 +26,7 @@ class LoanService
                 'type' => TransactionType::LoanReceive,
                 'amount' => $loan->principal_amount,
                 'transaction_date' => $loan->start_date,
-                'description' => 'دریافت وام: '.$loan->title,
+                'description' => __('دریافت وام: :title', ['title' => $loan->title]),
             ]);
 
             $date = Carbon::parse($loan->start_date);
@@ -52,7 +52,7 @@ class LoanService
                 'type' => TransactionType::LoanInstallmentPayment,
                 'amount' => $installment->amount,
                 'transaction_date' => $data['transaction_date'] ?? now()->toDateString(),
-                'description' => 'پرداخت قسط وام: '.$installment->loan->title,
+                'description' => __('پرداخت قسط وام: :title', ['title' => $installment->loan->title]),
             ]);
 
             $installment->forceFill([

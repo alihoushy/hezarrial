@@ -60,7 +60,7 @@ class ReportService
 
         $categories = $transactions
             ->where('type', TransactionType::Expense)
-            ->groupBy(fn (Transaction $transaction) => $transaction->category?->name ?? 'بدون دسته')
+            ->groupBy(fn (Transaction $transaction) => $transaction->category?->name ?? __('بدون دسته'))
             ->map(fn ($rows, $name) => [
                 'name' => $name,
                 'color' => $rows->first()->category?->color,
@@ -94,31 +94,45 @@ class ReportService
             ->each(fn (LoanInstallment $installment) => $items->push([
                 'key' => 'installment-'.$installment->id,
                 'kind' => 'installment',
-                'title' => 'قسط '.($installment->loan?->title ?? 'وام'),
+                'title' => __('قسط :title', ['title' => $installment->loan?->title ?? __('وام')]),
                 'amount' => (float) $installment->amount,
                 'due_date' => $installment->due_date?->toDateString(),
                 'href' => route('loans.show', $installment->loan_id),
             ]));
 
         Check::forUser($user)->where('status', 'pending')->whereDate('due_date', '<=', Carbon::now()->addDays(30))->orderBy('due_date')->limit(5)->get()
-            ->each(fn (Check $check) => $items->push([
-                'key' => 'check-'.$check->id,
-                'kind' => 'check',
-                'title' => ($check->type->value === 'payable' ? 'چک پرداختنی' : 'چک دریافتنی').($check->check_number ? ' '.$check->check_number : ''),
-                'amount' => (float) $check->amount,
-                'due_date' => $check->due_date?->toDateString(),
-                'href' => route('checks.index'),
-            ]));
+            ->each(function (Check $check) use ($items): void {
+                $payable = $check->type->value === 'payable';
+                $number = $check->check_number;
+
+                $items->push([
+                    'key' => 'check-'.$check->id,
+                    'kind' => 'check',
+                    'title' => match (true) {
+                        $payable && $number !== null => __('چک پرداختنی :number', ['number' => $number]),
+                        $payable => __('چک پرداختنی'),
+                        $number !== null => __('چک دریافتنی :number', ['number' => $number]),
+                        default => __('چک دریافتنی'),
+                    },
+                    'amount' => (float) $check->amount,
+                    'due_date' => $check->due_date?->toDateString(),
+                    'href' => route('checks.index'),
+                ]);
+            });
 
         Debt::forUser($user)->with('person:id,full_name')->whereIn('status', ['open', 'partially_settled', 'overdue'])->orderByRaw('due_date is null, due_date asc')->limit(5)->get()
-            ->each(fn (Debt $debt) => $items->push([
-                'key' => 'debt-'.$debt->id,
-                'kind' => 'debt',
-                'title' => ($debt->type->value === 'payable' ? 'بدهی به ' : 'طلب از ').($debt->person?->full_name ?? 'شخص'),
-                'amount' => (float) $debt->remaining_amount,
-                'due_date' => $debt->due_date?->toDateString(),
-                'href' => $debt->person_id ? route('people.show', $debt->person_id) : route('debts.index'),
-            ]));
+            ->each(function (Debt $debt) use ($items): void {
+                $name = $debt->person?->full_name ?? __('شخص');
+
+                $items->push([
+                    'key' => 'debt-'.$debt->id,
+                    'kind' => 'debt',
+                    'title' => $debt->type->value === 'payable' ? __('بدهی به :name', ['name' => $name]) : __('طلب از :name', ['name' => $name]),
+                    'amount' => (float) $debt->remaining_amount,
+                    'due_date' => $debt->due_date?->toDateString(),
+                    'href' => $debt->person_id ? route('people.show', $debt->person_id) : route('debts.index'),
+                ]);
+            });
 
         return $items
             ->sortBy(fn (array $item) => $item['due_date'] ?? '9999-12-31')

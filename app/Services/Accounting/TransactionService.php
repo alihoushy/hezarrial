@@ -79,14 +79,14 @@ class TransactionService
         }
 
         if (empty($data['category_id'])) {
-            throw ValidationException::withMessages(['category_id' => 'انتخاب دسته‌بندی برای درآمد و هزینه الزامی است.']);
+            throw ValidationException::withMessages(['category_id' => __('انتخاب دسته‌بندی برای درآمد و هزینه الزامی است.')]);
         }
 
         $expected = $type === TransactionType::Income ? CategoryType::Income : CategoryType::Expense;
         $category = Category::forUser($user)->findOrFail($data['category_id']);
 
         if ($category->type !== $expected) {
-            throw ValidationException::withMessages(['category_id' => 'نوع دسته‌بندی با نوع تراکنش هم‌خوان نیست.']);
+            throw ValidationException::withMessages(['category_id' => __('نوع دسته‌بندی با نوع تراکنش هم‌خوان نیست.')]);
         }
     }
 }

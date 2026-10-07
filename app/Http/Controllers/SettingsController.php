@@ -52,6 +52,6 @@ class SettingsController extends Controller
             Cookie::queue(Cookie::forever('locale', $data['locale']));
         }
 
-        return back()->with('status', __('تنظیمات ذخیره شد.'));
+        return back()->with('status', __(__('تنظیمات ذخیره شد.')));
     }
 }

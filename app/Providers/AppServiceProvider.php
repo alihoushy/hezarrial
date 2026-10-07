@@ -59,7 +59,7 @@ class AppServiceProvider extends ServiceProvider
             }
 
             if ($status === 419) {
-                return back()->with('status', 'نشست شما منقضی شده بود. لطفاً دوباره تلاش کنید.');
+                return back()->with('status', __('نشست شما منقضی شده بود. لطفاً دوباره تلاش کنید.'));
             }
 
             // Keep Laravel's debug page for server errors while developing.

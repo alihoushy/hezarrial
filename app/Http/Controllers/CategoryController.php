@@ -32,7 +32,7 @@ class CategoryController extends Controller
             'is_active' => $request->boolean('is_active', true),
         ]);
 
-        return redirect()->route('categories.index')->with('status', 'دسته‌بندی ساخته شد.');
+        return redirect()->route('categories.index')->with('status', __('دسته‌بندی ساخته شد.'));
     }
 
     public function edit(Category $category): Response
@@ -49,7 +49,7 @@ class CategoryController extends Controller
         $category->update($request->validated() + ['is_active' => $request->boolean('is_active', true)]);
         $audit->record('category.updated', $category, $old, $category->fresh()->toArray());
 
-        return redirect()->route('categories.index')->with('status', 'دسته‌بندی به‌روز شد.');
+        return redirect()->route('categories.index')->with('status', __('دسته‌بندی به‌روز شد.'));
     }
 
     public function destroy(Category $category, AuditLogService $audit): RedirectResponse
@@ -60,7 +60,7 @@ class CategoryController extends Controller
         $category->delete();
         $audit->record('category.archived', $category, $old);
 
-        return redirect()->route('categories.index')->with('status', 'دسته‌بندی بایگانی شد.');
+        return redirect()->route('categories.index')->with('status', __('دسته‌بندی بایگانی شد.'));
     }
 
     private function form(Category $category): Response

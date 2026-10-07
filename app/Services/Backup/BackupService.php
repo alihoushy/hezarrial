@@ -93,7 +93,7 @@ class BackupService
     public function restore(User $user, array $payload): array
     {
         if (($payload['schema_version'] ?? null) !== 1) {
-            throw ValidationException::withMessages(['backup' => 'نسخه فایل پشتیبان پشتیبانی نمی‌شود.']);
+            throw ValidationException::withMessages(['backup' => __('نسخه فایل پشتیبان پشتیبانی نمی‌شود.')]);
         }
 
         return DB::transaction(function () use ($user, $payload): array {

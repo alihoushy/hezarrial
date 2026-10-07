@@ -34,7 +34,7 @@ class AccountController extends Controller
             'is_active' => $request->boolean('is_active', true),
         ]);
 
-        return redirect()->route('accounts.show', $account)->with('status', 'حساب ساخته شد.');
+        return redirect()->route('accounts.show', $account)->with('status', __('حساب ساخته شد.'));
     }
 
     public function show(Account $account): Response
@@ -66,7 +66,7 @@ class AccountController extends Controller
         $account->update($request->validated() + ['is_active' => $request->boolean('is_active', true)]);
         $audit->record('account.updated', $account, $old, $account->fresh()->toArray());
 
-        return redirect()->route('accounts.show', $account)->with('status', 'حساب به‌روز شد.');
+        return redirect()->route('accounts.show', $account)->with('status', __('حساب به‌روز شد.'));
     }
 
     public function destroy(Account $account, AuditLogService $audit): RedirectResponse
@@ -77,7 +77,7 @@ class AccountController extends Controller
         $account->delete();
         $audit->record('account.archived', $account, $old);
 
-        return redirect()->route('accounts.index')->with('status', 'حساب بایگانی شد.');
+        return redirect()->route('accounts.index')->with('status', __('حساب بایگانی شد.'));
     }
 
     public function recalculate(Account $account, AccountBalanceService $balances): RedirectResponse
@@ -85,6 +85,6 @@ class AccountController extends Controller
         $this->authorize('update', $account);
         $result = $balances->recalculate($account, true);
 
-        return back()->with('status', 'مانده حساب بازسازی شد. اختلاف: '.number_format($result['difference']));
+        return back()->with('status', __('مانده حساب بازسازی شد. اختلاف: :difference', ['difference' => number_format($result['difference'])]));
     }
 }

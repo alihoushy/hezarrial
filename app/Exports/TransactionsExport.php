@@ -20,7 +20,7 @@ class TransactionsExport implements FromCollection, WithHeadings, WithMapping
 
     public function headings(): array
     {
-        return ['تاریخ', 'نوع', 'مبلغ', 'حساب', 'دسته', 'شخص', 'شرح', 'مرجع'];
+        return [__('تاریخ'), __('نوع'), __('مبلغ'), __('حساب'), __('دسته'), __('شخص'), __('شرح'), __('مرجع')];
     }
 
     public function map($transaction): array
