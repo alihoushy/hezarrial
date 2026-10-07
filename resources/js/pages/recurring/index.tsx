@@ -17,6 +17,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { todayIso, useFormat } from '@/lib/format';
 import { frequencies, recurringTypes } from '@/lib/labels';
 import type { CategoryOption, Option, RecurringItem } from '@/types';
+import { t } from '@/lib/i18n';
 
 interface Props {
     items?: RecurringItem[];
@@ -39,38 +40,38 @@ function NewRecurringSheet({ open, onOpenChange, accounts, categories }: { open:
     };
 
     return (
-        <ResponsiveModal open={open} onOpenChange={onOpenChange} title="تراکنش تکرارشونده" description="در سررسید، یک یادآوری پیشنهادی ساخته می‌شود.">
+        <ResponsiveModal open={open} onOpenChange={onOpenChange} title={t('تراکنش تکرارشونده')} description={t('در سررسید، یک یادآوری پیشنهادی ساخته می‌شود.')}>
             {accounts.length === 0 ? (
-                <p className="py-6 text-center text-sm text-muted-foreground">ابتدا یک حساب بسازید.</p>
+                <p className="py-6 text-center text-sm text-muted-foreground">{t('ابتدا یک حساب بسازید.')}</p>
             ) : (
                 <form onSubmit={submit} noValidate className="pb-4">
                     <FieldGroup className="gap-5">
-                        <FormField label="عنوان" htmlFor="rec_title" error={form.errors.title}>
-                            <Input id="rec_title" value={form.data.title} onChange={(event) => form.setData('title', event.target.value)} placeholder="مثلاً: اجاره خانه" aria-invalid={form.errors.title ? true : undefined} />
+                        <FormField label={t('عنوان')} htmlFor="rec_title" error={form.errors.title}>
+                            <Input id="rec_title" value={form.data.title} onChange={(event) => form.setData('title', event.target.value)} placeholder={t('مثلاً: اجاره خانه')} aria-invalid={form.errors.title ? true : undefined} />
                         </FormField>
-                        <FormField label="نوع" htmlFor="rec_type" error={form.errors.type}>
-                            <SelectField id="rec_type" value={form.data.type} onChange={(event) => form.setData('type', event.target.value)} options={Object.entries(recurringTypes).map(([value, label]) => ({ value, label }))} />
+                        <FormField label={t('نوع')} htmlFor="rec_type" error={form.errors.type}>
+                            <SelectField id="rec_type" value={form.data.type} onChange={(event) => form.setData('type', event.target.value)} options={Object.entries(recurringTypes).map(([value, label]) => ({ value, label: t(label) }))} />
                         </FormField>
-                        <FormField label="مبلغ" htmlFor="rec_amount" error={form.errors.amount}>
+                        <FormField label={t('مبلغ')} htmlFor="rec_amount" error={form.errors.amount}>
                             <AmountInput id="rec_amount" value={form.data.amount} onValueChange={(value) => form.setData('amount', value)} aria-invalid={form.errors.amount ? true : undefined} />
                         </FormField>
-                        <FormField label="حساب" htmlFor="rec_account" error={form.errors.account_id}>
+                        <FormField label={t('حساب')} htmlFor="rec_account" error={form.errors.account_id}>
                             <SelectField id="rec_account" value={form.data.account_id} onChange={(event) => form.setData('account_id', event.target.value)} options={accounts.map((account) => ({ value: account.id, label: account.name }))} />
                         </FormField>
-                        <FormField label="دسته‌بندی" htmlFor="rec_category" optional error={form.errors.category_id}>
-                            <SelectField id="rec_category" value={form.data.category_id} onChange={(event) => form.setData('category_id', event.target.value)} placeholder="بدون دسته" options={categories.map((category) => ({ value: category.id, label: category.name }))} />
+                        <FormField label={t('دسته‌بندی')} htmlFor="rec_category" optional error={form.errors.category_id}>
+                            <SelectField id="rec_category" value={form.data.category_id} onChange={(event) => form.setData('category_id', event.target.value)} placeholder={t('بدون دسته')} options={categories.map((category) => ({ value: category.id, label: category.name }))} />
                         </FormField>
-                        <FormField label="تکرار" htmlFor="rec_frequency" error={form.errors.frequency}>
-                            <SelectField id="rec_frequency" value={form.data.frequency} onChange={(event) => form.setData('frequency', event.target.value)} options={Object.entries(frequencies).map(([value, label]) => ({ value, label }))} />
+                        <FormField label={t('تکرار')} htmlFor="rec_frequency" error={form.errors.frequency}>
+                            <SelectField id="rec_frequency" value={form.data.frequency} onChange={(event) => form.setData('frequency', event.target.value)} options={Object.entries(frequencies).map(([value, label]) => ({ value, label: t(label) }))} />
                         </FormField>
-                        <FormField label="تاریخ اولین اجرا" htmlFor="rec_next" error={form.errors.next_run_date}>
+                        <FormField label={t('تاریخ اولین اجرا')} htmlFor="rec_next" error={form.errors.next_run_date}>
                             <DateInput id="rec_next" value={form.data.next_run_date} onChange={(event) => form.setData('next_run_date', event.target.value)} />
                         </FormField>
-                        <FormField label="توضیح" htmlFor="rec_description" optional error={form.errors.description}>
+                        <FormField label={t('توضیح')} htmlFor="rec_description" optional error={form.errors.description}>
                             <Textarea id="rec_description" rows={2} value={form.data.description} onChange={(event) => form.setData('description', event.target.value)} />
                         </FormField>
                         <SubmitButton size="lg" processing={form.processing}>
-                            ثبت
+                            {t('ثبت')}
                         </SubmitButton>
                     </FieldGroup>
                 </form>
@@ -85,13 +86,13 @@ export default function RecurringIndex({ items, accounts, categories }: Props) {
 
     return (
         <>
-            <Head title="تکرارشونده‌ها" />
+            <Head title={t('تکرارشونده‌ها')} />
             <PageHeader
-                title="تکرارشونده‌ها"
+                title={t('تکرارشونده‌ها')}
                 back={route('settings.index')}
                 backComponent="settings/index"
                 actions={
-                    <Button size="icon" variant="ghost" className="rounded-full" onClick={() => setCreating(true)} aria-label="ثبت تکرارشونده">
+                    <Button size="icon" variant="ghost" className="rounded-full" onClick={() => setCreating(true)} aria-label={t('ثبت تکرارشونده')}>
                         <PlusIcon className="size-6" />
                     </Button>
                 }
@@ -100,7 +101,7 @@ export default function RecurringIndex({ items, accounts, categories }: Props) {
                 {!items ? (
                     <ListSkeleton rows={4} />
                 ) : items.length === 0 ? (
-                    <EmptyState icon={RepeatIcon} title="تراکنش تکرارشونده‌ای نیست" description="اجاره، اشتراک‌ها و اقساط ثابت را یک بار ثبت کنید." action={<Button onClick={() => setCreating(true)}>ثبت تکرارشونده</Button>} />
+                    <EmptyState icon={RepeatIcon} title={t('تراکنش تکرارشونده‌ای نیست')} description={t('اجاره، اشتراک‌ها و اقساط ثابت را یک بار ثبت کنید.')} action={<Button onClick={() => setCreating(true)}>{t('ثبت تکرارشونده')}</Button>} />
                 ) : (
                     <ListCard>
                         {items.map((item) => (
@@ -111,8 +112,8 @@ export default function RecurringIndex({ items, accounts, categories }: Props) {
                                 title={item.title}
                                 subtitle={
                                     <span className="flex flex-wrap items-center gap-x-2">
-                                        <span>{frequencies[item.frequency] ?? item.frequency}</span>
-                                        <span>· اجرای بعدی {format.shortDate(item.next_run_date)}</span>
+                                        <span>{frequencies[item.frequency] ? t(frequencies[item.frequency]) : item.frequency}</span>
+                                        <span>· {t('اجرای بعدی :date', { date: format.shortDate(item.next_run_date) })}</span>
                                     </span>
                                 }
                                 trailing={
@@ -121,7 +122,7 @@ export default function RecurringIndex({ items, accounts, categories }: Props) {
                                         <Switch
                                             className="mt-1.5"
                                             checked={item.is_active}
-                                            aria-label={item.is_active ? 'توقف' : 'فعال‌سازی'}
+                                            aria-label={item.is_active ? t('توقف') : t('فعال‌سازی')}
                                             onCheckedChange={(checked) => router.patch(route('recurring.update', item.id), { is_active: checked }, { preserveScroll: true })}
                                         />
                                     </>

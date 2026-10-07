@@ -17,6 +17,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { todayIso, useFormat } from '@/lib/format';
 import { debtStatuses } from '@/lib/labels';
 import type { Debt, Option, PersonOption } from '@/types';
+import { t } from '@/lib/i18n';
 
 interface Props {
     debts?: Debt[];
@@ -39,9 +40,9 @@ function NewDebtSheet({ open, onOpenChange, people }: { open: boolean; onOpenCha
     };
 
     return (
-        <ResponsiveModal open={open} onOpenChange={onOpenChange} title="ثبت طلب یا بدهی">
+        <ResponsiveModal open={open} onOpenChange={onOpenChange} title={t('ثبت طلب یا بدهی')}>
             {people.length === 0 ? (
-                <p className="py-6 text-center text-sm text-muted-foreground">ابتدا از بخش «اشخاص» یک شخص اضافه کنید.</p>
+                <p className="py-6 text-center text-sm text-muted-foreground">{t('ابتدا از بخش «اشخاص» یک شخص اضافه کنید.')}</p>
             ) : (
                 <form onSubmit={submit} noValidate className="pb-4">
                     <FieldGroup className="gap-5">
@@ -50,36 +51,36 @@ function NewDebtSheet({ open, onOpenChange, people }: { open: boolean; onOpenCha
                             value={form.data.type}
                             onValueChange={(value) => value && form.setData('type', value)}
                             className="grid w-full grid-cols-2 gap-2"
-                            aria-label="نوع"
+                            aria-label={t('نوع')}
                         >
                             <ToggleGroupItem value="payable" className="h-11 rounded-xl border border-border data-[state=on]:border-expense data-[state=on]:bg-expense/10 data-[state=on]:text-expense">
-                                بدهی من
+                                {t('بدهی من')}
                             </ToggleGroupItem>
                             <ToggleGroupItem value="receivable" className="h-11 rounded-xl border border-border data-[state=on]:border-income data-[state=on]:bg-income/10 data-[state=on]:text-income">
-                                طلب من
+                                {t('طلب من')}
                             </ToggleGroupItem>
                         </ToggleGroup>
-                        <FormField label="شخص" htmlFor="debt_person" error={form.errors.person_id}>
+                        <FormField label={t('شخص')} htmlFor="debt_person" error={form.errors.person_id}>
                             <SelectField
                                 id="debt_person"
                                 value={form.data.person_id}
                                 onChange={(event) => form.setData('person_id', event.target.value)}
-                                placeholder="انتخاب شخص"
+                                placeholder={t('انتخاب شخص')}
                                 options={people.map((person) => ({ value: person.id, label: person.full_name }))}
                                 aria-invalid={form.errors.person_id ? true : undefined}
                             />
                         </FormField>
-                        <FormField label="مبلغ" htmlFor="debt_amount" error={form.errors.original_amount}>
+                        <FormField label={t('مبلغ')} htmlFor="debt_amount" error={form.errors.original_amount}>
                             <AmountInput id="debt_amount" value={form.data.original_amount} onValueChange={(value) => form.setData('original_amount', value)} aria-invalid={form.errors.original_amount ? true : undefined} />
                         </FormField>
-                        <FormField label="سررسید" htmlFor="debt_due" optional error={form.errors.due_date}>
+                        <FormField label={t('سررسید')} htmlFor="debt_due" optional error={form.errors.due_date}>
                             <DateInput id="debt_due" clearable value={form.data.due_date} onChange={(event) => form.setData('due_date', event.target.value)} />
                         </FormField>
-                        <FormField label="توضیح" htmlFor="debt_description" optional error={form.errors.description}>
+                        <FormField label={t('توضیح')} htmlFor="debt_description" optional error={form.errors.description}>
                             <Textarea id="debt_description" rows={2} value={form.data.description} onChange={(event) => form.setData('description', event.target.value)} />
                         </FormField>
                         <SubmitButton size="lg" processing={form.processing}>
-                            ثبت
+                            {t('ثبت')}
                         </SubmitButton>
                     </FieldGroup>
                 </form>
@@ -123,13 +124,13 @@ function SettleSheet({ debt, accounts, onClose }: { debt: Debt | null; accounts:
         <ResponsiveModal
             open={open}
             onOpenChange={(next) => !next && onClose()}
-            title={payable ? 'پرداخت بدهی' : 'دریافت طلب'}
-            description={debt ? `${debt.person?.name ?? ''} · مانده ${format.money(debt.remaining_amount)} ${format.unit}` : undefined}
+            title={payable ? t('پرداخت بدهی') : t('دریافت طلب')}
+            description={debt ? t(':person · مانده :amount :unit', { person: debt.person?.name ?? '', amount: format.money(debt.remaining_amount), unit: format.unit }) : undefined}
         >
             {debt && (
                 <form onSubmit={submit} noValidate className="pb-4">
                     <FieldGroup className="gap-5">
-                        <FormField label="مبلغ" htmlFor="settle_amount" error={form.errors.amount}>
+                        <FormField label={t('مبلغ')} htmlFor="settle_amount" error={form.errors.amount}>
                             <AmountInput
                                 id="settle_amount"
                                 value={form.data.amount}
@@ -137,7 +138,7 @@ function SettleSheet({ debt, accounts, onClose }: { debt: Debt | null; accounts:
                                 aria-invalid={form.errors.amount ? true : undefined}
                             />
                         </FormField>
-                        <FormField label={payable ? 'پرداخت از حساب' : 'واریز به حساب'} htmlFor="settle_account" error={form.errors.account_id}>
+                        <FormField label={payable ? t('پرداخت از حساب') : t('واریز به حساب')} htmlFor="settle_account" error={form.errors.account_id}>
                             <SelectField
                                 id="settle_account"
                                 value={form.data.account_id}
@@ -145,11 +146,11 @@ function SettleSheet({ debt, accounts, onClose }: { debt: Debt | null; accounts:
                                 options={accounts.map((account) => ({ value: account.id, label: account.name }))}
                             />
                         </FormField>
-                        <FormField label="تاریخ" htmlFor="settle_date" error={form.errors.transaction_date}>
+                        <FormField label={t('تاریخ')} htmlFor="settle_date" error={form.errors.transaction_date}>
                             <DateInput id="settle_date" value={form.data.transaction_date} onChange={(event) => form.setData('transaction_date', event.target.value)} />
                         </FormField>
                         <SubmitButton size="lg" processing={form.processing}>
-                            ثبت تسویه
+                            {t('ثبت تسویه')}
                         </SubmitButton>
                     </FieldGroup>
                 </form>
@@ -169,23 +170,23 @@ export default function DebtsIndex({ debts, people, accounts }: Props) {
 
     return (
         <>
-            <Head title="طلب و بدهی" />
+            <Head title={t('طلب و بدهی')} />
             <PageHeader
-                title="طلب و بدهی"
+                title={t('طلب و بدهی')}
                 back={route('settings.index')}
                 backComponent="settings/index"
                 actions={
-                    <Button size="icon" variant="ghost" className="rounded-full" onClick={() => setCreating(true)} aria-label="ثبت جدید">
+                    <Button size="icon" variant="ghost" className="rounded-full" onClick={() => setCreating(true)} aria-label={t('ثبت جدید')}>
                         <PlusIcon className="size-6" />
                     </Button>
                 }
             />
             <PageBody>
-                <ToggleGroup type="single" value={filter} onValueChange={(value) => value && setFilter(value)} className="w-full gap-2" aria-label="فیلتر">
+                <ToggleGroup type="single" value={filter} onValueChange={(value) => value && setFilter(value)} className="w-full gap-2" aria-label={t('فیلتر')}>
                     {[
-                        ['open', 'باز'],
-                        ['settled', 'تسویه‌شده'],
-                        ['all', 'همه'],
+                        ['open', t('باز')],
+                        ['settled', t('تسویه‌شده')],
+                        ['all', t('همه')],
                     ].map(([value, label]) => (
                         <ToggleGroupItem key={value} value={value} className="h-9 flex-1 rounded-full border border-border bg-card data-[state=on]:border-primary data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">
                             {label}
@@ -198,9 +199,9 @@ export default function DebtsIndex({ debts, people, accounts }: Props) {
                 ) : visible.length === 0 ? (
                     <EmptyState
                         icon={HandCoinsIcon}
-                        title="موردی نیست"
-                        description="طلب‌ها و بدهی‌های شما اینجا نمایش داده می‌شود."
-                        action={<Button onClick={() => setCreating(true)}>ثبت طلب یا بدهی</Button>}
+                        title={t('موردی نیست')}
+                        description={t('طلب‌ها و بدهی‌های شما اینجا نمایش داده می‌شود.')}
+                        action={<Button onClick={() => setCreating(true)}>{t('ثبت طلب یا بدهی')}</Button>}
                     />
                 ) : (
                     <ListCard>
@@ -212,11 +213,11 @@ export default function DebtsIndex({ debts, people, accounts }: Props) {
                                 <ListRow
                                     key={debt.id}
                                     media={<PersonAvatar name={debt.person?.name ?? '؟'} />}
-                                    title={debt.person?.name ?? 'بدون شخص'}
+                                    title={debt.person?.name ?? t('بدون شخص')}
                                     subtitle={
                                         <span className="flex items-center gap-2">
-                                            {payable ? 'بدهی من' : 'طلب من'}
-                                            {debt.due_date && <span>· سررسید {format.shortDate(debt.due_date)}</span>}
+                                            {payable ? t('بدهی من') : t('طلب من')}
+                                            {debt.due_date && <span>· {t('سررسید :date', { date: format.shortDate(debt.due_date) })}</span>}
                                         </span>
                                     }
                                     trailing={

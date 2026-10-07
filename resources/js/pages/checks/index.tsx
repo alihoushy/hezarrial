@@ -17,6 +17,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { todayIso, toLatinDigits, useFormat } from '@/lib/format';
 import { checkStatuses } from '@/lib/labels';
 import type { Check, Option, PersonOption } from '@/types';
+import { t } from '@/lib/i18n';
 
 interface Props {
     checks?: Check[];
@@ -40,39 +41,39 @@ function NewCheckSheet({ open, onOpenChange, accounts, people }: { open: boolean
     };
 
     return (
-        <ResponsiveModal open={open} onOpenChange={onOpenChange} title="ثبت چک">
+        <ResponsiveModal open={open} onOpenChange={onOpenChange} title={t('ثبت چک')}>
             <form onSubmit={submit} noValidate className="pb-4">
                 <FieldGroup className="gap-5">
-                    <ToggleGroup type="single" value={form.data.type} onValueChange={(value) => value && form.setData('type', value)} className="grid w-full grid-cols-2 gap-2" aria-label="نوع چک">
+                    <ToggleGroup type="single" value={form.data.type} onValueChange={(value) => value && form.setData('type', value)} className="grid w-full grid-cols-2 gap-2" aria-label={t('نوع چک')}>
                         <ToggleGroupItem value="payable" className="h-11 rounded-xl border border-border data-[state=on]:border-expense data-[state=on]:bg-expense/10 data-[state=on]:text-expense">
-                            پرداختنی
+                            {t('پرداختنی')}
                         </ToggleGroupItem>
                         <ToggleGroupItem value="receivable" className="h-11 rounded-xl border border-border data-[state=on]:border-income data-[state=on]:bg-income/10 data-[state=on]:text-income">
-                            دریافتنی
+                            {t('دریافتنی')}
                         </ToggleGroupItem>
                     </ToggleGroup>
-                    <FormField label="مبلغ" htmlFor="check_amount" error={form.errors.amount}>
+                    <FormField label={t('مبلغ')} htmlFor="check_amount" error={form.errors.amount}>
                         <AmountInput id="check_amount" value={form.data.amount} onValueChange={(value) => form.setData('amount', value)} aria-invalid={form.errors.amount ? true : undefined} />
                     </FormField>
-                    <FormField label="تاریخ سررسید" htmlFor="check_due" error={form.errors.due_date}>
+                    <FormField label={t('تاریخ سررسید')} htmlFor="check_due" error={form.errors.due_date}>
                         <DateInput id="check_due" value={form.data.due_date} onChange={(event) => form.setData('due_date', event.target.value)} />
                     </FormField>
-                    <FormField label="شماره چک" htmlFor="check_number" optional error={form.errors.check_number}>
+                    <FormField label={t('شماره چک')} htmlFor="check_number" optional error={form.errors.check_number}>
                         <Input id="check_number" inputMode="numeric" dir="ltr" className="text-start" value={form.data.check_number} onChange={(event) => form.setData('check_number', event.target.value)} />
                     </FormField>
-                    <FormField label="نام بانک" htmlFor="check_bank" optional error={form.errors.bank_name}>
+                    <FormField label={t('نام بانک')} htmlFor="check_bank" optional error={form.errors.bank_name}>
                         <Input id="check_bank" value={form.data.bank_name} onChange={(event) => form.setData('bank_name', event.target.value)} />
                     </FormField>
-                    <FormField label="حساب" htmlFor="check_account" optional error={form.errors.account_id}>
-                        <SelectField id="check_account" value={form.data.account_id} onChange={(event) => form.setData('account_id', event.target.value)} placeholder="بعداً انتخاب می‌شود" options={accounts.map((account) => ({ value: account.id, label: account.name }))} />
+                    <FormField label={t('حساب')} htmlFor="check_account" optional error={form.errors.account_id}>
+                        <SelectField id="check_account" value={form.data.account_id} onChange={(event) => form.setData('account_id', event.target.value)} placeholder={t('بعداً انتخاب می‌شود')} options={accounts.map((account) => ({ value: account.id, label: account.name }))} />
                     </FormField>
                     {people.length > 0 && (
-                        <FormField label="شخص" htmlFor="check_person" optional error={form.errors.person_id}>
-                            <SelectField id="check_person" value={form.data.person_id} onChange={(event) => form.setData('person_id', event.target.value)} placeholder="بدون شخص" options={people.map((person) => ({ value: person.id, label: person.full_name }))} />
+                        <FormField label={t('شخص')} htmlFor="check_person" optional error={form.errors.person_id}>
+                            <SelectField id="check_person" value={form.data.person_id} onChange={(event) => form.setData('person_id', event.target.value)} placeholder={t('بدون شخص')} options={people.map((person) => ({ value: person.id, label: person.full_name }))} />
                         </FormField>
                     )}
                     <SubmitButton size="lg" processing={form.processing}>
-                        ثبت چک
+                        {t('ثبت چک')}
                     </SubmitButton>
                 </FieldGroup>
             </form>
@@ -103,30 +104,30 @@ function CheckActionsSheet({ check, accounts, onClose }: { check: Check | null; 
         <ResponsiveModal
             open={check !== null}
             onOpenChange={(next) => !next && onClose()}
-            title={check ? `چک ${check.check_number ? format.digits(check.check_number) : ''}`.trim() : 'چک'}
-            description={check ? `${format.money(check.amount)} ${format.unit} · سررسید ${format.date(check.due_date)}` : undefined}
+            title={check ? (check.check_number ? t('چک :number', { number: format.digits(check.check_number) }) : t('چک')) : t('چک')}
+            description={check ? t(':amount :unit · سررسید :date', { amount: format.money(check.amount), unit: format.unit, date: format.date(check.due_date) }) : undefined}
         >
             {check && (
                 <div className="flex flex-col gap-5 pb-4">
                     <form onSubmit={pass} noValidate>
                         <FieldGroup className="gap-4">
-                            <FormField label={check.type === 'payable' ? 'پرداخت از حساب' : 'واریز به حساب'} htmlFor="pass_account" error={form.errors.account_id}>
+                            <FormField label={check.type === 'payable' ? t('پرداخت از حساب') : t('واریز به حساب')} htmlFor="pass_account" error={form.errors.account_id}>
                                 <SelectField id="pass_account" value={form.data.account_id} onChange={(event) => form.setData('account_id', event.target.value)} options={accounts.map((account) => ({ value: account.id, label: account.name }))} />
                             </FormField>
                             <SubmitButton size="lg" processing={form.processing}>
-                                پاس شد
+                                {t('پاس شد')}
                             </SubmitButton>
                         </FieldGroup>
                     </form>
                     <div className="grid grid-cols-2 gap-2.5">
-                        <ConfirmAction title="چک برگشت خورد؟" description="وضعیت چک برگشتی ثبت می‌شود و مانده حساب‌ها تغییر نمی‌کند." confirmLabel="ثبت برگشتی" href={route('checks.bounce', check.id)} destructive onSuccess={onClose}>
+                        <ConfirmAction title={t('چک برگشت خورد؟')} description={t('وضعیت چک برگشتی ثبت می‌شود و مانده حساب‌ها تغییر نمی‌کند.')} confirmLabel={t('ثبت برگشتی')} href={route('checks.bounce', check.id)} destructive onSuccess={onClose}>
                             <Button type="button" variant="outline" size="lg">
-                                برگشتی
+                                {t('برگشتی')}
                             </Button>
                         </ConfirmAction>
-                        <ConfirmAction title="چک باطل شود؟" confirmLabel="باطل شود" href={route('checks.cancel', check.id)} destructive onSuccess={onClose}>
+                        <ConfirmAction title={t('چک باطل شود؟')} confirmLabel={t('باطل شود')} href={route('checks.cancel', check.id)} destructive onSuccess={onClose}>
                             <Button type="button" variant="outline" size="lg">
-                                باطل
+                                {t('باطل')}
                             </Button>
                         </ConfirmAction>
                     </div>
@@ -145,23 +146,23 @@ export default function ChecksIndex({ checks, accounts, people }: Props) {
 
     return (
         <>
-            <Head title="چک‌ها" />
+            <Head title={t('چک‌ها')} />
             <PageHeader
-                title="چک‌ها"
+                title={t('چک‌ها')}
                 back={route('settings.index')}
                 backComponent="settings/index"
                 actions={
-                    <Button size="icon" variant="ghost" className="rounded-full" onClick={() => setCreating(true)} aria-label="ثبت چک">
+                    <Button size="icon" variant="ghost" className="rounded-full" onClick={() => setCreating(true)} aria-label={t('ثبت چک')}>
                         <PlusIcon className="size-6" />
                     </Button>
                 }
             />
             <PageBody>
-                <ToggleGroup type="single" value={filter} onValueChange={(value) => value && setFilter(value)} className="w-full gap-2" aria-label="فیلتر">
+                <ToggleGroup type="single" value={filter} onValueChange={(value) => value && setFilter(value)} className="w-full gap-2" aria-label={t('فیلتر')}>
                     {[
-                        ['pending', 'در انتظار'],
-                        ['done', 'نهایی‌شده'],
-                        ['all', 'همه'],
+                        ['pending', t('در انتظار')],
+                        ['done', t('نهایی‌شده')],
+                        ['all', t('همه')],
                     ].map(([value, label]) => (
                         <ToggleGroupItem key={value} value={value} className="h-9 flex-1 rounded-full border border-border bg-card data-[state=on]:border-primary data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">
                             {label}
@@ -172,7 +173,7 @@ export default function ChecksIndex({ checks, accounts, people }: Props) {
                 {!checks ? (
                     <ListSkeleton rows={5} />
                 ) : visible.length === 0 ? (
-                    <EmptyState icon={ReceiptTextIcon} title="چکی نیست" description="چک‌های پرداختنی و دریافتنی شما اینجا نمایش داده می‌شود." action={<Button onClick={() => setCreating(true)}>ثبت چک</Button>} />
+                    <EmptyState icon={ReceiptTextIcon} title={t('چکی نیست')} description={t('چک‌های پرداختنی و دریافتنی شما اینجا نمایش داده می‌شود.')} action={<Button onClick={() => setCreating(true)}>{t('ثبت چک')}</Button>} />
                 ) : (
                     <ListCard>
                         {visible.map((check) => {
@@ -184,7 +185,7 @@ export default function ChecksIndex({ checks, accounts, people }: Props) {
                                     key={check.id}
                                     icon={ReceiptTextIcon}
                                     iconClassName={payable ? 'bg-expense/10 text-expense' : 'bg-income/12 text-income'}
-                                    title={check.check_number ? `چک ${format.digits(check.check_number)}` : payable ? 'چک پرداختنی' : 'چک دریافتنی'}
+                                    title={check.check_number ? t('چک :number', { number: format.digits(check.check_number) }) : payable ? t('چک پرداختنی') : t('چک دریافتنی')}
                                     subtitle={[check.person?.name, check.bank_name, format.shortDate(check.due_date)].filter(Boolean).join(' · ')}
                                     trailing={
                                         <>

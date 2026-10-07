@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { todayIso, useFormat } from '@/lib/format';
 import { reminderStatuses } from '@/lib/labels';
 import type { Reminder } from '@/types';
+import { t } from '@/lib/i18n';
 
 function NewReminderSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
     const form = useForm({ title: '', due_date: todayIso(), due_time: '' });
@@ -29,20 +30,20 @@ function NewReminderSheet({ open, onOpenChange }: { open: boolean; onOpenChange:
     };
 
     return (
-        <ResponsiveModal open={open} onOpenChange={onOpenChange} title="یادآوری جدید">
+        <ResponsiveModal open={open} onOpenChange={onOpenChange} title={t('یادآوری جدید')}>
             <form onSubmit={submit} noValidate className="pb-4">
                 <FieldGroup className="gap-5">
-                    <FormField label="عنوان" htmlFor="reminder_title" error={form.errors.title}>
-                        <Input id="reminder_title" autoFocus value={form.data.title} onChange={(event) => form.setData('title', event.target.value)} placeholder="مثلاً: پرداخت قبض برق" aria-invalid={form.errors.title ? true : undefined} />
+                    <FormField label={t('عنوان')} htmlFor="reminder_title" error={form.errors.title}>
+                        <Input id="reminder_title" autoFocus value={form.data.title} onChange={(event) => form.setData('title', event.target.value)} placeholder={t('مثلاً: پرداخت قبض برق')} aria-invalid={form.errors.title ? true : undefined} />
                     </FormField>
-                    <FormField label="تاریخ" htmlFor="reminder_date" error={form.errors.due_date}>
+                    <FormField label={t('تاریخ')} htmlFor="reminder_date" error={form.errors.due_date}>
                         <DateInput id="reminder_date" value={form.data.due_date} onChange={(event) => form.setData('due_date', event.target.value)} />
                     </FormField>
-                    <FormField label="ساعت" htmlFor="reminder_time" optional error={form.errors.due_time}>
+                    <FormField label={t('ساعت')} htmlFor="reminder_time" optional error={form.errors.due_time}>
                         <Input id="reminder_time" type="time" dir="ltr" className="text-start" value={form.data.due_time} onChange={(event) => form.setData('due_time', event.target.value)} />
                     </FormField>
                     <SubmitButton size="lg" processing={form.processing}>
-                        ثبت یادآوری
+                        {t('ثبت یادآوری')}
                     </SubmitButton>
                 </FieldGroup>
             </form>
@@ -65,10 +66,10 @@ function ReminderRow({ reminder }: { reminder: Reminder }) {
             trailing={
                 pending ? (
                     <span className="flex items-center gap-1.5">
-                        <Button variant="outline" size="icon-sm" className="rounded-full text-income" onClick={() => update('done')} aria-label="انجام شد">
+                        <Button variant="outline" size="icon-sm" className="rounded-full text-income" onClick={() => update('done')} aria-label={t('انجام شد')}>
                             <CheckIcon />
                         </Button>
-                        <Button variant="outline" size="icon-sm" className="rounded-full text-muted-foreground" onClick={() => update('dismissed')} aria-label="نادیده گرفتن">
+                        <Button variant="outline" size="icon-sm" className="rounded-full text-muted-foreground" onClick={() => update('dismissed')} aria-label={t('نادیده گرفتن')}>
                             <XIcon />
                         </Button>
                     </span>
@@ -87,13 +88,13 @@ export default function RemindersIndex({ reminders }: { reminders?: Reminder[] }
 
     return (
         <>
-            <Head title="یادآوری‌ها" />
+            <Head title={t('یادآوری‌ها')} />
             <PageHeader
-                title="یادآوری‌ها"
+                title={t('یادآوری‌ها')}
                 back={route('settings.index')}
                 backComponent="settings/index"
                 actions={
-                    <Button size="icon" variant="ghost" className="rounded-full" onClick={() => setCreating(true)} aria-label="یادآوری جدید">
+                    <Button size="icon" variant="ghost" className="rounded-full" onClick={() => setCreating(true)} aria-label={t('یادآوری جدید')}>
                         <PlusIcon className="size-6" />
                     </Button>
                 }
@@ -102,12 +103,12 @@ export default function RemindersIndex({ reminders }: { reminders?: Reminder[] }
                 {!reminders ? (
                     <ListSkeleton rows={4} />
                 ) : reminders.length === 0 ? (
-                    <EmptyState icon={BellIcon} title="یادآوری‌ای ندارید" description="موعد قبض‌ها و پرداخت‌ها را اینجا ثبت کنید." action={<Button onClick={() => setCreating(true)}>یادآوری جدید</Button>} />
+                    <EmptyState icon={BellIcon} title={t('یادآوری‌ای ندارید')} description={t('موعد قبض‌ها و پرداخت‌ها را اینجا ثبت کنید.')} action={<Button onClick={() => setCreating(true)}>{t('یادآوری جدید')}</Button>} />
                 ) : (
                     <>
                         {pending.length > 0 && (
                             <section>
-                                <SectionTitle>در انتظار</SectionTitle>
+                                <SectionTitle>{t('در انتظار')}</SectionTitle>
                                 <ListCard>
                                     {pending.map((reminder) => (
                                         <ReminderRow key={reminder.id} reminder={reminder} />
@@ -117,7 +118,7 @@ export default function RemindersIndex({ reminders }: { reminders?: Reminder[] }
                         )}
                         {finished.length > 0 && (
                             <section>
-                                <SectionTitle>انجام‌شده و نادیده‌گرفته</SectionTitle>
+                                <SectionTitle>{t('انجام‌شده و نادیده‌گرفته')}</SectionTitle>
                                 <ListCard className="opacity-80">
                                     {finished.map((reminder) => (
                                         <ReminderRow key={reminder.id} reminder={reminder} />

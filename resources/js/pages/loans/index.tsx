@@ -16,6 +16,7 @@ import { Progress } from '@/components/ui/progress';
 import { toLatinDigits, todayIso, useFormat } from '@/lib/format';
 import { loanStatuses } from '@/lib/labels';
 import type { Loan, Option } from '@/types';
+import { t } from '@/lib/i18n';
 
 function NewLoanSheet({ open, onOpenChange, accounts }: { open: boolean; onOpenChange: (open: boolean) => void; accounts: Option[] }) {
     const form = useForm({
@@ -42,31 +43,31 @@ function NewLoanSheet({ open, onOpenChange, accounts }: { open: boolean; onOpenC
     };
 
     return (
-        <ResponsiveModal open={open} onOpenChange={onOpenChange} title="ثبت وام" description="اقساط ماهانه از تاریخ شروع ساخته می‌شود.">
+        <ResponsiveModal open={open} onOpenChange={onOpenChange} title={t('ثبت وام')} description={t('اقساط ماهانه از تاریخ شروع ساخته می‌شود.')}>
             {accounts.length === 0 ? (
-                <p className="py-6 text-center text-sm text-muted-foreground">ابتدا یک حساب بسازید.</p>
+                <p className="py-6 text-center text-sm text-muted-foreground">{t('ابتدا یک حساب بسازید.')}</p>
             ) : (
                 <form onSubmit={submit} noValidate className="pb-4">
                     <FieldGroup className="gap-5">
-                        <FormField label="عنوان وام" htmlFor="loan_title" error={form.errors.title}>
-                            <Input id="loan_title" value={form.data.title} onChange={(event) => form.setData('title', event.target.value)} placeholder="مثلاً: وام خرید خودرو" aria-invalid={form.errors.title ? true : undefined} />
+                        <FormField label={t('عنوان وام')} htmlFor="loan_title" error={form.errors.title}>
+                            <Input id="loan_title" value={form.data.title} onChange={(event) => form.setData('title', event.target.value)} placeholder={t('مثلاً: وام خرید خودرو')} aria-invalid={form.errors.title ? true : undefined} />
                         </FormField>
-                        <FormField label="وام‌دهنده" htmlFor="loan_lender" optional error={form.errors.lender_name}>
+                        <FormField label={t('وام‌دهنده')} htmlFor="loan_lender" optional error={form.errors.lender_name}>
                             <Input id="loan_lender" value={form.data.lender_name} onChange={(event) => form.setData('lender_name', event.target.value)} />
                         </FormField>
-                        <FormField label="حساب دریافت وام" htmlFor="loan_account" error={form.errors.account_id}>
+                        <FormField label={t('حساب دریافت وام')} htmlFor="loan_account" error={form.errors.account_id}>
                             <SelectField id="loan_account" value={form.data.account_id} onChange={(event) => form.setData('account_id', event.target.value)} options={accounts.map((account) => ({ value: account.id, label: account.name }))} />
                         </FormField>
-                        <FormField label="اصل وام" htmlFor="loan_principal" error={form.errors.principal_amount}>
+                        <FormField label={t('اصل وام')} htmlFor="loan_principal" error={form.errors.principal_amount}>
                             <AmountInput id="loan_principal" value={form.data.principal_amount} onValueChange={(value) => form.setData('principal_amount', value)} aria-invalid={form.errors.principal_amount ? true : undefined} />
                         </FormField>
-                        <FormField label="مبلغ کل قابل پرداخت" htmlFor="loan_total" error={form.errors.total_payable_amount} description="اصل وام به‌علاوه سود">
+                        <FormField label={t('مبلغ کل قابل پرداخت')} htmlFor="loan_total" error={form.errors.total_payable_amount} description={t('اصل وام به‌علاوه سود')}>
                             <AmountInput id="loan_total" value={form.data.total_payable_amount} onValueChange={(value) => form.setData('total_payable_amount', value)} aria-invalid={form.errors.total_payable_amount ? true : undefined} />
                         </FormField>
-                        <FormField label="مبلغ هر قسط" htmlFor="loan_installment" error={form.errors.installment_amount}>
+                        <FormField label={t('مبلغ هر قسط')} htmlFor="loan_installment" error={form.errors.installment_amount}>
                             <AmountInput id="loan_installment" value={form.data.installment_amount} onValueChange={(value) => form.setData('installment_amount', value)} aria-invalid={form.errors.installment_amount ? true : undefined} />
                         </FormField>
-                        <FormField label="تعداد اقساط" htmlFor="loan_count" error={form.errors.installment_count}>
+                        <FormField label={t('تعداد اقساط')} htmlFor="loan_count" error={form.errors.installment_count}>
                             <Input
                                 id="loan_count"
                                 inputMode="numeric"
@@ -77,11 +78,11 @@ function NewLoanSheet({ open, onOpenChange, accounts }: { open: boolean; onOpenC
                                 aria-invalid={form.errors.installment_count ? true : undefined}
                             />
                         </FormField>
-                        <FormField label="تاریخ اولین قسط" htmlFor="loan_start" error={form.errors.start_date}>
+                        <FormField label={t('تاریخ اولین قسط')} htmlFor="loan_start" error={form.errors.start_date}>
                             <DateInput id="loan_start" value={form.data.start_date} onChange={(event) => form.setData('start_date', event.target.value)} />
                         </FormField>
                         <SubmitButton size="lg" processing={form.processing}>
-                            ثبت وام
+                            {t('ثبت وام')}
                         </SubmitButton>
                     </FieldGroup>
                 </form>
@@ -96,13 +97,13 @@ export default function LoansIndex({ loans, accounts }: { loans?: Loan[]; accoun
 
     return (
         <>
-            <Head title="وام و اقساط" />
+            <Head title={t('وام و اقساط')} />
             <PageHeader
-                title="وام و اقساط"
+                title={t('وام و اقساط')}
                 back={route('settings.index')}
                 backComponent="settings/index"
                 actions={
-                    <Button size="icon" variant="ghost" className="rounded-full" onClick={() => setCreating(true)} aria-label="ثبت وام">
+                    <Button size="icon" variant="ghost" className="rounded-full" onClick={() => setCreating(true)} aria-label={t('ثبت وام')}>
                         <PlusIcon className="size-6" />
                     </Button>
                 }
@@ -111,7 +112,7 @@ export default function LoansIndex({ loans, accounts }: { loans?: Loan[]; accoun
                 {!loans ? (
                     <ListSkeleton rows={4} />
                 ) : loans.length === 0 ? (
-                    <EmptyState icon={LandmarkIcon} title="وامی ثبت نشده" description="وام‌ها و برنامه اقساط خود را اینجا دنبال کنید." action={<Button onClick={() => setCreating(true)}>ثبت وام</Button>} />
+                    <EmptyState icon={LandmarkIcon} title={t('وامی ثبت نشده')} description={t('وام‌ها و برنامه اقساط خود را اینجا دنبال کنید.')} action={<Button onClick={() => setCreating(true)}>{t('ثبت وام')}</Button>} />
                 ) : (
                     <ListCard>
                         {loans.map((loan) => {
@@ -123,14 +124,14 @@ export default function LoansIndex({ loans, accounts }: { loans?: Loan[]; accoun
                                     <div className="flex items-start justify-between gap-3">
                                         <div className="min-w-0">
                                             <p className="truncate font-semibold">{loan.title}</p>
-                                            <p className="text-xs text-muted-foreground">{loan.lender_name || `شروع ${format.shortDate(loan.start_date)}`}</p>
+                                            <p className="text-xs text-muted-foreground">{loan.lender_name || t('شروع :date', { date: format.shortDate(loan.start_date) })}</p>
                                         </div>
                                         <StatusBadge label={status.label} tone={status.tone} />
                                     </div>
-                                    <Progress value={percent} aria-label="پیشرفت پرداخت" />
+                                    <Progress value={percent} aria-label={t('پیشرفت پرداخت')} />
                                     <div className="flex items-center justify-between text-xs text-muted-foreground">
                                         <span>
-                                            {format.number(loan.paid_installment_count)} از {format.number(loan.installment_count)} قسط
+                                            {t(':paid از :total قسط', { paid: format.number(loan.paid_installment_count), total: format.number(loan.installment_count) })}
                                         </span>
                                         <Money amount={loan.installment_amount} className="text-sm font-semibold text-foreground" />
                                     </div>

@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useFormat } from '@/lib/format';
 import { importStatuses } from '@/lib/labels';
 import type { ImportRecord, SmsPattern } from '@/types';
+import { t } from '@/lib/i18n';
 
 function PatternSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
     const form = useForm({ name: '', bank_name: '', pattern: '', debit_keywords: '', credit_keywords: '' });
@@ -29,16 +30,16 @@ function PatternSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (op
     };
 
     return (
-        <ResponsiveModal open={open} onOpenChange={onOpenChange} title="الگوی پیامک بانک" description="برای بانک‌هایی که تشخیص خودکار آن‌ها را درست نمی‌خواند.">
+        <ResponsiveModal open={open} onOpenChange={onOpenChange} title={t('الگوی پیامک بانک')} description={t('برای بانک‌هایی که تشخیص خودکار آن‌ها را درست نمی‌خواند.')}>
             <form onSubmit={submit} noValidate className="pb-4">
                 <FieldGroup className="gap-5">
-                    <FormField label="نام الگو" htmlFor="pattern_name" error={form.errors.name}>
+                    <FormField label={t('نام الگو')} htmlFor="pattern_name" error={form.errors.name}>
                         <Input id="pattern_name" value={form.data.name} onChange={(event) => form.setData('name', event.target.value)} aria-invalid={form.errors.name ? true : undefined} />
                     </FormField>
-                    <FormField label="نام بانک" htmlFor="pattern_bank" optional error={form.errors.bank_name}>
+                    <FormField label={t('نام بانک')} htmlFor="pattern_bank" optional error={form.errors.bank_name}>
                         <Input id="pattern_bank" value={form.data.bank_name} onChange={(event) => form.setData('bank_name', event.target.value)} />
                     </FormField>
-                    <FormField label="عبارت منظم (Regex)" htmlFor="pattern_regex" error={form.errors.pattern} description="با گروه‌های amount، type، balance، date و card">
+                    <FormField label={t('عبارت منظم (Regex)')} htmlFor="pattern_regex" error={form.errors.pattern} description={t('با گروه‌های amount، type، balance، date و card')}>
                         <Textarea
                             id="pattern_regex"
                             dir="ltr"
@@ -49,14 +50,14 @@ function PatternSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (op
                             aria-invalid={form.errors.pattern ? true : undefined}
                         />
                     </FormField>
-                    <FormField label="کلیدواژه‌های برداشت" htmlFor="pattern_debit" optional error={form.errors.debit_keywords} description="با ویرگول جدا کنید">
+                    <FormField label={t('کلیدواژه‌های برداشت')} htmlFor="pattern_debit" optional error={form.errors.debit_keywords} description={t('با ویرگول جدا کنید')}>
                         <Input id="pattern_debit" value={form.data.debit_keywords} onChange={(event) => form.setData('debit_keywords', event.target.value)} />
                     </FormField>
-                    <FormField label="کلیدواژه‌های واریز" htmlFor="pattern_credit" optional error={form.errors.credit_keywords} description="با ویرگول جدا کنید">
+                    <FormField label={t('کلیدواژه‌های واریز')} htmlFor="pattern_credit" optional error={form.errors.credit_keywords} description={t('با ویرگول جدا کنید')}>
                         <Input id="pattern_credit" value={form.data.credit_keywords} onChange={(event) => form.setData('credit_keywords', event.target.value)} />
                     </FormField>
                     <SubmitButton size="lg" processing={form.processing}>
-                        ذخیره الگو
+                        {t('ذخیره الگو')}
                     </SubmitButton>
                 </FieldGroup>
             </form>
@@ -82,28 +83,28 @@ export default function ImportsIndex({ imports, smsPatterns }: { imports?: Impor
 
     return (
         <>
-            <Head title="وارد کردن داده" />
-            <PageHeader title="وارد کردن داده" back={route('settings.index')} backComponent="settings/index" />
+            <Head title={t('وارد کردن داده')} />
+            <PageHeader title={t('وارد کردن داده')} back={route('settings.index')} backComponent="settings/index" />
             <PageBody>
                 <form onSubmit={previewSms} noValidate className="rounded-2xl bg-card p-4 ring-1 ring-foreground/5">
                     <FieldGroup className="gap-4">
                         <div className="flex items-center gap-2 font-bold">
                             <MessageSquareTextIcon className="size-5 text-brand" />
-                            پیش‌نمایش پیامک بانکی
+                            {t('پیش‌نمایش پیامک بانکی')}
                         </div>
-                        <FormField label="الگو" htmlFor="sms_pattern" optional error={smsForm.errors.sms_pattern_id}>
+                        <FormField label={t('الگو')} htmlFor="sms_pattern" optional error={smsForm.errors.sms_pattern_id}>
                             <SelectField
                                 id="sms_pattern"
                                 value={smsForm.data.sms_pattern_id}
                                 onChange={(event) => smsForm.setData('sms_pattern_id', event.target.value)}
-                                placeholder="تشخیص خودکار"
+                                placeholder={t('تشخیص خودکار')}
                                 options={(smsPatterns ?? []).map((pattern) => ({ value: pattern.id, label: pattern.name }))}
                             />
                         </FormField>
-                        <FormField label="متن پیامک" htmlFor="sms_text" error={smsForm.errors.sms_text}>
-                            <Textarea id="sms_text" rows={5} value={smsForm.data.sms_text} onChange={(event) => smsForm.setData('sms_text', event.target.value)} placeholder="متن پیامک را اینجا بچسبانید" aria-invalid={smsForm.errors.sms_text ? true : undefined} />
+                        <FormField label={t('متن پیامک')} htmlFor="sms_text" error={smsForm.errors.sms_text}>
+                            <Textarea id="sms_text" rows={5} value={smsForm.data.sms_text} onChange={(event) => smsForm.setData('sms_text', event.target.value)} placeholder={t('متن پیامک را اینجا بچسبانید')} aria-invalid={smsForm.errors.sms_text ? true : undefined} />
                         </FormField>
-                        <SubmitButton processing={smsForm.processing}>تحلیل پیامک</SubmitButton>
+                        <SubmitButton processing={smsForm.processing}>{t('تحلیل پیامک')}</SubmitButton>
                     </FieldGroup>
                 </form>
 
@@ -111,13 +112,13 @@ export default function ImportsIndex({ imports, smsPatterns }: { imports?: Impor
                     <FieldGroup className="gap-4">
                         <div className="flex items-center gap-2 font-bold">
                             <FileUpIcon className="size-5 text-brand" />
-                            صورت‌حساب CSV / Excel
+                            {t('صورت‌حساب CSV / Excel')}
                         </div>
-                        <FormField label="فایل" htmlFor="statement" error={statementForm.errors.statement} description="حداکثر ۱۰ مگابایت">
+                        <FormField label={t('فایل')} htmlFor="statement" error={statementForm.errors.statement} description={t('حداکثر ۱۰ مگابایت')}>
                             <Input id="statement" type="file" accept=".csv,.txt,.xlsx" onChange={(event) => statementForm.setData('statement', event.target.files?.[0] ?? null)} className="h-auto py-2" />
                         </FormField>
                         <SubmitButton processing={statementForm.processing} disabled={!statementForm.data.statement}>
-                            ارسال فایل
+                            {t('ارسال فایل')}
                         </SubmitButton>
                     </FieldGroup>
                 </form>
@@ -127,20 +128,20 @@ export default function ImportsIndex({ imports, smsPatterns }: { imports?: Impor
                         action={
                             <Button variant="ghost" size="sm" className="text-brand" onClick={() => setPatternSheet(true)}>
                                 <PlusIcon />
-                                الگوی جدید
+                                {t('الگوی جدید')}
                             </Button>
                         }
                     >
-                        الگوهای پیامک
+                        {t('الگوهای پیامک')}
                     </SectionTitle>
                     {!smsPatterns ? (
                         <ListSkeleton rows={2} />
                     ) : smsPatterns.length === 0 ? (
-                        <p className="rounded-2xl bg-card px-4 py-6 text-center text-sm text-muted-foreground ring-1 ring-foreground/5">الگویی ذخیره نشده است.</p>
+                        <p className="rounded-2xl bg-card px-4 py-6 text-center text-sm text-muted-foreground ring-1 ring-foreground/5">{t('الگویی ذخیره نشده است.')}</p>
                     ) : (
                         <ListCard>
                             {smsPatterns.map((pattern) => (
-                                <ListRow key={pattern.id} icon={MessageSquareTextIcon} title={pattern.name} subtitle={pattern.bank_name || 'بدون بانک'} />
+                                <ListRow key={pattern.id} icon={MessageSquareTextIcon} title={pattern.name} subtitle={pattern.bank_name || t('بدون بانک')} />
                             ))}
                         </ListCard>
                     )}
@@ -148,7 +149,7 @@ export default function ImportsIndex({ imports, smsPatterns }: { imports?: Impor
 
                 {imports && imports.length > 0 && (
                     <section>
-                        <SectionTitle>سابقه ورود داده</SectionTitle>
+                        <SectionTitle>{t('سابقه ورود داده')}</SectionTitle>
                         <ListCard>
                             {imports.map((record) => {
                                 const status = importStatuses[record.status];
@@ -157,7 +158,7 @@ export default function ImportsIndex({ imports, smsPatterns }: { imports?: Impor
                                     <ListRow
                                         key={record.id}
                                         icon={record.type === 'csv' ? FileUpIcon : MessageSquareTextIcon}
-                                        title={record.type === 'csv' ? 'صورت‌حساب' : 'پیامک'}
+                                        title={record.type === 'csv' ? t('صورت‌حساب') : t('پیامک')}
                                         subtitle={format.dateTime(record.created_at)}
                                         trailing={<StatusBadge label={status.label} tone={status.tone} />}
                                     />

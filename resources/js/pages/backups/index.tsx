@@ -16,23 +16,24 @@ import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { useFormat } from '@/lib/format';
 import type { Backup } from '@/types';
+import { t } from '@/lib/i18n';
 
 /** Downloading is a real file response, so the password is sent with a plain form post. */
 function DownloadSheet({ backup, onClose }: { backup: Backup | null; onClose: () => void }) {
     const { csrf_token } = usePage().props;
 
     return (
-        <ResponsiveModal open={backup !== null} onOpenChange={(next) => !next && onClose()} title="دانلود پشتیبان" description={backup?.file_name}>
+        <ResponsiveModal open={backup !== null} onOpenChange={(next) => !next && onClose()} title={t('دانلود پشتیبان')} description={backup?.file_name}>
             {backup && (
                 <form method="post" action={route('backups.download', backup.id)} className="pb-4" onSubmit={() => setTimeout(onClose, 400)}>
                     <input type="hidden" name="_token" value={csrf_token} />
                     <FieldGroup className="gap-5">
-                        <FormField label="رمز عبور" htmlFor="download_password" description="برای دانلود، رمز عبور خود را تایید کنید.">
+                        <FormField label={t('رمز عبور')} htmlFor="download_password" description={t('برای دانلود، رمز عبور خود را تایید کنید.')}>
                             <PasswordInput id="download_password" name="password" autoComplete="current-password" required />
                         </FormField>
                         <SubmitButton size="lg">
                             <DownloadIcon />
-                            دانلود
+                            {t('دانلود')}
                         </SubmitButton>
                     </FieldGroup>
                 </form>
@@ -58,17 +59,17 @@ function RestoreSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (op
     };
 
     return (
-        <ResponsiveModal open={open} onOpenChange={onOpenChange} title="بازیابی پشتیبان" description="همه داده‌های مالی فعلی با محتوای فایل جایگزین می‌شود.">
+        <ResponsiveModal open={open} onOpenChange={onOpenChange} title={t('بازیابی پشتیبان')} description={t('همه داده‌های مالی فعلی با محتوای فایل جایگزین می‌شود.')}>
             <form onSubmit={submit} noValidate className="pb-4">
                 <FieldGroup className="gap-5">
-                    <FormField label="فایل پشتیبان (JSON)" htmlFor="restore_file" error={form.errors.backup}>
+                    <FormField label={t('فایل پشتیبان (JSON)')} htmlFor="restore_file" error={form.errors.backup}>
                         <Input id="restore_file" type="file" accept=".json,.txt" onChange={(event) => form.setData('backup', event.target.files?.[0] ?? null)} className="h-auto py-2" />
                     </FormField>
-                    <FormField label="رمز عبور" htmlFor="restore_password" error={form.errors.password}>
+                    <FormField label={t('رمز عبور')} htmlFor="restore_password" error={form.errors.password}>
                         <PasswordInput id="restore_password" autoComplete="current-password" value={form.data.password} onChange={(event) => form.setData('password', event.target.value)} aria-invalid={form.errors.password ? true : undefined} />
                     </FormField>
                     <SubmitButton size="lg" variant="destructive" processing={form.processing} disabled={!form.data.backup}>
-                        بازیابی و جایگزینی داده‌ها
+                        {t('بازیابی و جایگزینی داده‌ها')}
                     </SubmitButton>
                 </FieldGroup>
             </form>
@@ -92,24 +93,24 @@ export default function BackupsIndex({ backups }: { backups?: Backup[] }) {
 
     return (
         <>
-            <Head title="پشتیبان‌گیری" />
-            <PageHeader title="پشتیبان‌گیری" back={route('settings.index')} backComponent="settings/index" />
+            <Head title={t('پشتیبان‌گیری')} />
+            <PageHeader title={t('پشتیبان‌گیری')} back={route('settings.index')} backComponent="settings/index" />
             <PageBody>
                 <div className="grid grid-cols-2 gap-3">
                     <Button size="lg" disabled={creating} onClick={() => router.post(route('backups.store'), {}, { preserveScroll: true, onStart: () => setCreating(true), onFinish: () => setCreating(false) })}>
                         {creating ? <Spinner /> : <PlusIcon />}
-                        پشتیبان جدید
+                        {t('پشتیبان جدید')}
                     </Button>
                     <Button size="lg" variant="outline" onClick={() => setRestoring(true)}>
                         <UploadIcon />
-                        بازیابی
+                        {t('بازیابی')}
                     </Button>
                 </div>
 
                 {!backups ? (
                     <ListSkeleton rows={3} />
                 ) : backups.length === 0 ? (
-                    <EmptyState icon={DatabaseBackupIcon} title="پشتیبانی ساخته نشده" description="فایل پشتیبان خارج از پوشه عمومی سرور و فقط با رمز عبور شما قابل دانلود است." />
+                    <EmptyState icon={DatabaseBackupIcon} title={t('پشتیبانی ساخته نشده')} description={t('فایل پشتیبان خارج از پوشه عمومی سرور و فقط با رمز عبور شما قابل دانلود است.')} />
                 ) : (
                     <ListCard>
                         {backups.map((backup) => (
@@ -120,11 +121,11 @@ export default function BackupsIndex({ backups }: { backups?: Backup[] }) {
                                 subtitle={`${format.dateTime(backup.created_at)} · ${format.fileSize(backup.file_size)}`}
                                 trailing={
                                     <span className="flex items-center gap-1">
-                                        <Button variant="ghost" size="icon-sm" className="rounded-full" onClick={() => setDownloading(backup)} aria-label="دانلود">
+                                        <Button variant="ghost" size="icon-sm" className="rounded-full" onClick={() => setDownloading(backup)} aria-label={t('دانلود')}>
                                             <DownloadIcon />
                                         </Button>
-                                        <ConfirmAction title="حذف پشتیبان؟" description="این فایل پشتیبان برای همیشه حذف می‌شود." confirmLabel="حذف" href={route('backups.destroy', backup.id)} method="delete" destructive>
-                                            <Button variant="ghost" size="icon-sm" className="rounded-full text-destructive" aria-label="حذف">
+                                        <ConfirmAction title={t('حذف پشتیبان؟')} description={t('این فایل پشتیبان برای همیشه حذف می‌شود.')} confirmLabel={t('حذف')} href={route('backups.destroy', backup.id)} method="delete" destructive>
+                                            <Button variant="ghost" size="icon-sm" className="rounded-full text-destructive" aria-label={t('حذف')}>
                                                 <Trash2Icon />
                                             </Button>
                                         </ConfirmAction>
