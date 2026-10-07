@@ -33,7 +33,7 @@ class ReminderController extends Controller
             'notify_in_app' => $request->boolean('notify_in_app', true),
         ]);
 
-        return back()->with('status', 'یادآوری ثبت شد.');
+        return back()->with('status', __('یادآوری ثبت شد.'));
     }
 
     public function update(Request $request, Reminder $reminder): RedirectResponse
@@ -44,6 +44,6 @@ class ReminderController extends Controller
             'status' => ['required', Rule::in(['pending', 'done', 'dismissed'])],
         ]));
 
-        return back()->with('status', 'یادآوری به‌روز شد.');
+        return back()->with('status', __('یادآوری به‌روز شد.'));
     }
 }

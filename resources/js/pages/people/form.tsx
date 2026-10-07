@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toLatinDigits } from '@/lib/format';
 import type { Person } from '@/types';
+import { t } from '@/lib/i18n';
 
 export default function PersonForm({ person }: { person?: Person | null }) {
     const editing = Boolean(person);
@@ -29,16 +30,16 @@ export default function PersonForm({ person }: { person?: Person | null }) {
 
     return (
         <>
-            <Head title={editing ? 'ویرایش شخص' : 'شخص جدید'} />
+            <Head title={editing ? t('ویرایش شخص') : t('شخص جدید')} />
             <PageHeader
-                title={editing ? 'ویرایش شخص' : 'شخص جدید'}
+                title={editing ? t('ویرایش شخص') : t('شخص جدید')}
                 back={person ? route('people.show', person.id) : route('people.index')}
                 backComponent={person ? 'people/show' : 'people/index'}
             />
             <PageBody className="pt-5">
                 <form onSubmit={submit} noValidate>
                     <FieldGroup className="gap-6">
-                        <FormField label="نام کامل" htmlFor="full_name" error={form.errors.full_name}>
+                        <FormField label={t('نام کامل')} htmlFor="full_name" error={form.errors.full_name}>
                             <Input
                                 id="full_name"
                                 autoFocus={!editing}
@@ -48,7 +49,7 @@ export default function PersonForm({ person }: { person?: Person | null }) {
                                 aria-invalid={form.errors.full_name ? true : undefined}
                             />
                         </FormField>
-                        <FormField label="موبایل" htmlFor="mobile" optional error={form.errors.mobile}>
+                        <FormField label={t('موبایل')} htmlFor="mobile" optional error={form.errors.mobile}>
                             <Input
                                 id="mobile"
                                 type="tel"
@@ -61,11 +62,11 @@ export default function PersonForm({ person }: { person?: Person | null }) {
                                 aria-invalid={form.errors.mobile ? true : undefined}
                             />
                         </FormField>
-                        <FormField label="توضیح" htmlFor="description" optional error={form.errors.description}>
+                        <FormField label={t('توضیح')} htmlFor="description" optional error={form.errors.description}>
                             <Textarea id="description" rows={3} value={form.data.description} onChange={(event) => form.setData('description', event.target.value)} />
                         </FormField>
                         <SubmitButton size="lg" processing={form.processing} className="mt-2">
-                            ذخیره
+                            {t('ذخیره')}
                         </SubmitButton>
                     </FieldGroup>
                 </form>

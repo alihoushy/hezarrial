@@ -30,7 +30,7 @@ class ReportController extends Controller
 
     public function accounts(): Response
     {
-        return $this->cards('گزارش حساب‌ها', Account::forUser(auth()->user())->get()->map(fn (Account $account) => [
+        return $this->cards(__('گزارش حساب‌ها'), Account::forUser(auth()->user())->get()->map(fn (Account $account) => [
             'id' => $account->id,
             'title' => $account->name,
             'amount' => (float) $account->current_balance,
@@ -40,7 +40,7 @@ class ReportController extends Controller
 
     public function categories(): Response
     {
-        return $this->cards('گزارش دسته‌بندی‌ها', Category::forUser(auth()->user())->get()->map(fn (Category $category) => [
+        return $this->cards(__('گزارش دسته‌بندی‌ها'), Category::forUser(auth()->user())->get()->map(fn (Category $category) => [
             'id' => $category->id,
             'title' => $category->name,
             'amount' => null,
@@ -50,7 +50,7 @@ class ReportController extends Controller
 
     public function people(): Response
     {
-        return $this->cards('گزارش اشخاص', Person::forUser(auth()->user())->get()->map(fn (Person $person) => [
+        return $this->cards(__('گزارش اشخاص'), Person::forUser(auth()->user())->get()->map(fn (Person $person) => [
             'id' => $person->id,
             'title' => $person->full_name,
             'amount' => null,
@@ -60,7 +60,7 @@ class ReportController extends Controller
 
     public function loans(): Response
     {
-        return $this->cards('گزارش وام‌ها', Loan::forUser(auth()->user())->get()->map(fn (Loan $loan) => [
+        return $this->cards(__('گزارش وام‌ها'), Loan::forUser(auth()->user())->get()->map(fn (Loan $loan) => [
             'id' => $loan->id,
             'title' => $loan->title,
             'amount' => (float) $loan->principal_amount,
@@ -70,9 +70,9 @@ class ReportController extends Controller
 
     public function checks(): Response
     {
-        return $this->cards('گزارش چک‌ها', Check::forUser(auth()->user())->get()->map(fn (Check $check) => [
+        return $this->cards(__('گزارش چک‌ها'), Check::forUser(auth()->user())->get()->map(fn (Check $check) => [
             'id' => $check->id,
-            'title' => $check->check_number ?: 'چک',
+            'title' => $check->check_number ?: __('چک'),
             'amount' => (float) $check->amount,
             'href' => route('checks.index'),
         ]));
@@ -80,9 +80,9 @@ class ReportController extends Controller
 
     public function debts(): Response
     {
-        return $this->cards('گزارش طلب و بدهی', Debt::forUser(auth()->user())->with('person')->get()->map(fn (Debt $debt) => [
+        return $this->cards(__('گزارش طلب و بدهی'), Debt::forUser(auth()->user())->with('person')->get()->map(fn (Debt $debt) => [
             'id' => $debt->id,
-            'title' => $debt->person?->full_name ?? 'مورد',
+            'title' => $debt->person?->full_name ?? __('مورد'),
             'amount' => (float) $debt->remaining_amount,
             'href' => route('debts.index'),
         ]));

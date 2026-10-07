@@ -1,5 +1,6 @@
 import { usePage } from '@inertiajs/react';
 import { useMemo } from 'react';
+import { t } from '@/lib/i18n';
 import type { CurrencyDisplay, Settings } from '@/types';
 
 type DisplaySettings = Pick<Settings, 'currency_display' | 'persian_digits'>;
@@ -46,7 +47,11 @@ function sameDay(a: Date, b: Date): boolean {
 }
 
 export interface Formatters {
+    /** Interface language code (fa, en, ...). */
+    locale: string;
     settings: DisplaySettings;
+    /** 42٪ in Persian, 42% elsewhere. */
+    percent: (value: number) => string;
     /** Plain number in the user's digits, e.g. ۱۲٬۵۰۰. */
     number: (value: number, fractionDigits?: number) => string;
     /** Amount converted to the preferred unit, without the unit label. */
@@ -71,24 +76,24 @@ export interface Formatters {
     fileSize: (bytes: number) => string;
 }
 
-export function createFormatters(settings: DisplaySettings): Formatters {
-    const persian = settings.persian_digits;
-    // fa-IR uses the Persian (Solar Hijri) calendar; -nu-latn keeps ASCII digits.
-    const locale = persian ? 'fa-IR' : 'fa-IR-u-nu-latn';
+export function createFormatters(settings: DisplaySettings, locale = 'fa'): Formatters {
+    const persian = locale === 'fa' && settings.persian_digits;
+    // Persian uses the Solar Hijri calendar; -nu-latn keeps ASCII digits when the user prefers them.
+    const intlLocale = locale === 'fa' ? (persian ? 'fa-IR' : 'fa-IR-u-nu-latn') : locale;
     const display: CurrencyDisplay = settings.currency_display;
     const toman = display === 'toman';
 
-    const numberFormat = (fractionDigits: number) =>
-        new Intl.NumberFormat(persian ? 'fa-IR' : 'en-US', { maximumFractionDigits: fractionDigits });
+    const numberLocale = persian ? 'fa-IR' : locale === 'fa' ? 'en-US' : locale;
+    const numberFormat = (fractionDigits: number) => new Intl.NumberFormat(numberLocale, { maximumFractionDigits: fractionDigits });
     const integer = numberFormat(0);
 
-    const dateFormat = new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long', day: 'numeric' });
-    const shortFormat = new Intl.DateTimeFormat(locale, { month: 'long', day: 'numeric' });
-    const weekdayShort = new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'long', day: 'numeric' });
-    // ICU's Persian pattern for weekday + full date is "year month day, weekday", so join the parts ourselves.
-    const weekdayOnly = new Intl.DateTimeFormat(locale, { weekday: 'long' });
-    const dayFormat = new Intl.DateTimeFormat(locale, { day: 'numeric' });
-    const dateTimeFormat = new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    const dateFormat = new Intl.DateTimeFormat(intlLocale, { year: 'numeric', month: 'long', day: 'numeric' });
+    const shortFormat = new Intl.DateTimeFormat(intlLocale, { month: 'long', day: 'numeric' });
+    const weekdayShort = new Intl.DateTimeFormat(intlLocale, { weekday: 'long', month: 'long', day: 'numeric' });
+    const weekdayOnly = new Intl.DateTimeFormat(intlLocale, { weekday: 'long' });
+    const fullFormat = new Intl.DateTimeFormat(intlLocale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const dayFormat = new Intl.DateTimeFormat(intlLocale, { day: 'numeric' });
+    const dateTimeFormat = new Intl.DateTimeFormat(intlLocale, { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
     const withDate = (fn: (date: Date) => string) => (value: string | null | undefined) => {
         const date = parseDate(value);
@@ -97,11 +102,13 @@ export function createFormatters(settings: DisplaySettings): Formatters {
     };
 
     return {
+        locale,
         settings,
+        percent: (value) => `${integer.format(value)}${locale === 'fa' ? '٪' : '%'}`,
         number: (value, fractionDigits = 0) => numberFormat(fractionDigits).format(value),
         money: (rial) => integer.format(toman ? Math.round(rial / 10) : rial),
-        unit: toman ? 'تومان' : 'ریال',
-        secondary: (rial) => (display === 'both' ? `${integer.format(Math.round(rial / 10))} تومان` : null),
+        unit: toman ? t('تومان') : t('ریال'),
+        secondary: (rial) => (display === 'both' ? `${integer.format(Math.round(rial / 10))} ${t('تومان')}` : null),
         digits: (value) => (persian ? toPersianDigits(value) : value),
         date: withDate((date) => dateFormat.format(date)),
         shortDate: withDate((date) => shortFormat.format(date)),
@@ -109,13 +116,14 @@ export function createFormatters(settings: DisplaySettings): Formatters {
             const today = new Date();
             const offset = (days: number) => new Date(today.getFullYear(), today.getMonth(), today.getDate() + days);
 
-            if (sameDay(date, today)) return 'امروز';
-            if (sameDay(date, offset(-1))) return 'دیروز';
-            if (sameDay(date, offset(1))) return 'فردا';
+            if (sameDay(date, today)) return t('امروز');
+            if (sameDay(date, offset(-1))) return t('دیروز');
+            if (sameDay(date, offset(1))) return t('فردا');
 
             return weekdayShort.format(date);
         }),
-        longDate: withDate((date) => `${weekdayOnly.format(date)} ${dateFormat.format(date)}`),
+        // ICU's Persian pattern for weekday + full date is "year month day, weekday", so join the parts ourselves.
+        longDate: withDate((date) => (locale === 'fa' ? `${weekdayOnly.format(date)} ${dateFormat.format(date)}` : fullFormat.format(date))),
         dayOfMonth: withDate((date) => dayFormat.format(date)),
         dateTime: (value) => {
             if (!value) return '—';
@@ -124,19 +132,21 @@ export function createFormatters(settings: DisplaySettings): Formatters {
             return Number.isNaN(date.getTime()) ? '—' : dateTimeFormat.format(date);
         },
         fileSize: (bytes) => {
-            if (bytes < 1024) return `${integer.format(bytes)} بایت`;
-            if (bytes < 1024 * 1024) return `${numberFormat(1).format(bytes / 1024)} کیلوبایت`;
+            if (bytes < 1024) return `${integer.format(bytes)} ${t('بایت')}`;
+            if (bytes < 1024 * 1024) return `${numberFormat(1).format(bytes / 1024)} ${t('کیلوبایت')}`;
 
-            return `${numberFormat(1).format(bytes / 1024 / 1024)} مگابایت`;
+            return `${numberFormat(1).format(bytes / 1024 / 1024)} ${t('مگابایت')}`;
         },
     };
 }
 
-/** Formatters bound to the signed-in user's display settings (available on every page). */
+/** Formatters bound to the signed-in user's display settings and the interface language. */
 export function useFormat(): Formatters {
-    const settings = usePage().props.settings;
+    const { settings, locale } = usePage().props;
     const persian = settings?.persian_digits ?? true;
     const display = settings?.currency_display ?? 'both';
+    const code = locale?.code ?? 'fa';
 
-    return useMemo(() => createFormatters({ persian_digits: persian, currency_display: display }), [persian, display]);
+    // `unit` and the relative-day words are translated, so the language is part of the cache key.
+    return useMemo(() => createFormatters({ persian_digits: persian, currency_display: display }, code), [persian, display, code]);
 }

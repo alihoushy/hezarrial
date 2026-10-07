@@ -4,6 +4,7 @@ import { EmptyState } from '@/components/empty-state';
 import { ListCard, ListRow } from '@/components/list';
 import { Money } from '@/components/money';
 import { PageBody, PageHeader } from '@/components/page-header';
+import { t } from '@/lib/i18n';
 
 interface Item {
     id: number;
@@ -19,7 +20,7 @@ export default function ReportCards({ title, items }: { title: string; items: It
             <PageHeader title={title} back={route('reports.index')} backComponent="reports/index" />
             <PageBody>
                 {items.length === 0 ? (
-                    <EmptyState icon={InboxIcon} title="موردی برای گزارش نیست" />
+                    <EmptyState icon={InboxIcon} title={t('موردی برای گزارش نیست')} />
                 ) : (
                     <ListCard>
                         {items.map((item) => (

@@ -22,7 +22,7 @@ class CheckService
                 'type' => $type,
                 'amount' => $check->amount,
                 'transaction_date' => $data['transaction_date'] ?? now()->toDateString(),
-                'description' => 'پاس شدن چک '.$check->check_number,
+                'description' => __('پاس شدن چک :number', ['number' => $check->check_number]),
             ]);
 
             $check->forceFill([

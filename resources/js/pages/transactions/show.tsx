@@ -11,21 +11,22 @@ import { useFormat } from '@/lib/format';
 import { transactionTypes } from '@/lib/labels';
 import { cn } from '@/lib/utils';
 import type { Transaction } from '@/types';
+import { t } from '@/lib/i18n';
 
 export default function TransactionShow({ transaction }: { transaction?: Transaction }) {
     const format = useFormat();
 
     return (
         <>
-            <Head title="جزئیات تراکنش" />
+            <Head title={t('جزئیات تراکنش')} />
             <PageHeader
-                title="جزئیات تراکنش"
+                title={t('جزئیات تراکنش')}
                 back={route('transactions.index')}
                 backComponent="transactions/index"
                 actions={
                     transaction && (
                         <Button variant="ghost" size="icon" className="rounded-full" asChild>
-                            <Link href={route('transactions.edit', transaction.id)} component="transactions/form" aria-label="ویرایش">
+                            <Link href={route('transactions.edit', transaction.id)} component="transactions/form" aria-label={t('ویرایش')}>
                                 <PencilIcon className="size-5" />
                             </Link>
                         </Button>
@@ -48,12 +49,12 @@ function TransactionDetails({ transaction, format }: { transaction: Transaction;
     const incoming = transaction.direction > 0;
 
     const rows: [string, string | null | undefined][] = [
-        ['حساب', transaction.account?.name],
-        ['دسته‌بندی', transaction.category?.name],
-        ['شخص', transaction.person?.name],
-        ['تاریخ', format.longDate(transaction.date)],
-        ['ساعت', transaction.time ? format.digits(transaction.time) : null],
-        ['شماره پیگیری', transaction.reference_number ? format.digits(transaction.reference_number) : null],
+        [t('حساب'), transaction.account?.name],
+        [t('دسته‌بندی'), transaction.category?.name],
+        [t('شخص'), transaction.person?.name],
+        [t('تاریخ'), format.longDate(transaction.date)],
+        [t('ساعت'), transaction.time ? format.digits(transaction.time) : null],
+        [t('شماره پیگیری'), transaction.reference_number ? format.digits(transaction.reference_number) : null],
     ];
 
     return (
@@ -62,7 +63,7 @@ function TransactionDetails({ transaction, format }: { transaction: Transaction;
                 <span className={cn('flex size-14 items-center justify-center rounded-full', incoming ? 'bg-income/12 text-income' : 'bg-expense/10 text-expense')}>
                     <type.icon className="size-6" />
                 </span>
-                <Badge variant="secondary">{type.label}</Badge>
+                <Badge variant="secondary">{t(type.label)}</Badge>
                 <Money amount={transaction.amount} tone={incoming ? 'income' : 'expense'} showSign withSecondary className="items-center text-3xl font-extrabold" />
                 {transaction.description && <p className="max-w-xs text-sm text-muted-foreground">{transaction.description}</p>}
             </section>
@@ -76,16 +77,16 @@ function TransactionDetails({ transaction, format }: { transaction: Transaction;
             </ListCard>
 
             <ConfirmAction
-                title="حذف تراکنش؟"
-                description="مانده حساب بر اساس حذف این تراکنش به‌روز می‌شود."
-                confirmLabel="حذف"
+                title={t('حذف تراکنش؟')}
+                description={t('مانده حساب بر اساس حذف این تراکنش به‌روز می‌شود.')}
+                confirmLabel={t('حذف')}
                 href={route('transactions.destroy', transaction.id)}
                 method="delete"
                 destructive
             >
                 <Button variant="destructive" size="lg" className="w-full">
                     <Trash2Icon />
-                    حذف تراکنش
+                    {t('حذف تراکنش')}
                 </Button>
             </ConfirmAction>
         </>

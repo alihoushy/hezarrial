@@ -1,10 +1,11 @@
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { t } from '@/lib/i18n';
 
 /** Placeholder rows shaped like the real list rows (icon, two lines, amount). */
 export function ListSkeleton({ rows = 6, className }: { rows?: number; className?: string }) {
     return (
-        <div className={cn('overflow-hidden rounded-2xl bg-card ring-1 ring-foreground/5', className)} aria-busy="true" aria-label="در حال بارگذاری">
+        <div className={cn('overflow-hidden rounded-2xl bg-card ring-1 ring-foreground/5', className)} aria-busy="true" aria-label={t('در حال بارگذاری')}>
             {Array.from({ length: rows }, (_, index) => (
                 <div key={index} className="flex items-center gap-3 border-b border-border/60 px-4 py-3.5 last:border-b-0">
                     <Skeleton className="size-10 shrink-0 rounded-full" />
@@ -76,7 +77,7 @@ export function ChartSkeleton({ className }: { className?: string }) {
 
 export function FormSkeleton({ fields = 5 }: { fields?: number }) {
     return (
-        <div className="flex flex-col gap-5" aria-busy="true" aria-label="در حال بارگذاری فرم">
+        <div className="flex flex-col gap-5" aria-busy="true" aria-label={t('در حال بارگذاری فرم')}>
             {Array.from({ length: fields }, (_, index) => (
                 <div key={index} className="flex flex-col gap-2">
                     <Skeleton className="h-3.5 w-20" />

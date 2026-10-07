@@ -4,7 +4,7 @@ import {
     ArrowDownToLineIcon,
     ArrowUpFromLineIcon,
     BellIcon,
-    ChevronLeftIcon,
+    ChevronRightIcon,
     HandCoinsIcon,
     LandmarkIcon,
     ReceiptTextIcon,
@@ -23,6 +23,7 @@ import { accountTypes } from '@/lib/labels';
 import { cn } from '@/lib/utils';
 import type { Charts } from '@/components/dashboard-charts';
 import type { Account, Transaction } from '@/types';
+import { t } from '@/lib/i18n';
 
 // Recharts is large; it loads after the page has painted.
 const MonthTrend = lazy(() => import('@/components/dashboard-charts').then((module) => ({ default: module.MonthTrend })));
@@ -67,10 +68,10 @@ function Greeting() {
         <div className="pt-safe flex items-center justify-between gap-3 px-4 pt-5">
             <div className="min-w-0">
                 <p className="text-sm text-muted-foreground">{format.longDate(todayIso())}</p>
-                <h1 className="truncate text-2xl font-extrabold">سلام{auth.user ? `، ${auth.user.name}` : ''}</h1>
+                <h1 className="truncate text-2xl font-extrabold">{auth.user ? t('سلام، :name', { name: auth.user.name }) : t('سلام')}</h1>
             </div>
             <Button variant="secondary" size="icon" className="rounded-full" asChild>
-                <Link href={route('settings.index')} component="settings/index" aria-label="تنظیمات">
+                <Link href={route('settings.index')} component="settings/index" aria-label={t('تنظیمات')}>
                     <SettingsIcon className="size-5" />
                 </Link>
             </Button>
@@ -84,7 +85,7 @@ function BalanceHero({ summary }: { summary: Summary }) {
     return (
         <section className="relative overflow-hidden rounded-3xl bg-linear-to-br from-zinc-900 via-zinc-900 to-teal-900 p-5 text-white shadow-lg ring-1 ring-white/10">
             <div className="pointer-events-none absolute -top-16 -end-10 size-48 rounded-full bg-teal-400/20 blur-3xl" />
-            <p className="text-sm text-white/70">موجودی کل حساب‌ها</p>
+            <p className="text-sm text-white/70">{t('موجودی کل حساب‌ها')}</p>
             <p className="mt-1 text-[2rem] leading-tight font-extrabold">
                 <span className="tabular-nums" dir="ltr">
                     {summary.total_balance < 0 ? '−' : ''}
@@ -98,20 +99,20 @@ function BalanceHero({ summary }: { summary: Summary }) {
                 <div className="rounded-2xl bg-white/8 p-3 ring-1 ring-white/10">
                     <p className="flex items-center gap-1.5 text-xs text-white/70">
                         <ArrowDownToLineIcon className="size-3.5 text-emerald-300" />
-                        درآمد این ماه
+                        {t('درآمد این ماه')}
                     </p>
                     <p className="mt-1 font-bold tabular-nums">{format.money(summary.income)}</p>
                 </div>
                 <div className="rounded-2xl bg-white/8 p-3 ring-1 ring-white/10">
                     <p className="flex items-center gap-1.5 text-xs text-white/70">
                         <ArrowUpFromLineIcon className="size-3.5 text-rose-300" />
-                        هزینه این ماه
+                        {t('هزینه این ماه')}
                     </p>
                     <p className="mt-1 font-bold tabular-nums">{format.money(summary.expense)}</p>
                 </div>
             </div>
             <p className="mt-3 text-xs text-white/60">
-                خالص این ماه:{' '}
+                {t('خالص این ماه:')}{' '}
                 <span className={cn('font-semibold', summary.net >= 0 ? 'text-emerald-300' : 'text-rose-300')}>
                     <span className="tabular-nums" dir="ltr">
                         {summary.net < 0 ? '−' : ''}
@@ -129,12 +130,12 @@ function AccountsStrip({ accounts }: { accounts: Account[] }) {
         return (
             <EmptyState
                 icon={LandmarkIcon}
-                title="هنوز حسابی ندارید"
-                description="برای شروع، حساب بانکی، کارت یا کیف پول نقد خود را اضافه کنید."
+                title={t('هنوز حسابی ندارید')}
+                description={t('برای شروع، حساب بانکی، کارت یا کیف پول نقد خود را اضافه کنید.')}
                 action={
                     <Button asChild>
                         <Link href={route('accounts.create')} component="accounts/form">
-                            افزودن حساب
+                            {t('افزودن حساب')}
                         </Link>
                     </Button>
                 }
@@ -173,7 +174,7 @@ function Upcoming({ items }: { items: UpcomingItem[] }) {
     const format = useFormat();
 
     if (items.length === 0) {
-        return <p className="rounded-2xl bg-card px-4 py-6 text-center text-sm text-muted-foreground ring-1 ring-foreground/5">موعد نزدیکی ندارید.</p>;
+        return <p className="rounded-2xl bg-card px-4 py-6 text-center text-sm text-muted-foreground ring-1 ring-foreground/5">{t('موعد نزدیکی ندارید.')}</p>;
     }
 
     return (
@@ -188,7 +189,7 @@ function Upcoming({ items }: { items: UpcomingItem[] }) {
                         icon={icon}
                         iconClassName={tint}
                         title={item.title}
-                        subtitle={item.due_date ? format.relativeDay(item.due_date) : 'بدون سررسید'}
+                        subtitle={item.due_date ? format.relativeDay(item.due_date) : t('بدون سررسید')}
                         trailing={item.amount !== null ? <Money amount={item.amount} className="text-sm font-semibold" /> : undefined}
                     />
                 );
@@ -200,7 +201,7 @@ function Upcoming({ items }: { items: UpcomingItem[] }) {
 export default function Dashboard({ summary, accounts, recent, charts, upcoming }: DashboardProps) {
     return (
         <>
-            <Head title="خانه" />
+            <Head title={t('خانه')} />
             <Greeting />
             <div className="flex flex-col gap-7 px-4 pt-4">
                 {summary ? <BalanceHero summary={summary} /> : <HeroSkeleton className="h-56" />}
@@ -209,18 +210,18 @@ export default function Dashboard({ summary, accounts, recent, charts, upcoming 
                     <SectionTitle
                         action={
                             <Link href={route('accounts.index')} component="accounts/index" className="flex items-center text-sm font-medium text-brand">
-                                همه
-                                <ChevronLeftIcon className="size-4" />
+                                {t('همه')}
+                                <ChevronRightIcon className="size-4 rtl:rotate-180" />
                             </Link>
                         }
                     >
-                        حساب‌ها
+                        {t('حساب‌ها')}
                     </SectionTitle>
                     {accounts ? <AccountsStrip accounts={accounts} /> : <CardsRowSkeleton />}
                 </section>
 
                 <section className="flex flex-col gap-3">
-                    <SectionTitle>این ماه</SectionTitle>
+                    <SectionTitle>{t('این ماه')}</SectionTitle>
                     <Deferred data="charts" fallback={<ChartSkeleton />}>
                         <Suspense fallback={<ChartSkeleton />}>{charts && <MonthTrend daily={charts.daily} />}</Suspense>
                     </Deferred>
@@ -230,7 +231,7 @@ export default function Dashboard({ summary, accounts, recent, charts, upcoming 
                 </section>
 
                 <section>
-                    <SectionTitle>موعدهای نزدیک</SectionTitle>
+                    <SectionTitle>{t('موعدهای نزدیک')}</SectionTitle>
                     <Deferred data="upcoming" fallback={<ListSkeleton rows={3} />}>
                         {upcoming && <Upcoming items={upcoming} />}
                     </Deferred>
@@ -240,12 +241,12 @@ export default function Dashboard({ summary, accounts, recent, charts, upcoming 
                     <SectionTitle
                         action={
                             <Link href={route('transactions.index')} component="transactions/index" className="flex items-center text-sm font-medium text-brand">
-                                همه
-                                <ChevronLeftIcon className="size-4" />
+                                {t('همه')}
+                                <ChevronRightIcon className="size-4 rtl:rotate-180" />
                             </Link>
                         }
                     >
-                        آخرین تراکنش‌ها
+                        {t('آخرین تراکنش‌ها')}
                     </SectionTitle>
                     {recent ? (
                         recent.length > 0 ? (
@@ -255,7 +256,7 @@ export default function Dashboard({ summary, accounts, recent, charts, upcoming 
                                 ))}
                             </ListCard>
                         ) : (
-                            <p className="rounded-2xl bg-card px-4 py-6 text-center text-sm text-muted-foreground ring-1 ring-foreground/5">هنوز تراکنشی ثبت نشده است.</p>
+                            <p className="rounded-2xl bg-card px-4 py-6 text-center text-sm text-muted-foreground ring-1 ring-foreground/5">{t('هنوز تراکنشی ثبت نشده است.')}</p>
                         )
                     ) : (
                         <ListSkeleton rows={4} />

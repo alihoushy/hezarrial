@@ -21,9 +21,9 @@ class SmsIngestRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'message.required' => 'متن پیام الزامی است.',
-            'message.min' => 'متن پیام بسیار کوتاه است.',
-            'message.max' => 'متن پیام بسیار طولانی است.',
+            'message.required' => __('متن پیام الزامی است.'),
+            'message.min' => __('متن پیام بسیار کوتاه است.'),
+            'message.max' => __('متن پیام بسیار طولانی است.'),
         ];
     }
 }

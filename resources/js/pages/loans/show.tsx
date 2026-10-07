@@ -13,6 +13,7 @@ import { todayIso, useFormat } from '@/lib/format';
 import { installmentStatuses } from '@/lib/labels';
 import { cn } from '@/lib/utils';
 import type { Installment, Loan, Option } from '@/types';
+import { t } from '@/lib/i18n';
 
 interface Props {
     loan?: Loan;
@@ -41,19 +42,19 @@ function PaySheet({ loanId, installment, accounts, onClose }: { loanId: number; 
         <ResponsiveModal
             open={installment !== null}
             onOpenChange={(next) => !next && onClose()}
-            title="پرداخت قسط"
+            title={t('پرداخت قسط')}
             description={installment ? `${format.date(installment.due_date)} · ${format.money(installment.amount)} ${format.unit}` : undefined}
         >
             <form onSubmit={submit} noValidate className="pb-4">
                 <FieldGroup className="gap-5">
-                    <FormField label="پرداخت از حساب" htmlFor="pay_account" error={form.errors.account_id}>
+                    <FormField label={t('پرداخت از حساب')} htmlFor="pay_account" error={form.errors.account_id}>
                         <SelectField id="pay_account" value={form.data.account_id} onChange={(event) => form.setData('account_id', event.target.value)} options={accounts.map((account) => ({ value: account.id, label: account.name }))} />
                     </FormField>
-                    <FormField label="تاریخ پرداخت" htmlFor="pay_date" error={form.errors.transaction_date}>
+                    <FormField label={t('تاریخ پرداخت')} htmlFor="pay_date" error={form.errors.transaction_date}>
                         <DateInput id="pay_date" value={form.data.transaction_date} onChange={(event) => form.setData('transaction_date', event.target.value)} />
                     </FormField>
                     <SubmitButton size="lg" processing={form.processing}>
-                        ثبت پرداخت
+                        {t('ثبت پرداخت')}
                     </SubmitButton>
                 </FieldGroup>
             </form>
@@ -68,29 +69,29 @@ export default function LoanShow({ loan, installments, accounts }: Props) {
 
     return (
         <>
-            <Head title={loan?.title ?? 'وام'} />
-            <PageHeader title={loan?.title ?? 'وام'} back={route('loans.index')} backComponent="loans/index" />
+            <Head title={loan?.title ?? t('وام')} />
+            <PageHeader title={loan?.title ?? t('وام')} back={route('loans.index')} backComponent="loans/index" />
             <PageBody>
                 {!loan ? (
                     <DetailSkeleton />
                 ) : (
                     <section className="flex flex-col gap-4 rounded-3xl bg-card p-5 ring-1 ring-foreground/5">
                         <div>
-                            <p className="text-sm text-muted-foreground">مبلغ کل قابل پرداخت</p>
+                            <p className="text-sm text-muted-foreground">{t('مبلغ کل قابل پرداخت')}</p>
                             <Money amount={loan.total_payable_amount} withSecondary className="text-[1.75rem] font-extrabold" />
                         </div>
-                        <Progress value={percent} aria-label="پیشرفت پرداخت" />
+                        <Progress value={percent} aria-label={t('پیشرفت پرداخت')} />
                         <div className="grid grid-cols-3 gap-2 text-center">
                             <div className="rounded-2xl bg-muted/70 p-3">
-                                <p className="text-xs text-muted-foreground">اصل وام</p>
+                                <p className="text-xs text-muted-foreground">{t('اصل وام')}</p>
                                 <Money amount={loan.principal_amount} className="mt-1 text-sm font-bold" unitClassName="hidden" />
                             </div>
                             <div className="rounded-2xl bg-muted/70 p-3">
-                                <p className="text-xs text-muted-foreground">هر قسط</p>
+                                <p className="text-xs text-muted-foreground">{t('هر قسط')}</p>
                                 <Money amount={loan.installment_amount} className="mt-1 text-sm font-bold" unitClassName="hidden" />
                             </div>
                             <div className="rounded-2xl bg-muted/70 p-3">
-                                <p className="text-xs text-muted-foreground">پرداخت‌شده</p>
+                                <p className="text-xs text-muted-foreground">{t('پرداخت‌شده')}</p>
                                 <p className="mt-1 text-sm font-bold tabular-nums">
                                     {format.number(loan.paid_installment_count)}/{format.number(loan.installment_count)}
                                 </p>
@@ -100,7 +101,7 @@ export default function LoanShow({ loan, installments, accounts }: Props) {
                 )}
 
                 <section>
-                    <SectionTitle>اقساط</SectionTitle>
+                    <SectionTitle>{t('اقساط')}</SectionTitle>
                     {!installments ? (
                         <ListSkeleton rows={6} />
                     ) : (
@@ -118,7 +119,7 @@ export default function LoanShow({ loan, installments, accounts }: Props) {
                                             </span>
                                         }
                                         title={format.date(installment.due_date)}
-                                        subtitle={installment.paid_at ? `پرداخت در ${format.date(installment.paid_at)}` : undefined}
+                                        subtitle={installment.paid_at ? t('پرداخت در :date', { date: format.date(installment.paid_at) }) : undefined}
                                         trailing={
                                             <>
                                                 <Money amount={installment.amount} className="text-sm font-semibold" />

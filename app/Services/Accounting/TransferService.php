@@ -16,7 +16,7 @@ class TransferService
     public function create(User $user, array $data): array
     {
         if ((int) $data['account_id'] === (int) $data['destination_account_id']) {
-            throw ValidationException::withMessages(['destination_account_id' => 'حساب مبدا و مقصد نباید یکی باشد.']);
+            throw ValidationException::withMessages(['destination_account_id' => __('حساب مبدا و مقصد نباید یکی باشد.')]);
         }
 
         return DB::transaction(function () use ($user, $data): array {
@@ -28,7 +28,7 @@ class TransferService
                 'amount' => $data['amount'],
                 'transaction_date' => $data['transaction_date'],
                 'transaction_time' => $data['transaction_time'] ?? null,
-                'description' => $data['description'] ?? 'انتقال بین حساب‌ها',
+                'description' => $data['description'] ?? __('انتقال بین حساب‌ها'),
                 'reference_number' => $data['reference_number'] ?? null,
                 'transfer_group_uuid' => $uuid,
                 'source' => 'manual',
@@ -40,7 +40,7 @@ class TransferService
                 'amount' => $data['amount'],
                 'transaction_date' => $data['transaction_date'],
                 'transaction_time' => $data['transaction_time'] ?? null,
-                'description' => $data['description'] ?? 'انتقال بین حساب‌ها',
+                'description' => $data['description'] ?? __('انتقال بین حساب‌ها'),
                 'reference_number' => $data['reference_number'] ?? null,
                 'transfer_group_uuid' => $uuid,
                 'source' => 'manual',

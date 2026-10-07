@@ -2,13 +2,14 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 @import '@fontsource-variable/vazirmatn';
+@import '@fontsource-variable/inter';
 
 @source '../views';
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-    --font-sans: 'Vazirmatn Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-sans: var(--app-font);
     --font-heading: var(--font-sans);
 
     --color-income: var(--income);
@@ -55,6 +56,16 @@
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* Persian reads best in Vazirmatn; Latin-script languages get Inter, with Vazirmatn as the fallback for any Persian names. */
+:root {
+    --app-font: 'Vazirmatn Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+html:lang(en),
+html:lang(ru) {
+    --app-font: 'Inter Variable', 'Vazirmatn Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
 
 /* Light: an iOS-style grouped background with white cards on top. */

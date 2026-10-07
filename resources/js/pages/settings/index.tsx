@@ -21,6 +21,7 @@ import type { FormEvent } from 'react';
 import { ConfirmAction } from '@/components/confirm-action';
 import { FormField, SelectField, SubmitButton } from '@/components/form-field';
 import { ListCard, ListRow } from '@/components/list';
+import { LanguageSelect } from '@/components/language-select';
 import { PageBody, PageHeader, SectionTitle } from '@/components/page-header';
 import { PersonAvatar } from '@/components/person-avatar';
 import { Button } from '@/components/ui/button';
@@ -31,6 +32,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { applyTheme } from '@/hooks/use-theme';
 import { toLatinDigits } from '@/lib/format';
 import type { CurrencyDisplay, Theme } from '@/types';
+import { t, tr } from '@/lib/i18n';
 
 interface Preferences {
     currency_display: CurrencyDisplay;
@@ -41,34 +43,34 @@ interface Preferences {
 }
 
 const LINKS: { label: string; route: string; component: string; icon: LucideIcon }[] = [
-    { label: 'گزارش‌ها', route: 'reports.index', component: 'reports/index', icon: ChartPieIcon },
-    { label: 'دسته‌بندی‌ها', route: 'categories.index', component: 'categories/index', icon: TagsIcon },
-    { label: 'اشخاص', route: 'people.index', component: 'people/index', icon: UsersIcon },
-    { label: 'طلب و بدهی', route: 'debts.index', component: 'debts/index', icon: HandCoinsIcon },
-    { label: 'وام و اقساط', route: 'loans.index', component: 'loans/index', icon: LandmarkIcon },
-    { label: 'چک‌ها', route: 'checks.index', component: 'checks/index', icon: ReceiptTextIcon },
-    { label: 'بودجه‌بندی', route: 'budgets.index', component: 'budgets/index', icon: PiggyBankIcon },
-    { label: 'یادآوری‌ها', route: 'reminders.index', component: 'reminders/index', icon: BellIcon },
-    { label: 'تکرارشونده‌ها', route: 'recurring.index', component: 'recurring/index', icon: RepeatIcon },
+    { label: tr('گزارش‌ها'), route: 'reports.index', component: 'reports/index', icon: ChartPieIcon },
+    { label: tr('دسته‌بندی‌ها'), route: 'categories.index', component: 'categories/index', icon: TagsIcon },
+    { label: tr('اشخاص'), route: 'people.index', component: 'people/index', icon: UsersIcon },
+    { label: tr('طلب و بدهی'), route: 'debts.index', component: 'debts/index', icon: HandCoinsIcon },
+    { label: tr('وام و اقساط'), route: 'loans.index', component: 'loans/index', icon: LandmarkIcon },
+    { label: tr('چک‌ها'), route: 'checks.index', component: 'checks/index', icon: ReceiptTextIcon },
+    { label: tr('بودجه‌بندی'), route: 'budgets.index', component: 'budgets/index', icon: PiggyBankIcon },
+    { label: tr('یادآوری‌ها'), route: 'reminders.index', component: 'reminders/index', icon: BellIcon },
+    { label: tr('تکرارشونده‌ها'), route: 'recurring.index', component: 'recurring/index', icon: RepeatIcon },
 ];
 
 const DATA_LINKS: typeof LINKS = [
-    { label: 'وارد کردن داده', route: 'imports.index', component: 'imports/index', icon: FileUpIcon },
-    { label: 'پشتیبان‌گیری', route: 'backups.index', component: 'backups/index', icon: DatabaseBackupIcon },
+    { label: tr('وارد کردن داده'), route: 'imports.index', component: 'imports/index', icon: FileUpIcon },
+    { label: tr('پشتیبان‌گیری'), route: 'backups.index', component: 'backups/index', icon: DatabaseBackupIcon },
 ];
 
 function Links({ links }: { links: typeof LINKS }) {
     return (
         <ListCard>
             {links.map((link) => (
-                <ListRow key={link.route} href={route(link.route)} component={link.component} icon={link.icon} title={link.label} chevron />
+                <ListRow key={link.route} href={route(link.route)} component={link.component} icon={link.icon} title={t(link.label)} chevron />
             ))}
         </ListCard>
     );
 }
 
 export default function Settings({ preferences }: { preferences?: Preferences }) {
-    const { auth } = usePage().props;
+    const { auth, locale } = usePage().props;
     const form = useForm({
         currency_display: preferences?.currency_display ?? 'both',
         persian_digits: preferences?.persian_digits ?? true,
@@ -96,8 +98,8 @@ export default function Settings({ preferences }: { preferences?: Preferences })
 
     return (
         <>
-            <Head title="بیشتر" />
-            <PageHeader title="بیشتر" />
+            <Head title={t('بیشتر')} />
+            <PageHeader title={t('بیشتر')} />
             <PageBody>
                 {auth.user && (
                     <section className="flex items-center gap-3 rounded-2xl bg-card p-4 ring-1 ring-foreground/5">
@@ -114,34 +116,38 @@ export default function Settings({ preferences }: { preferences?: Preferences })
                 <Links links={LINKS} />
 
                 <section>
-                    <SectionTitle>داده‌ها</SectionTitle>
+                    <SectionTitle>{t('داده‌ها')}</SectionTitle>
                     <Links links={DATA_LINKS} />
                 </section>
 
                 <section>
-                    <SectionTitle>تنظیمات نمایش و امنیت</SectionTitle>
+                    <SectionTitle>{t('تنظیمات نمایش و امنیت')}</SectionTitle>
                     <form onSubmit={submit} noValidate className="rounded-2xl bg-card p-4 ring-1 ring-foreground/5">
                         <FieldGroup className="gap-5">
-                            <FormField label="نمایش ارز" htmlFor="currency_display" error={form.errors.currency_display}>
+                            <FormField label={t('نمایش ارز')} htmlFor="currency_display" error={form.errors.currency_display}>
                                 <SelectField
                                     id="currency_display"
                                     value={form.data.currency_display}
                                     onChange={(event) => form.setData('currency_display', event.target.value as CurrencyDisplay)}
                                     options={[
-                                        { value: 'both', label: 'ریال و تومان' },
-                                        { value: 'rial', label: 'فقط ریال' },
-                                        { value: 'toman', label: 'فقط تومان' },
+                                        { value: 'both', label: t('ریال و تومان') },
+                                        { value: 'rial', label: t('فقط ریال') },
+                                        { value: 'toman', label: t('فقط تومان') },
                                     ]}
                                 />
                             </FormField>
 
-                            <FormField label="ظاهر برنامه" error={form.errors.theme}>
-                                <ToggleGroup type="single" value={form.data.theme} onValueChange={(value) => value && changeTheme(value as Theme)} className="grid w-full grid-cols-3 gap-2" aria-label="ظاهر برنامه">
+                            <FormField label={t('زبان')} htmlFor="language">
+                                <LanguageSelect />
+                            </FormField>
+
+                            <FormField label={t('ظاهر برنامه')} error={form.errors.theme}>
+                                <ToggleGroup type="single" value={form.data.theme} onValueChange={(value) => value && changeTheme(value as Theme)} className="grid w-full grid-cols-3 gap-2" aria-label={t('ظاهر برنامه')}>
                                     {(
                                         [
-                                            ['system', 'سیستم', MonitorSmartphoneIcon],
-                                            ['light', 'روشن', SunIcon],
-                                            ['dark', 'تاریک', MoonIcon],
+                                            ['system', t('سیستم'), MonitorSmartphoneIcon],
+                                            ['light', t('روشن'), SunIcon],
+                                            ['dark', t('تاریک'), MoonIcon],
                                         ] as const
                                     ).map(([value, label, Icon]) => (
                                         <ToggleGroupItem key={value} value={value} className="h-14 flex-col gap-1 rounded-xl border border-border bg-card text-xs data-[state=on]:border-primary data-[state=on]:bg-primary/5 data-[state=on]:font-bold">
@@ -152,12 +158,14 @@ export default function Settings({ preferences }: { preferences?: Preferences })
                                 </ToggleGroup>
                             </FormField>
 
-                            <label className="flex min-h-11 items-center justify-between gap-3 text-sm font-medium">
-                                نمایش اعداد فارسی
-                                <Switch checked={form.data.persian_digits} onCheckedChange={(checked) => form.setData('persian_digits', checked)} />
-                            </label>
+                            {locale.code === 'fa' && (
+                                <label className="flex min-h-11 items-center justify-between gap-3 text-sm font-medium">
+                                    {t('نمایش اعداد فارسی')}
+                                    <Switch checked={form.data.persian_digits} onCheckedChange={(checked) => form.setData('persian_digits', checked)} />
+                                </label>
+                            )}
 
-                            <FormField label="زمان انقضای نشست (دقیقه)" htmlFor="session_timeout_minutes" error={form.errors.session_timeout_minutes}>
+                            <FormField label={t('زمان انقضای نشست (دقیقه)')} htmlFor="session_timeout_minutes" error={form.errors.session_timeout_minutes}>
                                 <Input
                                     id="session_timeout_minutes"
                                     inputMode="numeric"
@@ -168,29 +176,29 @@ export default function Settings({ preferences }: { preferences?: Preferences })
                                 />
                             </FormField>
 
-                            <FormField label="تراکنش‌های تکرارشونده" htmlFor="recurring_mode" error={form.errors.recurring_mode}>
+                            <FormField label={t('تراکنش‌های تکرارشونده')} htmlFor="recurring_mode" error={form.errors.recurring_mode}>
                                 <SelectField
                                     id="recurring_mode"
                                     value={form.data.recurring_mode}
                                     onChange={(event) => form.setData('recurring_mode', event.target.value)}
                                     options={[
-                                        { value: 'suggestion', label: 'فقط پیشنهاد بساز' },
-                                        { value: 'automatic', label: 'خودکار، بعد از تایید دستی' },
+                                        { value: 'suggestion', label: t('فقط پیشنهاد بساز') },
+                                        { value: 'automatic', label: t('خودکار، بعد از تایید دستی') },
                                     ]}
                                 />
                             </FormField>
 
                             <SubmitButton size="lg" processing={form.processing}>
-                                ذخیره تنظیمات
+                                {t('ذخیره تنظیمات')}
                             </SubmitButton>
                         </FieldGroup>
                     </form>
                 </section>
 
-                <ConfirmAction title="خروج از حساب؟" confirmLabel="خروج" href={route('logout')} destructive>
+                <ConfirmAction title={t('خروج از حساب؟')} confirmLabel={t('خروج')} href={route('logout')} destructive>
                     <Button variant="outline" size="lg" className="w-full text-destructive">
                         <LogOutIcon />
-                        خروج از حساب
+                        {t('خروج از حساب')}
                     </Button>
                 </ConfirmAction>
             </PageBody>

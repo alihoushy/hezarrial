@@ -22,7 +22,7 @@ class LoginRequest extends FormRequest
             : ['mobile' => $this->login, 'password' => $this->password];
 
         if (! Auth::attempt($credentials, false)) {
-            throw ValidationException::withMessages(['login' => 'اطلاعات ورود درست نیست.']);
+            throw ValidationException::withMessages(['login' => __('اطلاعات ورود درست نیست.')]);
         }
 
         $this->session()->regenerate();

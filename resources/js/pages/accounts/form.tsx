@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { toLatinDigits } from '@/lib/format';
 import { accountTypes } from '@/lib/labels';
 import type { Account, AccountType } from '@/types';
+import { t } from '@/lib/i18n';
 
 export default function AccountForm({ account }: { account?: Account | null }) {
     const editing = Boolean(account);
@@ -33,40 +34,40 @@ export default function AccountForm({ account }: { account?: Account | null }) {
 
     return (
         <>
-            <Head title={editing ? 'ویرایش حساب' : 'حساب جدید'} />
+            <Head title={editing ? t('ویرایش حساب') : t('حساب جدید')} />
             <PageHeader
-                title={editing ? 'ویرایش حساب' : 'حساب جدید'}
+                title={editing ? t('ویرایش حساب') : t('حساب جدید')}
                 back={account ? route('accounts.show', account.id) : route('accounts.index')}
                 backComponent={account ? 'accounts/show' : 'accounts/index'}
             />
             <PageBody className="pt-5">
                 <form onSubmit={submit} noValidate>
                     <FieldGroup className="gap-6">
-                        <FormField label="نام حساب" htmlFor="name" error={form.errors.name}>
+                        <FormField label={t('نام حساب')} htmlFor="name" error={form.errors.name}>
                             <Input
                                 id="name"
                                 autoFocus={!editing}
                                 value={form.data.name}
                                 onChange={(event) => form.setData('name', event.target.value)}
-                                placeholder="مثلاً: بانک ملت"
+                                placeholder={t('مثلاً: بانک ملت')}
                                 aria-invalid={form.errors.name ? true : undefined}
                             />
                         </FormField>
 
-                        <FormField label="نوع" htmlFor="type" error={form.errors.type}>
+                        <FormField label={t('نوع')} htmlFor="type" error={form.errors.type}>
                             <SelectField
                                 id="type"
                                 value={form.data.type}
                                 onChange={(event) => form.setData('type', event.target.value as AccountType)}
-                                options={Object.entries(accountTypes).map(([value, { label }]) => ({ value, label }))}
+                                options={Object.entries(accountTypes).map(([value, { label }]) => ({ value, label: t(label) }))}
                             />
                         </FormField>
 
-                        <FormField label="نام بانک" htmlFor="bank_name" optional error={form.errors.bank_name}>
+                        <FormField label={t('نام بانک')} htmlFor="bank_name" optional error={form.errors.bank_name}>
                             <Input id="bank_name" value={form.data.bank_name} onChange={(event) => form.setData('bank_name', event.target.value)} />
                         </FormField>
 
-                        <FormField label="۴ رقم آخر کارت" htmlFor="card_last_four" optional error={form.errors.card_last_four} description="فقط چهار رقم آخر ذخیره می‌شود؛ هرگز شماره کامل کارت یا رمز را وارد نکنید.">
+                        <FormField label={t('۴ رقم آخر کارت')} htmlFor="card_last_four" optional error={form.errors.card_last_four} description={t('فقط چهار رقم آخر ذخیره می‌شود؛ هرگز شماره کامل کارت یا رمز را وارد نکنید.')}>
                             <Input
                                 id="card_last_four"
                                 inputMode="numeric"
@@ -79,7 +80,7 @@ export default function AccountForm({ account }: { account?: Account | null }) {
                             />
                         </FormField>
 
-                        <FormField label="مانده افتتاحیه" htmlFor="opening_balance" error={form.errors.opening_balance} description="موجودی حساب در لحظه شروع استفاده از برنامه">
+                        <FormField label={t('مانده افتتاحیه')} htmlFor="opening_balance" error={form.errors.opening_balance} description={t('موجودی حساب در لحظه شروع استفاده از برنامه')}>
                             <AmountInput
                                 id="opening_balance"
                                 allowNegative
@@ -91,19 +92,19 @@ export default function AccountForm({ account }: { account?: Account | null }) {
 
                         <div className="flex flex-col gap-2.5 pt-2">
                             <SubmitButton size="lg" processing={form.processing}>
-                                ذخیره
+                                {t('ذخیره')}
                             </SubmitButton>
                             {account && (
                                 <ConfirmAction
-                                    title="بایگانی حساب؟"
-                                    description="حساب از فهرست حذف می‌شود ولی تراکنش‌های آن در گزارش‌ها باقی می‌ماند."
-                                    confirmLabel="بایگانی"
+                                    title={t('بایگانی حساب؟')}
+                                    description={t('حساب از فهرست حذف می‌شود ولی تراکنش‌های آن در گزارش‌ها باقی می‌ماند.')}
+                                    confirmLabel={t('بایگانی')}
                                     href={route('accounts.destroy', account.id)}
                                     method="delete"
                                     destructive
                                 >
                                     <Button type="button" size="lg" variant="destructive">
-                                        بایگانی حساب
+                                        {t('بایگانی حساب')}
                                     </Button>
                                 </ConfirmAction>
                             )}

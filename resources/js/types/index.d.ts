@@ -17,7 +17,14 @@ export interface Settings {
     theme: Theme;
 }
 
+export interface LocaleInfo {
+    code: string;
+    dir: 'rtl' | 'ltr';
+}
+
 export interface SharedProps {
+    locale: LocaleInfo;
+    locales: { code: string; name: string }[];
     auth: { user: User | null };
     settings: Settings;
     csrf_token: string;

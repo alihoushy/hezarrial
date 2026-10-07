@@ -18,7 +18,7 @@ class ExportController extends Controller
 
         return response()->streamDownload(function () use ($export): void {
             $handle = fopen('php://output', 'w');
-            fputcsv($handle, ['تاریخ', 'نوع', 'مبلغ', 'حساب', 'دسته', 'شخص', 'شرح']);
+            fputcsv($handle, [__('تاریخ'), __('نوع'), __('مبلغ'), __('حساب'), __('دسته'), __('شخص'), __('شرح')]);
             Transaction::forUser(auth()->user())->with(['account', 'category', 'person'])->orderByDesc('transaction_date')->chunk(200, function ($rows) use ($handle, $export): void {
                 foreach ($rows as $transaction) {
                     fputcsv($handle, [
@@ -43,6 +43,6 @@ class ExportController extends Controller
 
     public function reportPdf(): Response
     {
-        abort(501, 'خروجی PDF در فاز بعدی پیاده‌سازی می‌شود.');
+        abort(501, __('خروجی PDF در فاز بعدی پیاده‌سازی می‌شود.'));
     }
 }

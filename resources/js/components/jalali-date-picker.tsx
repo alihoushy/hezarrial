@@ -6,6 +6,7 @@ import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
 import { todayIso, useFormat } from '@/lib/format';
 import { JALALI_MONTHS, JALALI_WEEKDAYS_SHORT, daysInJalaliMonth, firstWeekdayOfJalaliMonth, isoToJalali, jalaliToIso, shiftJalaliMonth } from '@/lib/jalali';
 import { cn } from '@/lib/utils';
+import { t } from '@/lib/i18n';
 
 interface JalaliDatePickerProps {
     id?: string;
@@ -22,7 +23,7 @@ interface JalaliDatePickerProps {
  * A Persian (Solar Hijri) calendar in a bottom sheet. The field shows the Jalali
  * date, but the value it reports stays an ISO date, so nothing changes server-side.
  */
-export function JalaliDatePicker({ id, value, onChange, clearable = false, title = 'انتخاب تاریخ', ...props }: JalaliDatePickerProps) {
+export function JalaliDatePicker({ id, value, onChange, clearable = false, title = t('انتخاب تاریخ'), ...props }: JalaliDatePickerProps) {
     const format = useFormat();
     const [open, setOpen] = useState(false);
     const today = useMemo(() => isoToJalali(todayIso())!, []);
@@ -69,13 +70,13 @@ export function JalaliDatePicker({ id, value, onChange, clearable = false, title
             <ResponsiveModal open={open} onOpenChange={setOpen} title={title}>
                 <div className="flex flex-col gap-4 pb-4">
                     <div className="flex items-center gap-2">
-                        <Button type="button" variant="outline" size="icon" className="shrink-0 rounded-full" onClick={() => move(-1)} aria-label="ماه قبل">
+                        <Button type="button" variant="outline" size="icon" className="shrink-0 rounded-full" onClick={() => move(-1)} aria-label={t('ماه قبل')}>
                             <ChevronRightIcon />
                         </Button>
                         <NativeSelect
                             className="min-w-0 flex-1"
                             value={view.month}
-                            aria-label="ماه"
+                            aria-label={t('ماه')}
                             onChange={(event) => setView((current) => ({ ...current, month: Number(event.target.value), day: 1 }))}
                         >
                             {JALALI_MONTHS.map((name, index) => (
@@ -84,14 +85,14 @@ export function JalaliDatePicker({ id, value, onChange, clearable = false, title
                                 </NativeSelectOption>
                             ))}
                         </NativeSelect>
-                        <NativeSelect className="w-28 shrink-0" value={view.year} aria-label="سال" onChange={(event) => setView((current) => ({ ...current, year: Number(event.target.value), day: 1 }))}>
+                        <NativeSelect className="w-28 shrink-0" value={view.year} aria-label={t('سال')} onChange={(event) => setView((current) => ({ ...current, year: Number(event.target.value), day: 1 }))}>
                             {yearOptions.map((year) => (
                                 <NativeSelectOption key={year} value={year}>
                                     {format.digits(String(year))}
                                 </NativeSelectOption>
                             ))}
                         </NativeSelect>
-                        <Button type="button" variant="outline" size="icon" className="shrink-0 rounded-full" onClick={() => move(1)} aria-label="ماه بعد">
+                        <Button type="button" variant="outline" size="icon" className="shrink-0 rounded-full" onClick={() => move(1)} aria-label={t('ماه بعد')}>
                             <ChevronLeftIcon />
                         </Button>
                     </div>
@@ -142,7 +143,7 @@ export function JalaliDatePicker({ id, value, onChange, clearable = false, title
                                 setOpen(false);
                             }}
                         >
-                            امروز
+                            {t('امروز')}
                         </Button>
                         {clearable && value ? (
                             <Button
@@ -154,11 +155,11 @@ export function JalaliDatePicker({ id, value, onChange, clearable = false, title
                                     setOpen(false);
                                 }}
                             >
-                                حذف تاریخ
+                                {t('حذف تاریخ')}
                             </Button>
                         ) : (
                             <Button type="button" variant="ghost" size="lg" onClick={() => setOpen(false)}>
-                                انصراف
+                                {t('انصراف')}
                             </Button>
                         )}
                     </div>

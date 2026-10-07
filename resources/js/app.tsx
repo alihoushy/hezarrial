@@ -2,13 +2,13 @@ import '../css/app.css';
 
 import { createInertiaApp, router } from '@inertiajs/react';
 import { toast } from 'sonner';
-import { DirectionProvider } from '@/components/ui/direction';
-import { Toaster } from '@/components/ui/sonner';
+import { Providers } from '@/components/providers';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import PlainLayout from '@/layouts/plain-layout';
+import { t, tr } from '@/lib/i18n';
 
-const APP_NAME = 'هزار ریال';
+const APP_NAME = tr('هزار ریال');
 
 // Controllers flash `status` messages; show each once as a toast.
 router.on('flash', (event) => {
@@ -20,7 +20,7 @@ router.on('flash', (event) => {
 });
 
 router.on('networkError', () => {
-    toast.error('ارتباط با سرور برقرار نشد. اتصال اینترنت را بررسی کنید.');
+    toast.error(t('ارتباط با سرور برقرار نشد. اتصال اینترنت را بررسی کنید.'));
 });
 
 // Pages are code-split, so the first tap on a tab would wait for its chunk on a slow
@@ -35,7 +35,7 @@ if ('requestIdleCallback' in window) {
 }
 
 createInertiaApp({
-    title: (title) => (title ? `${title} · ${APP_NAME}` : APP_NAME),
+    title: (title) => (title ? `${title} · ${t(APP_NAME)}` : t(APP_NAME)),
     pages: './pages',
     layout: (name) => (name === 'error' ? PlainLayout : name.startsWith('auth/') ? AuthLayout : AppLayout),
     progress: {
@@ -43,16 +43,5 @@ createInertiaApp({
         delay: 250,
         showSpinner: false,
     },
-    withApp: (app) => (
-        <DirectionProvider dir="rtl">
-            {app}
-            <Toaster
-                dir="rtl"
-                position="top-center"
-                offset={{ top: 'calc(env(safe-area-inset-top) + 12px)' }}
-                mobileOffset={{ top: 'calc(env(safe-area-inset-top) + 12px)' }}
-                toastOptions={{ classNames: { toast: 'cn-toast font-sans' } }}
-            />
-        </DirectionProvider>
-    ),
+    withApp: (app) => <Providers>{app}</Providers>,
 });

@@ -28,7 +28,7 @@ class ProcessRecurringTransactions extends Command
                         'remindable_id' => $item->id,
                         'due_date' => $item->next_run_date,
                     ], [
-                        'title' => 'پیشنهاد تراکنش تکرارشونده: '.$item->title,
+                        'title' => __('پیشنهاد تراکنش تکرارشونده: :title', ['title' => $item->title]),
                         'status' => 'pending',
                         'notify_in_app' => true,
                     ]);

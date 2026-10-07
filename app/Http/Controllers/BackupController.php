@@ -27,7 +27,7 @@ class BackupController extends Controller
     {
         $backups->create(auth()->user());
 
-        return back()->with('status', 'پشتیبان ساخته شد.');
+        return back()->with('status', __('پشتیبان ساخته شد.'));
     }
 
     public function download(Request $request, Backup $backup): StreamedResponse
@@ -46,7 +46,7 @@ class BackupController extends Controller
         ]);
 
         if (! Hash::check($request->password, $request->user()->password)) {
-            return back()->withErrors(['password' => 'رمز عبور درست نیست.']);
+            return back()->withErrors(['password' => __('رمز عبور درست نیست.')]);
         }
 
         $payload = json_decode($request->file('backup')->get(), true, flags: JSON_THROW_ON_ERROR);
@@ -54,7 +54,7 @@ class BackupController extends Controller
 
         $audit->record('backup.restored', null, [], ['schema_version' => 1, 'restored' => $restored]);
 
-        return back()->with('status', 'بازیابی پشتیبان با موفقیت انجام شد.');
+        return back()->with('status', __('بازیابی پشتیبان با موفقیت انجام شد.'));
     }
 
     public function destroy(Backup $backup): RedirectResponse
@@ -63,6 +63,6 @@ class BackupController extends Controller
         Storage::disk('local')->delete($backup->file_path);
         $backup->delete();
 
-        return back()->with('status', 'پشتیبان حذف شد.');
+        return back()->with('status', __('پشتیبان حذف شد.'));
     }
 }

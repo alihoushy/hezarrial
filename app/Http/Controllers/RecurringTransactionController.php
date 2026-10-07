@@ -43,7 +43,7 @@ class RecurringTransactionController extends Controller
             'is_active' => true,
         ]);
 
-        return back()->with('status', 'تراکنش تکرارشونده ثبت شد.');
+        return back()->with('status', __('تراکنش تکرارشونده ثبت شد.'));
     }
 
     public function update(Request $request, RecurringTransaction $recurring): RedirectResponse
@@ -51,6 +51,6 @@ class RecurringTransactionController extends Controller
         abort_unless((int) $recurring->user_id === (int) auth()->id(), 403);
         $recurring->update(['is_active' => $request->boolean('is_active')]);
 
-        return back()->with('status', 'وضعیت تراکنش تکرارشونده تغییر کرد.');
+        return back()->with('status', __('وضعیت تراکنش تکرارشونده تغییر کرد.'));
     }
 }

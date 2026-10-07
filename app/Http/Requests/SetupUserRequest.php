@@ -25,9 +25,9 @@ class SetupUserRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'نام را وارد کنید.',
-            'password.min' => 'رمز عبور باید حداقل ۱۰ کاراکتر باشد.',
-            'password.confirmed' => 'تکرار رمز عبور هم‌خوان نیست.',
+            'name.required' => __('نام را وارد کنید.'),
+            'password.min' => __('رمز عبور باید حداقل ۱۰ کاراکتر باشد.'),
+            'password.confirmed' => __('تکرار رمز عبور هم‌خوان نیست.'),
         ];
     }
 }

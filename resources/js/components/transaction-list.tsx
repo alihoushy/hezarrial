@@ -3,12 +3,14 @@ import { ListCard, ListRow } from '@/components/list';
 import { useFormat } from '@/lib/format';
 import { transactionTypes } from '@/lib/labels';
 import type { Transaction } from '@/types';
+import { t } from '@/lib/i18n';
 
 export function TransactionRow({ transaction }: { transaction: Transaction }) {
     const type = transactionTypes[transaction.type];
     const incoming = transaction.direction > 0;
-    const title = transaction.description || transaction.category?.name || type.label;
-    const subtitle = [transaction.account?.name, transaction.description && transaction.category?.name, type.label !== title ? type.label : null]
+    const typeLabel = t(type.label);
+    const title = transaction.description || transaction.category?.name || typeLabel;
+    const subtitle = [transaction.account?.name, transaction.description && transaction.category?.name, typeLabel !== title ? typeLabel : null]
         .filter(Boolean)
         .join(' · ');
 
@@ -40,7 +42,7 @@ export function GroupedTransactions({ transactions }: { transactions: Transactio
         <div className="flex flex-col gap-5">
             {[...groups.entries()].map(([date, items]) => (
                 <section key={date || 'undated'}>
-                    <h3 className="px-1 pb-2 text-xs font-semibold text-muted-foreground">{date ? format.relativeDay(date) : 'بدون تاریخ'}</h3>
+                    <h3 className="px-1 pb-2 text-xs font-semibold text-muted-foreground">{date ? format.relativeDay(date) : t('بدون تاریخ')}</h3>
                     <ListCard>
                         {items.map((transaction) => (
                             <TransactionRow key={transaction.id} transaction={transaction} />

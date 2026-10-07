@@ -1,6 +1,7 @@
 <!doctype html>
 @php($theme = $page['props']['settings']['theme'] ?? 'system')
-<html lang="fa" dir="rtl" @class(['dark' => $theme === 'dark'])>
+@php($locale = $page['props']['locale'] ?? ['code' => 'fa', 'dir' => 'rtl'])
+<html lang="{{ $locale['code'] }}" dir="{{ $locale['dir'] }}" @class(['dark' => $theme === 'dark'])>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">

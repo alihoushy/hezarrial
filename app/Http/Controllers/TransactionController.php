@@ -45,8 +45,8 @@ class TransactionController extends Controller
         }
 
         return $request->has('save_add_another')
-            ? redirect()->route('transactions.create', ['type' => $data['type']])->with('status', 'تراکنش ذخیره شد.')
-            : redirect()->route('transactions.index')->with('status', 'تراکنش ذخیره شد.');
+            ? redirect()->route('transactions.create', ['type' => $data['type']])->with('status', __('تراکنش ذخیره شد.'))
+            : redirect()->route('transactions.index')->with('status', __('تراکنش ذخیره شد.'));
     }
 
     public function show(Transaction $transaction): Response
@@ -70,7 +70,7 @@ class TransactionController extends Controller
         $this->authorize('update', $transaction);
         $transactions->update($transaction, $request->validated());
 
-        return redirect()->route('transactions.show', $transaction)->with('status', 'تراکنش به‌روز شد.');
+        return redirect()->route('transactions.show', $transaction)->with('status', __('تراکنش به‌روز شد.'));
     }
 
     public function destroy(Transaction $transaction, TransactionService $transactions): RedirectResponse
@@ -78,7 +78,7 @@ class TransactionController extends Controller
         $this->authorize('delete', $transaction);
         $transactions->delete($transaction);
 
-        return redirect()->route('transactions.index')->with('status', 'تراکنش حذف شد.');
+        return redirect()->route('transactions.index')->with('status', __('تراکنش حذف شد.'));
     }
 
     private function form(Transaction $transaction): Response

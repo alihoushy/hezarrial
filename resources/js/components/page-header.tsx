@@ -1,8 +1,9 @@
 import { Link } from '@inertiajs/react';
-import { ChevronRightIcon } from 'lucide-react';
+import { ChevronLeftIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { t } from '@/lib/i18n';
 
 interface PageHeaderProps {
     title: string;
@@ -26,8 +27,8 @@ export function PageHeader({ title, back, backComponent, actions, className }: P
             <div className="flex h-14 items-center gap-1 px-2">
                 {back ? (
                     <Button variant="ghost" size="icon" asChild className="shrink-0 rounded-full">
-                        <Link href={back} component={backComponent} aria-label="بازگشت">
-                            <ChevronRightIcon className="size-6" />
+                        <Link href={back} component={backComponent} aria-label={t('بازگشت')}>
+                            <ChevronLeftIcon className="size-6 rtl:rotate-180" />
                         </Link>
                     </Button>
                 ) : (

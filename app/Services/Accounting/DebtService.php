@@ -24,7 +24,7 @@ class DebtService
                 'type' => $type,
                 'amount' => $amount,
                 'transaction_date' => $data['transaction_date'] ?? now()->toDateString(),
-                'description' => $data['description'] ?? 'تسویه طلب و بدهی',
+                'description' => $data['description'] ?? __('تسویه طلب و بدهی'),
             ]);
 
             $remaining = round((float) $debt->remaining_amount - $amount, 2);

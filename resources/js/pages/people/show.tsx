@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { useFormat } from '@/lib/format';
 import { debtStatuses } from '@/lib/labels';
 import type { Debt, Person, Transaction } from '@/types';
+import { t } from '@/lib/i18n';
 
 interface Props {
     person?: Person;
@@ -27,8 +28,8 @@ function DebtRow({ debt }: { debt: Debt }) {
 
     return (
         <ListRow
-            title={payable ? 'بدهی من' : 'طلب من'}
-            subtitle={debt.due_date ? `سررسید: ${format.date(debt.due_date)}` : 'بدون سررسید'}
+            title={payable ? t('بدهی من') : t('طلب من')}
+            subtitle={debt.due_date ? t('سررسید: :date', { date: format.date(debt.due_date) }) : t('بدون سررسید')}
             trailing={
                 <>
                     <Money amount={debt.remaining_amount} tone={payable ? 'expense' : 'income'} className="text-sm font-semibold" />
@@ -44,15 +45,15 @@ function DebtRow({ debt }: { debt: Debt }) {
 export default function PersonShow({ person, summary, openItems, settledItems, transactions }: Props) {
     return (
         <>
-            <Head title={person?.full_name ?? 'پرونده شخص'} />
+            <Head title={person?.full_name ?? t('پرونده شخص')} />
             <PageHeader
-                title="پرونده شخص"
+                title={t('پرونده شخص')}
                 back={route('people.index')}
                 backComponent="people/index"
                 actions={
                     person && (
                         <Button variant="ghost" size="icon" className="rounded-full" asChild>
-                            <Link href={route('people.edit', person.id)} component="people/form" aria-label="ویرایش">
+                            <Link href={route('people.edit', person.id)} component="people/form" aria-label={t('ویرایش')}>
                                 <PencilIcon className="size-5" />
                             </Link>
                         </Button>
@@ -75,22 +76,22 @@ export default function PersonShow({ person, summary, openItems, settledItems, t
                             {person.description && <p className="max-w-xs text-sm text-muted-foreground">{person.description}</p>}
                             <div className="mt-3 grid w-full grid-cols-3 gap-2 text-center">
                                 <div className="rounded-2xl bg-muted/70 p-3">
-                                    <p className="text-xs text-muted-foreground">بدهی من</p>
+                                    <p className="text-xs text-muted-foreground">{t('بدهی من')}</p>
                                     <Money amount={summary.payable} className="mt-1 text-sm font-bold" unitClassName="hidden" />
                                 </div>
                                 <div className="rounded-2xl bg-muted/70 p-3">
-                                    <p className="text-xs text-muted-foreground">طلب من</p>
+                                    <p className="text-xs text-muted-foreground">{t('طلب من')}</p>
                                     <Money amount={summary.receivable} className="mt-1 text-sm font-bold" unitClassName="hidden" />
                                 </div>
                                 <div className="rounded-2xl bg-muted/70 p-3">
-                                    <p className="text-xs text-muted-foreground">خالص</p>
+                                    <p className="text-xs text-muted-foreground">{t('خالص')}</p>
                                     <Money amount={summary.net} tone="signed" className="mt-1 text-sm font-bold" unitClassName="hidden" />
                                 </div>
                             </div>
                         </section>
 
                         <section>
-                            <SectionTitle>موارد باز</SectionTitle>
+                            <SectionTitle>{t('موارد باز')}</SectionTitle>
                             {openItems && openItems.length > 0 ? (
                                 <ListCard>
                                     {openItems.map((debt) => (
@@ -98,13 +99,13 @@ export default function PersonShow({ person, summary, openItems, settledItems, t
                                     ))}
                                 </ListCard>
                             ) : (
-                                <p className="rounded-2xl bg-card px-4 py-6 text-center text-sm text-muted-foreground ring-1 ring-foreground/5">مورد بازی وجود ندارد.</p>
+                                <p className="rounded-2xl bg-card px-4 py-6 text-center text-sm text-muted-foreground ring-1 ring-foreground/5">{t('مورد بازی وجود ندارد.')}</p>
                             )}
                         </section>
 
                         {settledItems && settledItems.length > 0 && (
                             <section>
-                                <SectionTitle>تسویه‌شده</SectionTitle>
+                                <SectionTitle>{t('تسویه‌شده')}</SectionTitle>
                                 <ListCard className="opacity-80">
                                     {settledItems.map((debt) => (
                                         <DebtRow key={debt.id} debt={debt} />
@@ -114,7 +115,7 @@ export default function PersonShow({ person, summary, openItems, settledItems, t
                         )}
 
                         <section>
-                            <SectionTitle>تراکنش‌های مرتبط</SectionTitle>
+                            <SectionTitle>{t('تراکنش‌های مرتبط')}</SectionTitle>
                             {transactions && transactions.length > 0 ? (
                                 <ListCard>
                                     {transactions.map((transaction) => (
@@ -122,21 +123,21 @@ export default function PersonShow({ person, summary, openItems, settledItems, t
                                     ))}
                                 </ListCard>
                             ) : (
-                                <p className="rounded-2xl bg-card px-4 py-6 text-center text-sm text-muted-foreground ring-1 ring-foreground/5">تراکنشی برای این شخص ثبت نشده است.</p>
+                                <p className="rounded-2xl bg-card px-4 py-6 text-center text-sm text-muted-foreground ring-1 ring-foreground/5">{t('تراکنشی برای این شخص ثبت نشده است.')}</p>
                             )}
                         </section>
 
                         <ConfirmAction
-                            title="حذف شخص؟"
-                            description="پرونده این شخص حذف می‌شود."
-                            confirmLabel="حذف"
+                            title={t('حذف شخص؟')}
+                            description={t('پرونده این شخص حذف می‌شود.')}
+                            confirmLabel={t('حذف')}
                             href={route('people.destroy', person.id)}
                             method="delete"
                             destructive
                         >
                             <Button variant="destructive" size="lg" className="w-full">
                                 <Trash2Icon />
-                                حذف شخص
+                                {t('حذف شخص')}
                             </Button>
                         </ConfirmAction>
                     </>

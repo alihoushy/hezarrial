@@ -17,6 +17,10 @@ return [
     'required' => ':attribute الزامی است.',
     'string' => ':attribute باید متن باشد.',
     'unique' => ':attribute قبلا ثبت شده است.',
+    'after_or_equal' => ':attribute باید تاریخی برابر یا بعد از :date باشد.',
+    'boolean' => ':attribute باید درست یا نادرست باشد.',
+    'current_password' => 'رمز عبور درست نیست.',
+    'date_format' => ':attribute با قالب :format هم‌خوان نیست.',
     'attributes' => [
         'name' => 'نام',
         'email' => 'ایمیل',

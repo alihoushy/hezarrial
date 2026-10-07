@@ -7,6 +7,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\ImportController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\RecurringTransactionController;
 use App\Http\Controllers\ReminderController;
 use App\Http\Controllers\ReportController;
@@ -14,6 +15,8 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SimpleModuleController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
+
+Route::post('/locale', [LocaleController::class, 'update'])->middleware('throttle:30,1')->name('locale.update');
 
 Route::middleware('guest')->group(function () {
     Route::get('/setup', [AuthenticatedSessionController::class, 'setup'])->name('setup');
@@ -94,3 +97,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/settings', [SettingsController::class, 'edit'])->name('settings.index');
     Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');
 });
+
+// Unknown addresses go through the web group too, so the error page knows the language and theme.
+Route::fallback(fn () => abort(404));

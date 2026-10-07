@@ -57,7 +57,7 @@ echo "==> Trimming files the host does not need"
 cp "$APP/deploy/shared-hosting/env.example" "$WORK/env.example"
 cp "$APP/deploy/shared-hosting/public_html-index.php" "$WORK/public_html-index.php"
 rm -rf \
-    "$APP"/{node_modules,tests,docs,docker,deploy,.github,.claude} \
+    "$APP"/{node_modules,tests,docs,docker,deploy,.github,.claude,scripts} \
     "$APP"/resources/{css,js} \
     "$APP"/{Dockerfile,compose.prod.yaml,.dockerignore,phpunit.xml,package.json,package-lock.json,vite.config.ts,tsconfig.json,components.json} \
     "$APP"/{.editorconfig,.gitattributes,.gitignore,.npmrc,.nvmrc,sms-samples.txt.example,README.md}
