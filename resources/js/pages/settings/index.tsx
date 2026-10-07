@@ -1,4 +1,4 @@
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import {
     ChartPieIcon,
     DatabaseBackupIcon,
@@ -6,6 +6,9 @@ import {
     HandCoinsIcon,
     LandmarkIcon,
     LogOutIcon,
+    MonitorSmartphoneIcon,
+    MoonIcon,
+    SunIcon,
     PiggyBankIcon,
     ReceiptTextIcon,
     RepeatIcon,
@@ -24,13 +27,15 @@ import { Button } from '@/components/ui/button';
 import { FieldGroup } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { applyTheme } from '@/hooks/use-theme';
 import { toLatinDigits } from '@/lib/format';
-import type { CurrencyDisplay } from '@/types';
+import type { CurrencyDisplay, Theme } from '@/types';
 
 interface Preferences {
     currency_display: CurrencyDisplay;
     persian_digits: boolean;
-    theme: string;
+    theme: Theme;
     session_timeout_minutes: number;
     recurring_mode: string;
 }
@@ -71,6 +76,17 @@ export default function Settings({ preferences }: { preferences?: Preferences })
         session_timeout_minutes: String(preferences?.session_timeout_minutes ?? 120),
         recurring_mode: preferences?.recurring_mode ?? 'suggestion',
     });
+
+    // The theme applies and saves straight away; the other preferences wait for the save button.
+    const changeTheme = (theme: Theme) => {
+        if (!preferences) {
+            return;
+        }
+
+        applyTheme(theme);
+        form.setData('theme', theme);
+        router.put(route('settings.update'), { ...preferences, theme }, { preserveScroll: true, preserveState: true, only: ['settings', 'preferences', 'flash'] });
+    };
 
     const submit = (event: FormEvent) => {
         event.preventDefault();
@@ -117,6 +133,23 @@ export default function Settings({ preferences }: { preferences?: Preferences })
                                         { value: 'toman', label: 'فقط تومان' },
                                     ]}
                                 />
+                            </FormField>
+
+                            <FormField label="ظاهر برنامه" error={form.errors.theme}>
+                                <ToggleGroup type="single" value={form.data.theme} onValueChange={(value) => value && changeTheme(value as Theme)} className="grid w-full grid-cols-3 gap-2" aria-label="ظاهر برنامه">
+                                    {(
+                                        [
+                                            ['system', 'سیستم', MonitorSmartphoneIcon],
+                                            ['light', 'روشن', SunIcon],
+                                            ['dark', 'تاریک', MoonIcon],
+                                        ] as const
+                                    ).map(([value, label, Icon]) => (
+                                        <ToggleGroupItem key={value} value={value} className="h-14 flex-col gap-1 rounded-xl border border-border bg-card text-xs data-[state=on]:border-primary data-[state=on]:bg-primary/5 data-[state=on]:font-bold">
+                                            <Icon className="size-5" />
+                                            {label}
+                                        </ToggleGroupItem>
+                                    ))}
+                                </ToggleGroup>
                             </FormField>
 
                             <label className="flex min-h-11 items-center justify-between gap-3 text-sm font-medium">
