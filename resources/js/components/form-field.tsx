@@ -1,10 +1,9 @@
 import type { ComponentProps, ReactNode } from 'react';
+import { JalaliDatePicker } from '@/components/jalali-date-picker';
 import { Button } from '@/components/ui/button';
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
 import { Spinner } from '@/components/ui/spinner';
-import { useFormat } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
 interface FormFieldProps {
@@ -50,16 +49,17 @@ export function SelectField({ options, placeholder, ...props }: SelectFieldProps
     );
 }
 
-/** Native date input (iOS wheel picker) with the Jalali date spelled out underneath. */
-export function DateInput({ value, ...props }: Omit<ComponentProps<typeof Input>, 'type'> & { value: string }) {
-    const format = useFormat();
+interface DateInputProps {
+    id?: string;
+    value: string;
+    onChange: (event: { target: { value: string } }) => void;
+    clearable?: boolean;
+    'aria-invalid'?: boolean;
+}
 
-    return (
-        <div className="flex flex-col gap-1.5">
-            <Input type="date" dir="ltr" value={value} className="text-start" {...props} />
-            {value && <p className="px-1 text-xs text-muted-foreground">{format.longDate(value)}</p>}
-        </div>
-    );
+/** Persian calendar picker; the form value stays an ISO date. */
+export function DateInput({ onChange, ...props }: DateInputProps) {
+    return <JalaliDatePicker {...props} onChange={(value) => onChange({ target: { value } })} />;
 }
 
 export function SubmitButton({ processing, children, className, ...props }: ComponentProps<typeof Button> & { processing?: boolean }) {

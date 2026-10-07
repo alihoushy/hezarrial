@@ -73,7 +73,7 @@ function NewDebtSheet({ open, onOpenChange, people }: { open: boolean; onOpenCha
                             <AmountInput id="debt_amount" value={form.data.original_amount} onValueChange={(value) => form.setData('original_amount', value)} aria-invalid={form.errors.original_amount ? true : undefined} />
                         </FormField>
                         <FormField label="سررسید" htmlFor="debt_due" optional error={form.errors.due_date}>
-                            <DateInput id="debt_due" value={form.data.due_date} onChange={(event) => form.setData('due_date', event.target.value)} />
+                            <DateInput id="debt_due" clearable value={form.data.due_date} onChange={(event) => form.setData('due_date', event.target.value)} />
                         </FormField>
                         <FormField label="توضیح" htmlFor="debt_description" optional error={form.errors.description}>
                             <Textarea id="debt_description" rows={2} value={form.data.description} onChange={(event) => form.setData('description', event.target.value)} />

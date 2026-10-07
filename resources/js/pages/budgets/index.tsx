@@ -47,7 +47,7 @@ function NewBudgetSheet({ open, onOpenChange, categories }: { open: boolean; onO
                         <DateInput id="budget_start" value={form.data.start_date} onChange={(event) => form.setData('start_date', event.target.value)} />
                     </FormField>
                     <FormField label="تا تاریخ" htmlFor="budget_end" optional error={form.errors.end_date}>
-                        <DateInput id="budget_end" value={form.data.end_date} onChange={(event) => form.setData('end_date', event.target.value)} />
+                        <DateInput id="budget_end" clearable value={form.data.end_date} onChange={(event) => form.setData('end_date', event.target.value)} />
                     </FormField>
                     <SubmitButton size="lg" processing={form.processing}>
                         ثبت بودجه
