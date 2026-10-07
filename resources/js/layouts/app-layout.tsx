@@ -1,6 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import { ArrowLeftRightIcon, EllipsisIcon, HouseIcon, PlusIcon, WalletIcon, type LucideIcon } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
+import { ErrorBoundary } from '@/components/error-boundary';
 import { ResponsiveModal } from '@/components/responsive-modal';
 import { useTheme } from '@/hooks/use-theme';
 import { t, tr, useLocale } from '@/lib/i18n';
@@ -104,14 +105,16 @@ function TabBar() {
 }
 
 export default function AppLayout({ children }: { children: ReactNode }) {
-    const { component } = usePage();
+    const { component, url } = usePage();
     useLocale();
     useTheme();
     const showTabBar = !PAGES_WITHOUT_TAB_BAR.has(component);
 
     return (
         <div className="min-h-dvh">
-            <main className={cn('mx-auto w-full max-w-2xl', showTabBar ? 'pb-tab-bar' : 'pb-[calc(2rem+env(safe-area-inset-bottom))]')}>{children}</main>
+            <main className={cn('mx-auto w-full max-w-2xl', showTabBar ? 'pb-tab-bar' : 'pb-[calc(2rem+env(safe-area-inset-bottom))]')}>
+                <ErrorBoundary resetKey={url}>{children}</ErrorBoundary>
+            </main>
             {showTabBar && <TabBar />}
         </div>
     );

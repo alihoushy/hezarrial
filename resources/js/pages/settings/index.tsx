@@ -150,7 +150,7 @@ export default function Settings({ preferences }: { preferences?: Preferences })
                                             ['dark', t('تاریک'), MoonIcon],
                                         ] as const
                                     ).map(([value, label, Icon]) => (
-                                        <ToggleGroupItem key={value} value={value} className="h-14 flex-col gap-1 rounded-xl border border-border bg-card text-xs data-[state=on]:border-primary data-[state=on]:bg-primary/5 data-[state=on]:font-bold">
+                                        <ToggleGroupItem key={value} value={value} className="h-auto min-h-[4.75rem] flex-col gap-2 rounded-xl border border-border bg-card py-4 text-xs leading-5 data-[state=on]:border-primary data-[state=on]:bg-primary/5 data-[state=on]:font-bold">
                                             <Icon className="size-5" />
                                             {label}
                                         </ToggleGroupItem>

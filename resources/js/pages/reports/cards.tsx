@@ -4,6 +4,7 @@ import { EmptyState } from '@/components/empty-state';
 import { ListCard, ListRow } from '@/components/list';
 import { Money } from '@/components/money';
 import { PageBody, PageHeader } from '@/components/page-header';
+import { ListSkeleton } from '@/components/skeletons';
 import { t } from '@/lib/i18n';
 
 interface Item {
@@ -13,13 +14,21 @@ interface Item {
     href: string;
 }
 
-export default function ReportCards({ title, items }: { title: string; items: Item[] }) {
+interface Props {
+    title?: string;
+    items?: Item[];
+}
+
+/** Opened with an instant visit, so `title` and `items` are undefined until the server answers. */
+export default function ReportCards({ title = t('گزارش‌ها'), items }: Props) {
     return (
         <>
             <Head title={title} />
             <PageHeader title={title} back={route('reports.index')} backComponent="reports/index" />
             <PageBody>
-                {items.length === 0 ? (
+                {!items ? (
+                    <ListSkeleton rows={6} />
+                ) : items.length === 0 ? (
                     <EmptyState icon={InboxIcon} title={t('موردی برای گزارش نیست')} />
                 ) : (
                     <ListCard>

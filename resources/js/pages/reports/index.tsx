@@ -3,17 +3,19 @@ import { ArrowDownToLineIcon, ArrowUpFromLineIcon, FileSpreadsheetIcon, FileText
 import { ListCard, ListRow } from '@/components/list';
 import { Money } from '@/components/money';
 import { PageBody, PageHeader, SectionTitle } from '@/components/page-header';
+import { Skeleton } from '@/components/ui/skeleton';
 import { t, tr } from '@/lib/i18n';
 
-const REPORTS: { label: string; route: string; component: string; icon: LucideIcon }[] = [
-    { label: tr('حساب‌ها'), route: 'reports.accounts', component: 'reports/cards', icon: WalletIcon },
-    { label: tr('دسته‌بندی‌ها'), route: 'reports.categories', component: 'reports/cards', icon: TagsIcon },
-    { label: tr('اشخاص'), route: 'reports.people', component: 'reports/cards', icon: UsersIcon },
-    { label: tr('وام‌ها'), route: 'reports.loans', component: 'reports/cards', icon: LandmarkIcon },
-    { label: tr('چک‌ها'), route: 'reports.checks', component: 'reports/cards', icon: ReceiptTextIcon },
+/** `title` is what the report page shows; it is also sent with the tap so the header is right before the data arrives. */
+const REPORTS: { label: string; title: string; route: string; component: string; icon: LucideIcon }[] = [
+    { label: tr('حساب‌ها'), title: tr('گزارش حساب‌ها'), route: 'reports.accounts', component: 'reports/cards', icon: WalletIcon },
+    { label: tr('دسته‌بندی‌ها'), title: tr('گزارش دسته‌بندی‌ها'), route: 'reports.categories', component: 'reports/cards', icon: TagsIcon },
+    { label: tr('اشخاص'), title: tr('گزارش اشخاص'), route: 'reports.people', component: 'reports/cards', icon: UsersIcon },
+    { label: tr('وام‌ها'), title: tr('گزارش وام‌ها'), route: 'reports.loans', component: 'reports/cards', icon: LandmarkIcon },
+    { label: tr('چک‌ها'), title: tr('گزارش چک‌ها'), route: 'reports.checks', component: 'reports/cards', icon: ReceiptTextIcon },
 ];
 
-export default function ReportsIndex({ monthlyIncome, monthlyExpense }: { monthlyIncome: number; monthlyExpense: number }) {
+export default function ReportsIndex({ monthlyIncome, monthlyExpense }: { monthlyIncome?: number; monthlyExpense?: number }) {
     return (
         <>
             <Head title={t('گزارش‌ها')} />
@@ -25,14 +27,14 @@ export default function ReportsIndex({ monthlyIncome, monthlyExpense }: { monthl
                             <ArrowDownToLineIcon className="size-3.5 text-income" />
                             {t('درآمد این ماه')}
                         </p>
-                        <Money amount={monthlyIncome} tone="income" className="mt-2 text-lg font-bold" />
+                        {monthlyIncome === undefined ? <Skeleton className="mt-2 h-7 w-24" /> : <Money amount={monthlyIncome} tone="income" className="mt-2 text-lg font-bold" />}
                     </div>
                     <div className="rounded-2xl bg-card p-4 ring-1 ring-foreground/5">
                         <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
                             <ArrowUpFromLineIcon className="size-3.5 text-expense" />
                             {t('هزینه این ماه')}
                         </p>
-                        <Money amount={monthlyExpense} tone="expense" className="mt-2 text-lg font-bold" />
+                        {monthlyExpense === undefined ? <Skeleton className="mt-2 h-7 w-24" /> : <Money amount={monthlyExpense} tone="expense" className="mt-2 text-lg font-bold" />}
                     </div>
                 </section>
 
@@ -40,7 +42,7 @@ export default function ReportsIndex({ monthlyIncome, monthlyExpense }: { monthl
                     <SectionTitle>{t('گزارش‌ها')}</SectionTitle>
                     <ListCard>
                         {REPORTS.map((report) => (
-                            <ListRow key={report.route} href={route(report.route)} component={report.component} icon={report.icon} title={t(report.label)} chevron />
+                            <ListRow key={report.route} href={route(report.route)} component={report.component} pageProps={{ title: t(report.title) }} icon={report.icon} title={t(report.label)} chevron />
                         ))}
                     </ListCard>
                 </section>
