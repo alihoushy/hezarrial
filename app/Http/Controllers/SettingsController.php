@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -21,6 +22,7 @@ class SettingsController extends Controller
                 'theme' => $settings['theme'] ?? 'system',
                 'session_timeout_minutes' => (int) ($settings['session_timeout_minutes'] ?? 120),
                 'recurring_mode' => $settings['recurring_mode'] ?? 'suggestion',
+                'locale' => app()->getLocale(),
             ],
         ]);
     }
@@ -33,6 +35,7 @@ class SettingsController extends Controller
             'theme' => ['required', Rule::in(['system', 'light', 'dark'])],
             'session_timeout_minutes' => ['nullable', 'integer', 'min:5', 'max:1440'],
             'recurring_mode' => ['required', Rule::in(['suggestion', 'automatic'])],
+            'locale' => ['sometimes', Rule::in(array_keys(config('app.supported_locales')))],
         ]);
 
         $request->user()->forceFill([
@@ -43,6 +46,12 @@ class SettingsController extends Controller
             ],
         ])->save();
 
-        return back()->with('status', 'تنظیمات ذخیره شد.');
+        // Confirm in the language that was just chosen, and remember it for the login screen.
+        if (isset($data['locale'])) {
+            app()->setLocale($data['locale']);
+            Cookie::queue(Cookie::forever('locale', $data['locale']));
+        }
+
+        return back()->with('status', __('تنظیمات ذخیره شد.'));
     }
 }

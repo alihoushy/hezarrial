@@ -82,6 +82,22 @@ return [
 
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Supported Locales
+    |--------------------------------------------------------------------------
+    |
+    | Languages the interface can be switched to. `dir` is the text direction
+    | of the language; translations live in resources/lang/{code}.json, keyed
+    | by the Persian source text (Persian itself needs no file).
+    |
+    */
+
+    'supported_locales' => [
+        'fa' => ['name' => 'فارسی', 'dir' => 'rtl'],
+        'en' => ['name' => 'English', 'dir' => 'ltr'],
+    ],
+
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
     /*
