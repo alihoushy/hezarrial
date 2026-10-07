@@ -4,7 +4,7 @@ import {
     ArrowDownToLineIcon,
     ArrowUpFromLineIcon,
     BellIcon,
-    ChevronLeftIcon,
+    ChevronRightIcon,
     HandCoinsIcon,
     LandmarkIcon,
     ReceiptTextIcon,
@@ -211,7 +211,7 @@ export default function Dashboard({ summary, accounts, recent, charts, upcoming 
                         action={
                             <Link href={route('accounts.index')} component="accounts/index" className="flex items-center text-sm font-medium text-brand">
                                 {t('همه')}
-                                <ChevronLeftIcon className="size-4" />
+                                <ChevronRightIcon className="size-4 rtl:rotate-180" />
                             </Link>
                         }
                     >
@@ -242,7 +242,7 @@ export default function Dashboard({ summary, accounts, recent, charts, upcoming 
                         action={
                             <Link href={route('transactions.index')} component="transactions/index" className="flex items-center text-sm font-medium text-brand">
                                 {t('همه')}
-                                <ChevronLeftIcon className="size-4" />
+                                <ChevronRightIcon className="size-4 rtl:rotate-180" />
                             </Link>
                         }
                     >

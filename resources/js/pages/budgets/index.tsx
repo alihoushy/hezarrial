@@ -93,7 +93,7 @@ export default function BudgetsIndex({ budgets, categories }: { budgets?: Budget
                                             <p className="truncate font-semibold">{budget.title}</p>
                                             <p className="text-xs text-muted-foreground">{budget.category?.name ?? t('همه هزینه‌ها')}</p>
                                         </div>
-                                        <p className={cn('text-lg font-extrabold tabular-nums', progress.over_threshold ? 'text-expense' : 'text-income')}>{t(':percent٪', { percent: format.number(progress.percent) })}</p>
+                                        <p className={cn('text-lg font-extrabold tabular-nums', progress.over_threshold ? 'text-expense' : 'text-income')}>{format.percent(progress.percent)}</p>
                                     </div>
                                     <Progress
                                         value={Math.min(100, progress.percent)}

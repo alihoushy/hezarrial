@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { ChevronLeftIcon, type LucideIcon } from 'lucide-react';
+import { ChevronRightIcon, type LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Badge } from '@/components/ui/badge';
 import type { Tone } from '@/lib/labels';
@@ -42,7 +42,7 @@ export function ListRow({ icon: Icon, iconClassName, media, title, subtitle, tra
                 {subtitle && <span className="truncate text-xs text-muted-foreground">{subtitle}</span>}
             </span>
             {trailing && <span className="flex shrink-0 flex-col items-end text-end">{trailing}</span>}
-            {chevron && <ChevronLeftIcon className="size-4 shrink-0 text-muted-foreground/60" />}
+            {chevron && <ChevronRightIcon className="size-4 shrink-0 text-muted-foreground/60 rtl:rotate-180" />}
         </>
     );
 

@@ -1,7 +1,7 @@
 import { Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, XAxis } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
 import { todayIso, useFormat } from '@/lib/format';
-import { t } from '@/lib/i18n';
+import { t, useDocumentDirection } from '@/lib/i18n';
 
 export interface Charts {
     daily: { date: string; income: number; expense: number }[];
@@ -12,6 +12,7 @@ const CATEGORY_COLORS = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', '
 
 export function MonthTrend({ daily }: { daily: Charts['daily'] }) {
     const format = useFormat();
+    const direction = useDocumentDirection();
     const today = todayIso();
     let income = 0;
     let expense = 0;
@@ -59,7 +60,7 @@ export function MonthTrend({ daily }: { daily: Charts['daily'] }) {
                     <CartesianGrid vertical={false} />
                     <XAxis
                         dataKey="date"
-                        reversed
+                        reversed={direction === 'rtl'}
                         tickLine={false}
                         axisLine={false}
                         tickMargin={8}
@@ -124,7 +125,7 @@ export function CategorySpending({ categories }: { categories: Charts['categorie
                         <li key={category.name} className="flex items-center gap-2 text-sm">
                             <span className="size-2.5 shrink-0 rounded-full" style={{ background: colorOf(index) }} />
                             <span className="min-w-0 flex-1 truncate">{category.name}</span>
-                            <span className="shrink-0 text-xs text-muted-foreground tabular-nums">{t(':percent٪', { percent: format.number(total ? Math.round((category.value / total) * 100) : 0) })}</span>
+                            <span className="shrink-0 text-xs text-muted-foreground tabular-nums">{format.percent(total ? Math.round((category.value / total) * 100) : 0)}</span>
                         </li>
                     ))}
                 </ul>

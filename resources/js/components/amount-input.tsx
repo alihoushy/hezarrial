@@ -79,6 +79,7 @@ export function AmountInput({ value, onValueChange, allowNegative = false, size 
                 <InputGroupInput
                     ref={inputRef}
                     inputMode="numeric"
+                    placeholder={format.digits('0')}
                     autoComplete="off"
                     dir="ltr"
                     value={display}

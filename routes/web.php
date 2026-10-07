@@ -97,3 +97,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/settings', [SettingsController::class, 'edit'])->name('settings.index');
     Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');
 });
+
+// Unknown addresses go through the web group too, so the error page knows the language and theme.
+Route::fallback(fn () => abort(404));

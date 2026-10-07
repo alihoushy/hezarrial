@@ -148,7 +148,6 @@ function TransactionForm({ transaction, initialType, accounts, categories, peopl
                         value={form.data.amount}
                         onValueChange={(value) => form.setData('amount', value)}
                         aria-invalid={form.errors.amount ? true : undefined}
-                        placeholder={t('۰')}
                     />
                 </FormField>
 

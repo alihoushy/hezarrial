@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { ChevronRightIcon } from 'lucide-react';
+import { ChevronLeftIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -28,7 +28,7 @@ export function PageHeader({ title, back, backComponent, actions, className }: P
                 {back ? (
                     <Button variant="ghost" size="icon" asChild className="shrink-0 rounded-full">
                         <Link href={back} component={backComponent} aria-label={t('بازگشت')}>
-                            <ChevronRightIcon className="size-6" />
+                            <ChevronLeftIcon className="size-6 rtl:rotate-180" />
                         </Link>
                     </Button>
                 ) : (

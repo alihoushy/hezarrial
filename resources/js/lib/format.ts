@@ -50,6 +50,8 @@ export interface Formatters {
     /** Interface language code (fa, en, ...). */
     locale: string;
     settings: DisplaySettings;
+    /** 42٪ in Persian, 42% elsewhere. */
+    percent: (value: number) => string;
     /** Plain number in the user's digits, e.g. ۱۲٬۵۰۰. */
     number: (value: number, fractionDigits?: number) => string;
     /** Amount converted to the preferred unit, without the unit label. */
@@ -102,6 +104,7 @@ export function createFormatters(settings: DisplaySettings, locale = 'fa'): Form
     return {
         locale,
         settings,
+        percent: (value) => `${integer.format(value)}${locale === 'fa' ? '٪' : '%'}`,
         number: (value, fractionDigits = 0) => numberFormat(fractionDigits).format(value),
         money: (rial) => integer.format(toman ? Math.round(rial / 10) : rial),
         unit: toman ? t('تومان') : t('ریال'),
