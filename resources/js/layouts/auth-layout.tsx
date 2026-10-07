@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { LanguageLinks } from '@/components/language-select';
 import { useTheme } from '@/hooks/use-theme';
 import { t, useLocale } from '@/lib/i18n';
 
@@ -15,6 +16,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
                     <p className="text-xl font-extrabold">{t('هزار ریال')}</p>
                 </div>
                 {children}
+                <LanguageLinks />
             </div>
         </div>
     );

@@ -81,6 +81,23 @@ class LocaleTest extends TestCase
         $this->assertSame('en', $user->fresh()->settings['locale']);
     }
 
+    public function test_messages_and_error_pages_follow_the_language(): void
+    {
+        $user = $this->user(['locale' => 'en']);
+
+        $this->actingAs($user)->post(route('categories.store'), ['name' => 'Travel', 'type' => 'expense'])
+            ->assertRedirect(route('categories.index'));
+
+        $this->get(route('categories.index'))
+            ->assertInertia(fn (AssertableInertia $page) => $page->hasFlash('status', 'Category created.'));
+
+        // Unknown addresses still go through the web group, so the error page is English too.
+        $this->get('/no-such-page')
+            ->assertNotFound()
+            ->assertSee('<html lang="en" dir="ltr"', false)
+            ->assertInertia(fn (AssertableInertia $page) => $page->component('error')->where('status', 404)->where('locale.code', 'en'));
+    }
+
     public function test_validation_messages_follow_the_language(): void
     {
         $user = $this->user(['locale' => 'en']);

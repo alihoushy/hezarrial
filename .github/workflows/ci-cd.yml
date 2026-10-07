@@ -74,6 +74,12 @@ jobs:
       - name: Install npm dependencies
         run: npm ci --no-audit --no-fund
 
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Check translations
+        run: npm run i18n:check
+
       - name: Build assets
         run: npm run build
 

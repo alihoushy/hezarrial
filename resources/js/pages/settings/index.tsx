@@ -21,6 +21,7 @@ import type { FormEvent } from 'react';
 import { ConfirmAction } from '@/components/confirm-action';
 import { FormField, SelectField, SubmitButton } from '@/components/form-field';
 import { ListCard, ListRow } from '@/components/list';
+import { LanguageSelect } from '@/components/language-select';
 import { PageBody, PageHeader, SectionTitle } from '@/components/page-header';
 import { PersonAvatar } from '@/components/person-avatar';
 import { Button } from '@/components/ui/button';
@@ -69,7 +70,7 @@ function Links({ links }: { links: typeof LINKS }) {
 }
 
 export default function Settings({ preferences }: { preferences?: Preferences }) {
-    const { auth } = usePage().props;
+    const { auth, locale } = usePage().props;
     const form = useForm({
         currency_display: preferences?.currency_display ?? 'both',
         persian_digits: preferences?.persian_digits ?? true,
@@ -136,6 +137,10 @@ export default function Settings({ preferences }: { preferences?: Preferences })
                                 />
                             </FormField>
 
+                            <FormField label={t('زبان')} htmlFor="language">
+                                <LanguageSelect />
+                            </FormField>
+
                             <FormField label={t('ظاهر برنامه')} error={form.errors.theme}>
                                 <ToggleGroup type="single" value={form.data.theme} onValueChange={(value) => value && changeTheme(value as Theme)} className="grid w-full grid-cols-3 gap-2" aria-label={t('ظاهر برنامه')}>
                                     {(
@@ -153,10 +158,12 @@ export default function Settings({ preferences }: { preferences?: Preferences })
                                 </ToggleGroup>
                             </FormField>
 
-                            <label className="flex min-h-11 items-center justify-between gap-3 text-sm font-medium">
-                                {t('نمایش اعداد فارسی')}
-                                <Switch checked={form.data.persian_digits} onCheckedChange={(checked) => form.setData('persian_digits', checked)} />
-                            </label>
+                            {locale.code === 'fa' && (
+                                <label className="flex min-h-11 items-center justify-between gap-3 text-sm font-medium">
+                                    {t('نمایش اعداد فارسی')}
+                                    <Switch checked={form.data.persian_digits} onCheckedChange={(checked) => form.setData('persian_digits', checked)} />
+                                </label>
+                            )}
 
                             <FormField label={t('زمان انقضای نشست (دقیقه)')} htmlFor="session_timeout_minutes" error={form.errors.session_timeout_minutes}>
                                 <Input
