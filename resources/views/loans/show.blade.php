@@ -1,2 +1,0 @@
-@extends('layouts.app')
-@section('content')<section class="space-y-4"><div class="glass rounded-3xl p-5"><h1 class="text-2xl font-black">{{ $loan->title }}</h1><p class="num mt-3 text-2xl font-black">{{ number_format($loan->total_payable_amount) }}</p></div>@foreach($loan->installments as $installment)<div class="rounded-3xl bg-white/85 p-4 dark:bg-slate-900"><strong>{{ $installment->due_date?->format('Y-m-d') }}</strong><p class="num">{{ number_format($installment->amount) }}</p></div>@endforeach</section>@endsection

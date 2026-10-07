@@ -2,23 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Presenters\Present;
 use App\Http\Requests\AccountRequest;
 use App\Models\Account;
 use App\Services\Accounting\AccountBalanceService;
 use App\Services\Audit\AuditLogService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class AccountController extends Controller
 {
-    public function index(): View
+    public function index(): Response
     {
-        return view('accounts.index', ['accounts' => Account::forUser(auth()->user())->orderBy('sort_order')->get()]);
+        return Inertia::render('accounts/index', [
+            'accounts' => Account::forUser(auth()->user())->orderBy('sort_order')->get()->map(Present::account(...)),
+        ]);
     }
 
-    public function create(): View
+    public function create(): Response
     {
-        return view('accounts.form', ['account' => new Account()]);
+        return Inertia::render('accounts/form', ['account' => null]);
     }
 
     public function store(AccountRequest $request): RedirectResponse
@@ -33,21 +37,26 @@ class AccountController extends Controller
         return redirect()->route('accounts.show', $account)->with('status', 'حساب ساخته شد.');
     }
 
-    public function show(Account $account): View
+    public function show(Account $account): Response
     {
         $this->authorize('view', $account);
 
-        return view('accounts.show', [
-            'account' => $account,
-            'transactions' => $account->transactions()->with(['category', 'person'])->latest('transaction_date')->paginate(20),
+        return Inertia::render('accounts/show', [
+            'account' => Present::account($account),
+            'transactions' => Inertia::scroll(fn () => $account->transactions()
+                ->with(['account', 'category', 'person'])
+                ->latest('transaction_date')
+                ->latest('id')
+                ->paginate(25)
+                ->through(Present::transaction(...))),
         ]);
     }
 
-    public function edit(Account $account): View
+    public function edit(Account $account): Response
     {
         $this->authorize('update', $account);
 
-        return view('accounts.form', ['account' => $account]);
+        return Inertia::render('accounts/form', ['account' => Present::account($account)]);
     }
 
     public function update(AccountRequest $request, Account $account, AuditLogService $audit): RedirectResponse

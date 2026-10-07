@@ -2,22 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Presenters\Present;
 use App\Http\Requests\CategoryRequest;
 use App\Models\Category;
 use App\Services\Audit\AuditLogService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class CategoryController extends Controller
 {
-    public function index(): View
+    public function index(): Response
     {
-        return view('categories.index', [
-            'categories' => Category::forUser(auth()->user())->orderBy('type')->orderBy('sort_order')->get(),
+        return Inertia::render('categories/index', [
+            'categories' => Category::forUser(auth()->user())->orderBy('type')->orderBy('sort_order')->get()->map(Present::category(...)),
         ]);
     }
 
-    public function create(): View
+    public function create(): Response
     {
         return $this->form(new Category());
     }
@@ -33,7 +35,7 @@ class CategoryController extends Controller
         return redirect()->route('categories.index')->with('status', 'دسته‌بندی ساخته شد.');
     }
 
-    public function edit(Category $category): View
+    public function edit(Category $category): Response
     {
         $this->authorize('update', $category);
 
@@ -61,14 +63,14 @@ class CategoryController extends Controller
         return redirect()->route('categories.index')->with('status', 'دسته‌بندی بایگانی شد.');
     }
 
-    private function form(Category $category): View
+    private function form(Category $category): Response
     {
-        return view('categories.form', [
-            'category' => $category,
+        return Inertia::render('categories/form', [
+            'category' => $category->exists ? Present::category($category) : null,
             'parents' => Category::forUser(auth()->user())
                 ->when($category->exists, fn ($query) => $query->whereKeyNot($category->id))
                 ->orderBy('name')
-                ->get(),
+                ->get(['id', 'name', 'type']),
         ]);
     }
 }

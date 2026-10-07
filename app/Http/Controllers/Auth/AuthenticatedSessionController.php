@@ -10,26 +10,27 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class AuthenticatedSessionController extends Controller
 {
-    public function create(): View|RedirectResponse
+    public function create(): Response|RedirectResponse
     {
         if (User::query()->doesntExist()) {
             return redirect()->route('setup');
         }
 
-        return view('auth.login');
+        return Inertia::render('auth/login');
     }
 
-    public function setup(): View|RedirectResponse
+    public function setup(): Response|RedirectResponse
     {
         if (User::query()->exists()) {
             return redirect()->route('login');
         }
 
-        return view('auth.setup');
+        return Inertia::render('auth/setup');
     }
 
     public function storeSetup(SetupUserRequest $request): RedirectResponse

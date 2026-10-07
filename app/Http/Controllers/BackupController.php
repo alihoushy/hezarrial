@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Presenters\Present;
 use App\Models\Backup;
 use App\Services\Audit\AuditLogService;
 use App\Services\Backup\BackupService;
@@ -9,14 +10,17 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class BackupController extends Controller
 {
-    public function index(): View
+    public function index(): Response
     {
-        return view('backups.index', ['backups' => Backup::forUser(auth()->user())->latest('created_at')->get()]);
+        return Inertia::render('backups/index', [
+            'backups' => Backup::forUser(auth()->user())->latest('created_at')->get()->map(Present::backup(...)),
+        ]);
     }
 
     public function store(BackupService $backups): RedirectResponse

@@ -5,13 +5,24 @@ namespace App\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class SettingsController extends Controller
 {
-    public function edit(): View
+    public function edit(): Response
     {
-        return view('settings.index', ['settings' => auth()->user()->settings ?? []]);
+        $settings = auth()->user()->settings ?? [];
+
+        return Inertia::render('settings/index', [
+            'preferences' => [
+                'currency_display' => $settings['currency_display'] ?? 'both',
+                'persian_digits' => (bool) ($settings['persian_digits'] ?? true),
+                'theme' => $settings['theme'] ?? 'system',
+                'session_timeout_minutes' => (int) ($settings['session_timeout_minutes'] ?? 120),
+                'recurring_mode' => $settings['recurring_mode'] ?? 'suggestion',
+            ],
+        ]);
     }
 
     public function update(Request $request): RedirectResponse

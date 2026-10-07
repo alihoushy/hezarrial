@@ -14,58 +14,123 @@ use Illuminate\Support\Carbon;
 
 class ReportService
 {
-    public function dashboard(User $user): array
+    /**
+     * Current month's income, expense and net, plus the total of active balances.
+     */
+    public function summary(User $user): array
     {
-        $start = now()->startOfMonth()->toDateString();
-        $end = now()->endOfMonth()->toDateString();
+        [$start, $end] = $this->currentMonth();
 
-        $income = Transaction::forUser($user)->where('type', TransactionType::Income)->whereBetween('transaction_date', [$start, $end])->sum('amount');
-        $expense = Transaction::forUser($user)->where('type', TransactionType::Expense)->whereBetween('transaction_date', [$start, $end])->sum('amount');
+        $income = (float) Transaction::forUser($user)->where('type', TransactionType::Income)->whereBetween('transaction_date', [$start, $end])->sum('amount');
+        $expense = (float) Transaction::forUser($user)->where('type', TransactionType::Expense)->whereBetween('transaction_date', [$start, $end])->sum('amount');
+
+        return [
+            'income' => $income,
+            'expense' => $expense,
+            'net' => $income - $expense,
+            'total_balance' => (float) Account::forUser($user)->where('is_active', true)->sum('current_balance'),
+        ];
+    }
+
+    /**
+     * Daily income/expense for the current month and expense per category.
+     */
+    public function charts(User $user): array
+    {
+        [$start, $end] = $this->currentMonth();
 
         $transactions = Transaction::forUser($user)
+            ->with('category:id,name,color')
+            ->whereIn('type', [TransactionType::Income, TransactionType::Expense])
             ->whereBetween('transaction_date', [$start, $end])
             ->get(['type', 'amount', 'transaction_date', 'category_id']);
 
-        $days = collect(Carbon::parse($start)->daysUntil(Carbon::parse($end)->addDay()))
-            ->map(fn (Carbon $date) => $date->toDateString());
+        $daily = collect(Carbon::parse($start)->daysUntil(Carbon::parse($end)))
+            ->map(function (Carbon $day) use ($transactions): array {
+                $date = $day->toDateString();
+                $sameDay = $transactions->filter(fn (Transaction $transaction) => $transaction->transaction_date?->toDateString() === $date);
 
-        $sumForDay = fn (string $date, TransactionType $type): float => (float) $transactions
-            ->filter(fn (Transaction $transaction) => $transaction->transaction_date?->toDateString() === $date && $transaction->type === $type)
-            ->sum('amount');
+                return [
+                    'date' => $date,
+                    'income' => (float) $sameDay->where('type', TransactionType::Income)->sum('amount'),
+                    'expense' => (float) $sameDay->where('type', TransactionType::Expense)->sum('amount'),
+                ];
+            })
+            ->values();
 
-        $trend = [
-            'labels' => $days->map(fn (string $date) => Carbon::parse($date)->format('m/d'))->values(),
-            'income' => $days->map(fn (string $date) => $sumForDay($date, TransactionType::Income))->values(),
-            'expense' => $days->map(fn (string $date) => $sumForDay($date, TransactionType::Expense))->values(),
-        ];
-
-        $categorySpending = Transaction::forUser($user)
-            ->with('category')
+        $categories = $transactions
             ->where('type', TransactionType::Expense)
-            ->whereBetween('transaction_date', [$start, $end])
-            ->get()
-            ->groupBy(fn ($transaction) => $transaction->category?->name ?? 'بدون دسته')
-            ->map(fn ($rows) => (float) $rows->sum('amount'));
+            ->groupBy(fn (Transaction $transaction) => $transaction->category?->name ?? 'بدون دسته')
+            ->map(fn ($rows, $name) => [
+                'name' => $name,
+                'color' => $rows->first()->category?->color,
+                'value' => (float) $rows->sum('amount'),
+            ])
+            ->sortByDesc('value')
+            ->values();
 
-        return [
-            'income' => (float) $income,
-            'expense' => (float) $expense,
-            'net' => (float) $income - (float) $expense,
-            'total_balance' => (float) Account::forUser($user)->where('is_active', true)->sum('current_balance'),
-            'accounts' => Account::forUser($user)->where('is_active', true)->orderBy('sort_order')->get(),
-            'recent_transactions' => Transaction::forUser($user)->with(['account', 'category', 'person'])->latest('transaction_date')->latest('id')->limit(8)->get(),
-            'reminders' => Reminder::forUser($user)->where('status', 'pending')->whereDate('due_date', '<=', Carbon::now()->addDays(14))->orderBy('due_date')->limit(5)->get(),
-            'installments' => LoanInstallment::forUser($user)->where('status', 'pending')->whereDate('due_date', '<=', Carbon::now()->addDays(30))->orderBy('due_date')->limit(5)->get(),
-            'checks' => Check::forUser($user)->where('status', 'pending')->whereDate('due_date', '<=', Carbon::now()->addDays(30))->orderBy('due_date')->limit(5)->get(),
-            'debts' => Debt::forUser($user)->whereIn('status', ['open', 'partially_settled', 'overdue'])->orderByRaw('due_date is null, due_date asc')->limit(5)->get(),
-            'category_spending' => $categorySpending,
-            'charts' => [
-                'income_expense' => $trend,
-                'category_spending' => [
-                    'labels' => $categorySpending->keys()->values(),
-                    'values' => $categorySpending->values(),
-                ],
-            ],
-        ];
+        return ['daily' => $daily, 'categories' => $categories];
+    }
+
+    /**
+     * Pending reminders, installments, checks and open debts that are due soon,
+     * merged into one list ordered by due date (undated debts last).
+     */
+    public function upcoming(User $user): array
+    {
+        $items = collect();
+
+        Reminder::forUser($user)->where('status', 'pending')->whereDate('due_date', '<=', Carbon::now()->addDays(14))->orderBy('due_date')->limit(5)->get()
+            ->each(fn (Reminder $reminder) => $items->push([
+                'key' => 'reminder-'.$reminder->id,
+                'kind' => 'reminder',
+                'title' => $reminder->title,
+                'amount' => null,
+                'due_date' => $reminder->due_date?->toDateString(),
+                'href' => route('reminders.index'),
+            ]));
+
+        LoanInstallment::forUser($user)->with('loan:id,title')->where('status', 'pending')->whereDate('due_date', '<=', Carbon::now()->addDays(30))->orderBy('due_date')->limit(5)->get()
+            ->each(fn (LoanInstallment $installment) => $items->push([
+                'key' => 'installment-'.$installment->id,
+                'kind' => 'installment',
+                'title' => 'قسط '.($installment->loan?->title ?? 'وام'),
+                'amount' => (float) $installment->amount,
+                'due_date' => $installment->due_date?->toDateString(),
+                'href' => route('loans.show', $installment->loan_id),
+            ]));
+
+        Check::forUser($user)->where('status', 'pending')->whereDate('due_date', '<=', Carbon::now()->addDays(30))->orderBy('due_date')->limit(5)->get()
+            ->each(fn (Check $check) => $items->push([
+                'key' => 'check-'.$check->id,
+                'kind' => 'check',
+                'title' => ($check->type->value === 'payable' ? 'چک پرداختنی' : 'چک دریافتنی').($check->check_number ? ' '.$check->check_number : ''),
+                'amount' => (float) $check->amount,
+                'due_date' => $check->due_date?->toDateString(),
+                'href' => route('checks.index'),
+            ]));
+
+        Debt::forUser($user)->with('person:id,full_name')->whereIn('status', ['open', 'partially_settled', 'overdue'])->orderByRaw('due_date is null, due_date asc')->limit(5)->get()
+            ->each(fn (Debt $debt) => $items->push([
+                'key' => 'debt-'.$debt->id,
+                'kind' => 'debt',
+                'title' => ($debt->type->value === 'payable' ? 'بدهی به ' : 'طلب از ').($debt->person?->full_name ?? 'شخص'),
+                'amount' => (float) $debt->remaining_amount,
+                'due_date' => $debt->due_date?->toDateString(),
+                'href' => $debt->person_id ? route('people.show', $debt->person_id) : route('debts.index'),
+            ]));
+
+        return $items
+            ->sortBy(fn (array $item) => $item['due_date'] ?? '9999-12-31')
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array{0: string, 1: string}
+     */
+    private function currentMonth(): array
+    {
+        return [now()->startOfMonth()->toDateString(), now()->endOfMonth()->toDateString()];
     }
 }

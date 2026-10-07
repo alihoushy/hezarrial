@@ -2,22 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Presenters\Present;
 use App\Models\Account;
 use App\Models\Category;
 use App\Models\RecurringTransaction;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Illuminate\View\View;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class RecurringTransactionController extends Controller
 {
-    public function index(): View
+    public function index(): Response
     {
-        return view('recurring.index', [
-            'items' => RecurringTransaction::forUser(auth()->user())->orderBy('next_run_date')->get(),
-            'accounts' => Account::forUser(auth()->user())->where('is_active', true)->get(),
-            'categories' => Category::forUser(auth()->user())->where('is_active', true)->get(),
+        $user = auth()->user();
+
+        return Inertia::render('recurring/index', [
+            'items' => RecurringTransaction::forUser($user)->orderBy('next_run_date')->get()->map(Present::recurring(...)),
+            'accounts' => Account::forUser($user)->where('is_active', true)->orderBy('sort_order')->get(['id', 'name']),
+            'categories' => Category::forUser($user)->where('is_active', true)->orderBy('sort_order')->get(['id', 'name', 'type']),
         ]);
     }
 

@@ -32,3 +32,6 @@ Thumbs.db
 sms-samples.txt
 /dist
 /RELEASE
+
+# Database dumps can hold personal financial data
+/*.sql

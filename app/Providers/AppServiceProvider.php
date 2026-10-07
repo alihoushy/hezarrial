@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Inertia\ExceptionResponse;
+use Inertia\Inertia;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -46,5 +48,30 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
         }
+
+        Inertia::handleExceptionsUsing(function (ExceptionResponse $response) {
+            $request = $response->request;
+            $status = $response->statusCode();
+
+            // The SMS ingest API and other JSON clients keep Laravel's responses.
+            if ($request->is('api/*') || ($request->expectsJson() && ! $request->header('X-Inertia'))) {
+                return null;
+            }
+
+            if ($status === 419) {
+                return back()->with('status', 'نشست شما منقضی شده بود. لطفاً دوباره تلاش کنید.');
+            }
+
+            // Keep Laravel's debug page for server errors while developing.
+            if ($status >= 500 && config('app.debug')) {
+                return null;
+            }
+
+            if (in_array($status, [403, 404, 429, 500, 503], true)) {
+                return $response->render('error', ['status' => $status])->withSharedData();
+            }
+
+            return null;
+        });
     }
 }

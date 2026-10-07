@@ -59,7 +59,7 @@ cp "$APP/deploy/shared-hosting/public_html-index.php" "$WORK/public_html-index.p
 rm -rf \
     "$APP"/{node_modules,tests,docs,docker,deploy,.github,.claude} \
     "$APP"/resources/{css,js} \
-    "$APP"/{Dockerfile,compose.prod.yaml,.dockerignore,phpunit.xml,package.json,package-lock.json,vite.config.js} \
+    "$APP"/{Dockerfile,compose.prod.yaml,.dockerignore,phpunit.xml,package.json,package-lock.json,vite.config.ts,tsconfig.json,components.json} \
     "$APP"/{.editorconfig,.gitattributes,.gitignore,.npmrc,.nvmrc,sms-samples.txt.example,README.md}
 mv "$WORK/env.example" "$APP/.env.example"
 echo "$RELEASE" > "$APP/RELEASE"
