@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\MobileController;
 use App\Http\Controllers\RecurringTransactionController;
 use App\Http\Controllers\ReminderController;
 use App\Http\Controllers\ReportController;
@@ -92,6 +93,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/settings/sms', [SmsTokenController::class, 'index'])->name('sms-tokens.index');
     Route::post('/settings/sms/tokens', [SmsTokenController::class, 'store'])->middleware('throttle:10,1')->name('sms-tokens.store');
     Route::delete('/settings/sms/tokens/{token}', [SmsTokenController::class, 'destroy'])->name('sms-tokens.destroy');
+
+    Route::post('/settings/mobile/code', [MobileController::class, 'sendCode'])->middleware('throttle:6,10')->name('mobile.code');
+    Route::post('/settings/mobile/verify', [MobileController::class, 'verify'])->middleware('throttle:10,10')->name('mobile.verify');
+    Route::delete('/settings/mobile', [MobileController::class, 'destroy'])->name('mobile.destroy');
 
     Route::get('/settings/account', [AccountSettingsController::class, 'edit'])->name('account.edit');
     Route::get('/settings/security', [AccountSettingsController::class, 'security'])->middleware('password.confirm')->name('security.edit');

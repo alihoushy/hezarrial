@@ -35,6 +35,21 @@ return [
         ],
     ],
 
+    // Outgoing SMS (reminders, mobile verification). "log" only writes to the log; "smsir" uses sms.ir.
+    'sms' => [
+        'driver' => env('SMS_DRIVER', 'log'),
+        // Cost control: SMS notifications sent to one user per day.
+        'daily_limit_per_user' => (int) env('SMS_DAILY_LIMIT_PER_USER', 5),
+        'smsir' => [
+            'api_key' => env('SMSIR_API_KEY'),
+            // The approved sender line for free-text messages.
+            'line_number' => env('SMSIR_LINE_NUMBER'),
+            // A verify (OTP) template with one parameter; without it the code goes out as free text.
+            'verify_template_id' => env('SMSIR_VERIFY_TEMPLATE_ID'),
+            'verify_parameter' => env('SMSIR_VERIFY_PARAMETER', 'Code'),
+        ],
+    ],
+
     'sms_ingest' => [
         'token' => env('SMS_INGEST_TOKEN'),
         'user_id' => env('SMS_INGEST_USER_ID', 1),

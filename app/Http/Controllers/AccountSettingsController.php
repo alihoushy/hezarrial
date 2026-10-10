@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\Backup\BackupService;
+use App\Services\Messaging\MobileVerifier;
 use App\Support\UserAgent;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -17,9 +18,18 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 /** Profile, security and the data rights of the signed-in user. */
 class AccountSettingsController extends Controller
 {
-    public function edit(): Response
+    public function edit(Request $request, MobileVerifier $mobiles): Response
     {
-        return Inertia::render('settings/account');
+        $user = $request->user();
+
+        return Inertia::render('settings/account', [
+            'mobile' => [
+                'number' => $user->mobile,
+                'verified' => (bool) $user->mobile_verified_at,
+                // A code was sent to this number and is waiting to be entered.
+                'pending' => $mobiles->pendingMobile($user),
+            ],
+        ]);
     }
 
     public function security(Request $request): Response

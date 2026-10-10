@@ -10,6 +10,7 @@ use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Http\Responses\PasswordResetLinkFailedResponse;
 use App\Http\Responses\SignedOutResponse;
 use App\Models\User;
+use App\Support\Mobile;
 use App\Support\Registration;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -45,7 +46,9 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::authenticateUsing(function (Request $request) {
             $login = trim((string) $request->input('login'));
             $column = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'mobile';
-            $user = User::query()->where($column, $column === 'email' ? mb_strtolower($login) : $login)->first();
+            $user = $column === 'email'
+                ? User::query()->where('email', mb_strtolower($login))->first()
+                : User::query()->where('mobile', Mobile::normalize($login) ?? $login)->whereNotNull('mobile_verified_at')->first();
 
             // Hash a dummy when the user is unknown so the response time does not give them away.
             if (! $user) {
