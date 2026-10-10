@@ -215,6 +215,16 @@ enum Bank: string
         return $best;
     }
 
+    /** A known bank replaces the free-text name, so the two never disagree. */
+    public static function withoutDuplicateName(array $data): array
+    {
+        if (! empty($data['bank'])) {
+            $data['bank_name'] = null;
+        }
+
+        return $data;
+    }
+
     /** @return list<array{value: string, label: string}> */
     public static function options(): array
     {
