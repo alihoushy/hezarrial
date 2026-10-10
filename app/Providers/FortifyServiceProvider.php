@@ -57,6 +57,10 @@ class FortifyServiceProvider extends ServiceProvider
             return Hash::check($request->input('password', ''), $user->password) ? $user : null;
         });
 
+        // Confirming a password must look at the password hash. Fortify's default searches the user
+        // by the "username" field, which here is the virtual "login" (email or mobile) and not a column.
+        Fortify::confirmPasswordsUsing(fn (User $user, ?string $password = null) => filled($password) && Hash::check($password, $user->password));
+
         Fortify::loginView(fn () => User::query()->doesntExist() ? redirect()->route('register') : Inertia::render('auth/login'));
         Fortify::registerView(function () {
             abort_unless(Registration::isOpen(), 404);

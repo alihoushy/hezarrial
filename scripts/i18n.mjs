@@ -87,7 +87,9 @@ if (process.argv.includes('--list')) {
 }
 
 const langDir = join(root, 'resources/lang');
-const locales = readdirSync(langDir).filter((name) => name.endsWith('.json')).map((name) => name.replace(/\.json$/, ''));
+// fa.json is not a translation of the Persian text: it holds Persian for the English messages of
+// third-party packages (Fortify, ...), so it is not checked against the keys found in the code.
+const locales = readdirSync(langDir).filter((name) => name.endsWith('.json') && name !== 'fa.json').map((name) => name.replace(/\.json$/, ''));
 let problems = 0;
 
 for (const code of locales) {
