@@ -2,10 +2,13 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class SecurityHeadersTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_pages_carry_the_baseline_security_headers(): void
     {
         $response = $this->get('/login');
@@ -16,6 +19,27 @@ class SecurityHeadersTest extends TestCase
         $response->assertHeader('Cross-Origin-Opener-Policy', 'same-origin');
         $this->assertStringContainsString('geolocation=()', $response->headers->get('Permissions-Policy'));
         $this->assertStringContainsString("frame-ancestors 'none'", $response->headers->get('Content-Security-Policy'));
+    }
+
+    public function test_scripts_are_allowed_by_nonce_not_by_unsafe_inline(): void
+    {
+        $response = $this->get('/setup');
+
+        preg_match("/script-src ([^;]+);/", $response->headers->get('Content-Security-Policy'), $script);
+        $this->assertStringNotContainsString('unsafe-inline', $script[1]);
+        preg_match("/'nonce-([^']+)'/", $script[1], $nonce);
+
+        $html = $response->getContent();
+        $this->assertStringContainsString('<script nonce="'.$nonce[1].'">', $html, 'theme script');
+        $this->assertSame(substr_count($html, '<script'), substr_count($html, 'nonce="'.$nonce[1].'"') + substr_count($html, 'type="application/json"'), 'every executable script carries the nonce');
+    }
+
+    public function test_nonce_changes_on_every_request(): void
+    {
+        $first = $this->get('/setup')->headers->get('Content-Security-Policy');
+        $second = $this->get('/setup')->headers->get('Content-Security-Policy');
+
+        $this->assertNotSame($first, $second);
     }
 
     public function test_hsts_is_sent_only_over_https_in_production(): void

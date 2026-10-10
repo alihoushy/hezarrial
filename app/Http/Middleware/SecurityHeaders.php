@@ -11,6 +11,9 @@ class SecurityHeaders
 {
     public function handle(Request $request, Closure $next): Response
     {
+        // Must exist before the view renders: Vite tags and the inline scripts in app.blade.php carry it.
+        $nonce = Vite::useCspNonce();
+
         $response = $next($request);
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('X-Frame-Options', 'DENY');
@@ -29,7 +32,7 @@ class SecurityHeaders
             return $response;
         }
 
-        $response->headers->set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+        $response->headers->set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'nonce-{$nonce}'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
 
         return $response;
     }
