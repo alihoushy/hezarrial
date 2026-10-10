@@ -17,7 +17,7 @@ const root = new URL('..', import.meta.url).pathname;
 const PERSIAN_LETTER = /[\u0621-\u063A\u0641-\u064A\u0679-\u06D3]/;
 // Persian symbols that are shown as-is in every language, and files whose Persian is data, not UI text.
 const IGNORED_KEYS = new Set(['؟']);
-const IGNORED_FILES = new Set(['resources/js/lib/jalali.ts']);
+const IGNORED_FILES = new Set(['resources/js/lib/jalali.ts', 'resources/js/lib/search.ts']);
 
 function walk(dir, extensions) {
     return readdirSync(dir).flatMap((name) => {

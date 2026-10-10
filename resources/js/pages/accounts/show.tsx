@@ -1,5 +1,6 @@
 import { Head, InfiniteScroll, Link } from '@inertiajs/react';
 import { PencilIcon, ReceiptTextIcon, RefreshCwIcon } from 'lucide-react';
+import { BankLogo } from '@/components/bank-logo';
 import { ConfirmAction } from '@/components/confirm-action';
 import { EmptyState } from '@/components/empty-state';
 import { PageBody, PageHeader, SectionTitle } from '@/components/page-header';
@@ -40,9 +41,9 @@ export default function AccountShow({ account, transactions }: Props) {
             <PageBody>
                 {account && type ? (
                     <section className="rounded-3xl bg-linear-to-br from-zinc-900 to-teal-900 p-5 text-white shadow-lg ring-1 ring-white/10">
-                        <div className="flex items-center gap-2 text-sm text-white/75">
-                            <type.icon className="size-4" />
-                            {[t(type.label), account.bank_name, account.card_last_four ? `•••• ${format.digits(account.card_last_four)}` : null].filter(Boolean).join(' · ')}
+                        <div className="flex items-center gap-3 text-sm text-white/75">
+                            {account.bank ? <BankLogo bank={account.bank} size="sm" /> : <type.icon className="size-4" />}
+                            {[account.type === 'bank' && (account.bank_label ?? account.bank_name) ? null : t(type.label), account.bank_label ?? account.bank_name, account.card_last_four ? `•••• ${format.digits(account.card_last_four)}` : null].filter(Boolean).join(' · ')}
                         </div>
                         <p className="mt-3 text-sm text-white/60">{t('موجودی فعلی')}</p>
                         <p className="text-[2rem] leading-tight font-extrabold">

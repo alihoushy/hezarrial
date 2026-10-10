@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Bank;
 use App\Http\Presenters\Present;
 use App\Http\Requests\AccountRequest;
 use App\Models\Account;
@@ -22,13 +23,13 @@ class AccountController extends Controller
 
     public function create(): Response
     {
-        return Inertia::render('accounts/form', ['account' => null]);
+        return Inertia::render('accounts/form', ['account' => null, 'banks' => Bank::options()]);
     }
 
     public function store(AccountRequest $request): RedirectResponse
     {
         $account = Account::create([
-            ...$request->validated(),
+            ...Bank::withoutDuplicateName($request->validated()),
             'user_id' => auth()->id(),
             'current_balance' => $request->opening_balance,
             'is_active' => $request->boolean('is_active', true),
@@ -56,14 +57,14 @@ class AccountController extends Controller
     {
         $this->authorize('update', $account);
 
-        return Inertia::render('accounts/form', ['account' => Present::account($account)]);
+        return Inertia::render('accounts/form', ['account' => Present::account($account), 'banks' => Bank::options()]);
     }
 
     public function update(AccountRequest $request, Account $account, AuditLogService $audit): RedirectResponse
     {
         $this->authorize('update', $account);
         $old = $account->toArray();
-        $account->update($request->validated() + ['is_active' => $request->boolean('is_active', true)]);
+        $account->update(Bank::withoutDuplicateName($request->validated()) + ['is_active' => $request->boolean('is_active', true)]);
         $audit->record('account.updated', $account, $old, $account->fresh()->toArray());
 
         return redirect()->route('accounts.show', $account)->with('status', __('حساب به‌روز شد.'));

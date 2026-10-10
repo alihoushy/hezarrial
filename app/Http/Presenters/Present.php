@@ -2,6 +2,7 @@
 
 namespace App\Http\Presenters;
 
+use App\Enums\Bank;
 use App\Models\Account;
 use App\Models\Backup;
 use App\Models\Budget;
@@ -29,13 +30,21 @@ class Present
         return $model ? ['id' => $model->id, 'name' => $model->{$label}] : null;
     }
 
+    /** The logo slug and label of a known bank; unknown or missing banks fall back to the typed name. */
+    private static function bank(?string $slug, ?string $typedName): array
+    {
+        $bank = $slug ? Bank::tryFrom($slug) : null;
+
+        return ['bank' => $bank?->value, 'bank_label' => $bank?->label(), 'bank_name' => $typedName];
+    }
+
     public static function account(Account $account): array
     {
         return [
             'id' => $account->id,
             'name' => $account->name,
             'type' => $account->type->value,
-            'bank_name' => $account->bank_name,
+            ...self::bank($account->bank, $account->bank_name),
             'card_last_four' => $account->card_last_four,
             'opening_balance' => (float) $account->opening_balance,
             'current_balance' => (float) $account->current_balance,
@@ -150,7 +159,7 @@ class Present
             'amount' => (float) $check->amount,
             'due_date' => $check->due_date?->toDateString(),
             'check_number' => $check->check_number,
-            'bank_name' => $check->bank_name,
+            ...self::bank($check->bank, $check->bank_name),
             'account' => self::option($check->account),
             'person' => self::option($check->person, 'full_name'),
         ];

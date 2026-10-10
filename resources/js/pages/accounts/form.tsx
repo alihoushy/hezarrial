@@ -1,6 +1,7 @@
 import { Head, useForm } from '@inertiajs/react';
 import type { FormEvent } from 'react';
 import { AmountInput } from '@/components/amount-input';
+import { BankField } from '@/components/bank-field';
 import { FormField, SelectField, SubmitButton } from '@/components/form-field';
 import { PageBody, PageHeader } from '@/components/page-header';
 import { ConfirmAction } from '@/components/confirm-action';
@@ -9,14 +10,15 @@ import { FieldGroup } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { toLatinDigits } from '@/lib/format';
 import { accountTypes } from '@/lib/labels';
-import type { Account, AccountType } from '@/types';
+import type { Account, AccountType, BankOption } from '@/types';
 import { t } from '@/lib/i18n';
 
-export default function AccountForm({ account }: { account?: Account | null }) {
+export default function AccountForm({ account, banks }: { account?: Account | null; banks?: BankOption[] }) {
     const editing = Boolean(account);
     const form = useForm({
         name: account?.name ?? '',
         type: (account?.type ?? 'bank') as AccountType,
+        bank: account?.bank ?? '',
         bank_name: account?.bank_name ?? '',
         card_last_four: account?.card_last_four ?? '',
         opening_balance: account ? String(Math.round(account.opening_balance)) : '0',
@@ -63,8 +65,17 @@ export default function AccountForm({ account }: { account?: Account | null }) {
                             />
                         </FormField>
 
-                        <FormField label={t('نام بانک')} htmlFor="bank_name" optional error={form.errors.bank_name}>
-                            <Input id="bank_name" value={form.data.bank_name} onChange={(event) => form.setData('bank_name', event.target.value)} />
+                        <FormField label={t('بانک')} htmlFor="bank" optional error={form.errors.bank ?? form.errors.bank_name}>
+                            <BankField
+                                id="bank"
+                                banks={banks}
+                                value={form.data.bank}
+                                onChange={(bank) => form.setData((data) => ({ ...data, bank, bank_name: bank ? '' : data.bank_name }))}
+                                fallbackLabel={account?.bank_label}
+                                otherName={form.data.bank_name}
+                                onOtherNameChange={(name) => form.setData('bank_name', name)}
+                                aria-invalid={form.errors.bank || form.errors.bank_name ? true : undefined}
+                            />
                         </FormField>
 
                         <FormField label={t('۴ رقم آخر کارت')} htmlFor="card_last_four" optional error={form.errors.card_last_four} description={t('فقط چهار رقم آخر ذخیره می‌شود؛ هرگز شماره کامل کارت یا رمز را وارد نکنید.')}>

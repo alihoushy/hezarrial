@@ -168,3 +168,7 @@ php artisan test
 - دانلود/بازیابی پشتیبان نیازمند تایید رمز عبور است.
 - CSV export در برابر formula injection محافظت می‌شود.
 - همه رکوردهای مالی با policy و `user_id` محدود شده‌اند.
+
+## سپاس و مجوزها
+
+- لوگوی بانک‌ها از [@persianlabs/icons](https://github.com/persianlabs/icons) (مجوز MIT) گرفته شده که خودش بر پایه‌ی [zegond/logos-per-banks](https://github.com/zegond/logos-per-banks) (CC0) است. اسکریپت `scripts/bank-logos.mjs` فایل‌ها را بهینه می‌کند و در `public/images/banks` می‌گذارد. لوگوها علامت تجاری بانک‌های مربوطه‌اند.

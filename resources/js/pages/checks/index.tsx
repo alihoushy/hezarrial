@@ -2,6 +2,7 @@ import { Head, useForm } from '@inertiajs/react';
 import { PlusIcon, ReceiptTextIcon } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { AmountInput } from '@/components/amount-input';
+import { BankLogo } from '@/components/bank-logo';
 import { ConfirmAction } from '@/components/confirm-action';
 import { EmptyState } from '@/components/empty-state';
 import { DateInput, FormField, SelectField, SubmitButton } from '@/components/form-field';
@@ -16,17 +17,18 @@ import { Input } from '@/components/ui/input';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { todayIso, toLatinDigits, useFormat } from '@/lib/format';
 import { checkStatuses } from '@/lib/labels';
-import type { Check, Option, PersonOption } from '@/types';
+import type { BankOption, Check, Option, PersonOption } from '@/types';
 import { t } from '@/lib/i18n';
 
 interface Props {
     checks?: Check[];
     accounts?: Option[];
     people?: PersonOption[];
+    banks?: BankOption[];
 }
 
-function NewCheckSheet({ open, onOpenChange, accounts, people }: { open: boolean; onOpenChange: (open: boolean) => void; accounts: Option[]; people: PersonOption[] }) {
-    const form = useForm({ type: 'payable', amount: '', due_date: todayIso(), check_number: '', bank_name: '', account_id: '', person_id: '' });
+function NewCheckSheet({ open, onOpenChange, accounts, people, banks }: { open: boolean; onOpenChange: (open: boolean) => void; accounts: Option[]; people: PersonOption[]; banks: BankOption[] }) {
+    const form = useForm({ type: 'payable', amount: '', due_date: todayIso(), check_number: '', bank: '', bank_name: '', account_id: '', person_id: '' });
 
     const submit = (event: FormEvent) => {
         event.preventDefault();
@@ -61,8 +63,10 @@ function NewCheckSheet({ open, onOpenChange, accounts, people }: { open: boolean
                     <FormField label={t('شماره چک')} htmlFor="check_number" optional error={form.errors.check_number}>
                         <Input id="check_number" inputMode="numeric" dir="ltr" className="text-start" value={form.data.check_number} onChange={(event) => form.setData('check_number', event.target.value)} />
                     </FormField>
-                    <FormField label={t('نام بانک')} htmlFor="check_bank" optional error={form.errors.bank_name}>
-                        <Input id="check_bank" value={form.data.bank_name} onChange={(event) => form.setData('bank_name', event.target.value)} />
+                    {/* A native select, not the logo grid: this form is already inside a bottom sheet. */}
+                    <FormField label={t('بانک')} htmlFor="check_bank" optional error={form.errors.bank ?? form.errors.bank_name}>
+                        <SelectField id="check_bank" value={form.data.bank} onChange={(event) => form.setData('bank', event.target.value)} placeholder={t('سایر / بدون بانک')} options={banks} />
+                        {!form.data.bank && <Input value={form.data.bank_name} onChange={(event) => form.setData('bank_name', event.target.value)} placeholder={t('اگر بانک در فهرست نیست، نامش را بنویسید')} aria-label={t('نام بانک')} />}
                     </FormField>
                     <FormField label={t('حساب')} htmlFor="check_account" optional error={form.errors.account_id}>
                         <SelectField id="check_account" value={form.data.account_id} onChange={(event) => form.setData('account_id', event.target.value)} placeholder={t('بعداً انتخاب می‌شود')} options={accounts.map((account) => ({ value: account.id, label: account.name }))} />
@@ -137,7 +141,7 @@ function CheckActionsSheet({ check, accounts, onClose }: { check: Check | null; 
     );
 }
 
-export default function ChecksIndex({ checks, accounts, people }: Props) {
+export default function ChecksIndex({ checks, accounts, people, banks }: Props) {
     const format = useFormat();
     const [filter, setFilter] = useState('pending');
     const [creating, setCreating] = useState(false);
@@ -185,8 +189,9 @@ export default function ChecksIndex({ checks, accounts, people }: Props) {
                                     key={check.id}
                                     icon={ReceiptTextIcon}
                                     iconClassName={payable ? 'bg-expense/10 text-expense' : 'bg-income/12 text-income'}
+                                    media={check.bank ? <BankLogo bank={check.bank} /> : undefined}
                                     title={check.check_number ? t('چک :number', { number: format.digits(check.check_number) }) : payable ? t('چک پرداختنی') : t('چک دریافتنی')}
-                                    subtitle={[check.person?.name, check.bank_name, format.shortDate(check.due_date)].filter(Boolean).join(' · ')}
+                                    subtitle={[check.person?.name, check.bank_label ?? check.bank_name, format.shortDate(check.due_date)].filter(Boolean).join(' · ')}
                                     trailing={
                                         <>
                                             <Money amount={check.amount} tone={payable ? 'expense' : 'income'} className="text-sm font-semibold" />
@@ -202,7 +207,7 @@ export default function ChecksIndex({ checks, accounts, people }: Props) {
                     </ListCard>
                 )}
             </PageBody>
-            <NewCheckSheet open={creating} onOpenChange={setCreating} accounts={accounts ?? []} people={people ?? []} />
+            <NewCheckSheet open={creating} onOpenChange={setCreating} accounts={accounts ?? []} people={people ?? []} banks={banks ?? []} />
             <CheckActionsSheet check={selected} accounts={accounts ?? []} onClose={() => setSelected(null)} />
         </>
     );

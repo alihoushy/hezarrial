@@ -14,7 +14,7 @@ class Account extends Model
     use BelongsToUser, HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'user_id', 'name', 'type', 'bank_name', 'card_last_four', 'masked_card_number',
+        'user_id', 'name', 'type', 'bank_name', 'bank', 'card_last_four', 'masked_card_number',
         'opening_balance', 'current_balance', 'currency', 'color', 'icon', 'is_active', 'sort_order',
     ];
 

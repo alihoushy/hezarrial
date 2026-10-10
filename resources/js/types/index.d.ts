@@ -70,10 +70,17 @@ export type TransactionType =
 export type AccountType = 'bank' | 'cash' | 'wallet' | 'card' | 'other';
 export type CategoryType = 'income' | 'expense';
 
+export interface BankOption {
+    value: string;
+    label: string;
+}
+
 export interface Account {
     id: number;
     name: string;
     type: AccountType;
+    bank: string | null;
+    bank_label: string | null;
     bank_name: string | null;
     card_last_four: string | null;
     opening_balance: number;
@@ -157,6 +164,8 @@ export interface Check {
     amount: number;
     due_date: string | null;
     check_number: string | null;
+    bank: string | null;
+    bank_label: string | null;
     bank_name: string | null;
     account: Option | null;
     person: Option | null;

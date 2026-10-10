@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\AccountType;
+use App\Enums\Bank;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -15,6 +16,7 @@ class AccountRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:120'],
             'type' => ['required', Rule::enum(AccountType::class)],
+            'bank' => ['nullable', Rule::enum(Bank::class)],
             'bank_name' => ['nullable', 'string', 'max:120'],
             'card_last_four' => ['nullable', 'digits:4'],
             'masked_card_number' => ['nullable', 'string', 'max:32'],

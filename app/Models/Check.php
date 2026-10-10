@@ -14,7 +14,7 @@ class Check extends Model
 {
     use BelongsToUser, HasFactory, SoftDeletes;
 
-    protected $fillable = ['user_id', 'person_id', 'account_id', 'type', 'check_number', 'bank_name', 'amount', 'due_date', 'issued_date', 'status', 'description', 'transaction_id'];
+    protected $fillable = ['user_id', 'person_id', 'account_id', 'type', 'check_number', 'bank_name', 'bank', 'amount', 'due_date', 'issued_date', 'status', 'description', 'transaction_id'];
 
     protected function casts(): array
     {

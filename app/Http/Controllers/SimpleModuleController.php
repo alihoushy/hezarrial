@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Bank;
 use App\Http\Presenters\Present;
 use App\Http\Requests\DebtRequest;
 use App\Http\Requests\SettlementRequest;
@@ -177,12 +178,13 @@ class SimpleModuleController extends Controller
             'checks' => Check::forUser($user)->with(['account', 'person'])->orderBy('due_date')->get()->map(Present::check(...)),
             'accounts' => $this->accountOptions(),
             'people' => Person::forUser($user)->orderBy('full_name')->get(['id', 'full_name']),
+            'banks' => Bank::options(),
         ]);
     }
 
     public function storeCheck(Request $request): RedirectResponse
     {
-        Check::create([...$request->validate(['type' => ['required', 'in:payable,receivable'], 'amount' => ['required', 'numeric', 'min:0.01'], 'due_date' => ['required', 'date'], 'check_number' => ['nullable', 'string', 'max:80'], 'bank_name' => ['nullable', 'string', 'max:120'], 'person_id' => ['nullable', Rule::exists('people', 'id')->where('user_id', auth()->id())], 'account_id' => ['nullable', Rule::exists('accounts', 'id')->where('user_id', auth()->id())]]), 'user_id' => auth()->id(), 'status' => 'pending']);
+        Check::create([...Bank::withoutDuplicateName($request->validate(['type' => ['required', 'in:payable,receivable'], 'amount' => ['required', 'numeric', 'min:0.01'], 'due_date' => ['required', 'date'], 'check_number' => ['nullable', 'string', 'max:80'], 'bank' => ['nullable', Rule::enum(Bank::class)], 'bank_name' => ['nullable', 'string', 'max:120'], 'person_id' => ['nullable', Rule::exists('people', 'id')->where('user_id', auth()->id())], 'account_id' => ['nullable', Rule::exists('accounts', 'id')->where('user_id', auth()->id())]])), 'user_id' => auth()->id(), 'status' => 'pending']);
 
         return back()->with('status', __('چک ثبت شد.'));
     }
