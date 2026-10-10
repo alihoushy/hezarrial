@@ -67,4 +67,50 @@ class ExportAndBackupTest extends TestCase
         $this->assertDatabaseHas('transactions', ['user_id' => $user->id, 'amount' => 1000]);
         $this->assertDatabaseHas('audit_logs', ['user_id' => $user->id, 'action' => 'backup.restored']);
     }
+
+    public function test_backup_is_encrypted_on_disk_but_downloaded_as_plain_json(): void
+    {
+        Storage::fake('local');
+        $user = User::create(['name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password')]);
+        Account::create(['user_id' => $user->id, 'name' => 'بانک محرمانه', 'type' => 'bank', 'opening_balance' => 0, 'current_balance' => 0]);
+        $backup = app(BackupService::class)->create($user);
+
+        $stored = Storage::disk('local')->get($backup->file_path);
+        $this->assertTrue($backup->is_encrypted);
+        $this->assertStringNotContainsString('بانک محرمانه', $stored);
+        $this->assertNull(json_decode($stored, true));
+
+        $download = $this->actingAs($user)->post(route('backups.download', $backup), ['password' => 'password-password']);
+        $download->assertOk();
+        $plain = $download->streamedContent();
+        $this->assertSame(1, json_decode($plain, true)['schema_version']);
+        $this->assertStringContainsString('بانک محرمانه', $plain);
+    }
+
+    public function test_plain_json_backup_from_download_can_be_restored(): void
+    {
+        Storage::fake('local');
+        $user = User::create(['name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password')]);
+        $account = Account::create(['user_id' => $user->id, 'name' => 'بانک اصلی', 'type' => 'bank', 'opening_balance' => 0, 'current_balance' => 0]);
+        $backups = app(BackupService::class);
+        $plain = $backups->contents($backups->create($user));
+        $account->update(['name' => 'حساب اشتباه']);
+
+        $this->actingAs($user)->post(route('backups.restore'), [
+            'password' => 'password-password',
+            'backup' => UploadedFile::fake()->createWithContent('backup.json', $plain),
+        ])->assertRedirect();
+
+        $this->assertDatabaseHas('accounts', ['user_id' => $user->id, 'name' => 'بانک اصلی']);
+    }
+
+    public function test_invalid_backup_file_is_rejected(): void
+    {
+        $user = User::create(['name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password')]);
+
+        $this->actingAs($user)->post(route('backups.restore'), [
+            'password' => 'password-password',
+            'backup' => UploadedFile::fake()->createWithContent('backup.json', 'not a backup'),
+        ])->assertSessionHasErrors('backup');
+    }
 }
