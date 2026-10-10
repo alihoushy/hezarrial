@@ -16,6 +16,9 @@ use App\Models\Reminder;
 use App\Models\SmsPattern;
 use App\Models\Transaction;
 use App\Policies\UserOwnedPolicy;
+use App\Services\Messaging\LogSmsGateway;
+use App\Services\Messaging\SmsGateway;
+use App\Services\Messaging\SmsIrGateway;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -35,7 +38,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(SmsGateway::class, function () {
+            $sms = config('services.sms');
+
+            return match ($sms['driver']) {
+                'smsir' => new SmsIrGateway($sms['smsir']['api_key'], $sms['smsir']['line_number'], $sms['smsir']['verify_template_id'], $sms['smsir']['verify_parameter']),
+                default => new LogSmsGateway,
+            };
+        });
     }
 
     /**

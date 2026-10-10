@@ -1,6 +1,7 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { DownloadIcon, Trash2Icon } from 'lucide-react';
+import { DownloadIcon, SmartphoneIcon, Trash2Icon } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
+import { ConfirmAction } from '@/components/confirm-action';
 import { FormField, SubmitButton } from '@/components/form-field';
 import { PageBody, PageHeader, SectionTitle } from '@/components/page-header';
 import { PasswordInput } from '@/components/password-input';
@@ -8,6 +9,8 @@ import { ResponsiveModal } from '@/components/responsive-modal';
 import { Button } from '@/components/ui/button';
 import { FieldGroup } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
+import { toLatinDigits, useFormat } from '@/lib/format';
 import { t } from '@/lib/i18n';
 
 function ProfileForm() {
@@ -83,6 +86,77 @@ function PasswordForm() {
     );
 }
 
+interface MobileState {
+    number: string | null;
+    verified: boolean;
+    /** A code was sent to this number and is waiting to be entered. */
+    pending: string | null;
+}
+
+function MobileSection({ mobile }: { mobile?: MobileState }) {
+    const format = useFormat();
+    const request = useForm({ mobile: '' });
+    const confirm = useForm({ code: '' });
+
+    if (!mobile) {
+        return <Skeleton className="h-32 rounded-2xl" />;
+    }
+
+    const sendCode = (event: FormEvent) => {
+        event.preventDefault();
+        request.transform((data) => ({ mobile: toLatinDigits(data.mobile) }));
+        request.post(route('mobile.code'), { preserveScroll: true });
+    };
+
+    const verify = (event: FormEvent) => {
+        event.preventDefault();
+        confirm.transform((data) => ({ code: toLatinDigits(data.code).replace(/\D/g, '') }));
+        confirm.post(route('mobile.verify'), { preserveScroll: true, onSuccess: () => confirm.reset(), onError: () => confirm.reset() });
+    };
+
+    return (
+        <div className="flex flex-col gap-4 rounded-2xl bg-card p-4 ring-1 ring-foreground/5">
+            {mobile.number && mobile.verified ? (
+                <>
+                    <div className="flex items-center gap-3">
+                        <SmartphoneIcon className="size-5 text-muted-foreground" />
+                        <span className="flex-1 font-medium" dir="ltr">
+                            {format.digits(mobile.number)}
+                        </span>
+                        <span className="text-xs text-income">{t('تأییدشده')}</span>
+                    </div>
+                    <p className="text-xs leading-5 text-muted-foreground">{t('یادآوری‌های پیامکی به این شماره می‌رسد و می‌توانید با آن وارد شوید.')}</p>
+                    <ConfirmAction title={t('حذف شماره‌ی موبایل؟')} description={t('پیامک و ورود با موبایل برای این حساب خاموش می‌شود.')} confirmLabel={t('حذف')} href={route('mobile.destroy')} method="delete" destructive>
+                        <Button type="button" variant="outline" className="text-destructive">
+                            {t('حذف شماره')}
+                        </Button>
+                    </ConfirmAction>
+                </>
+            ) : mobile.pending ? (
+                <form onSubmit={verify} noValidate>
+                    <FieldGroup className="gap-4">
+                        <p className="text-sm leading-6 text-muted-foreground">{t('کد ۶ رقمی به :mobile پیامک شد. تا ۱۰ دقیقه معتبر است.', { mobile: format.digits(mobile.pending) })}</p>
+                        <FormField label={t('کد تأیید')} htmlFor="mobile_code" error={confirm.errors.code}>
+                            <Input id="mobile_code" inputMode="numeric" dir="ltr" maxLength={6} className="text-center text-lg tracking-[0.5em]" autoComplete="one-time-code" value={confirm.data.code} onChange={(event) => confirm.setData('code', event.target.value)} aria-invalid={confirm.errors.code ? true : undefined} />
+                        </FormField>
+                        <SubmitButton processing={confirm.processing}>{t('تأیید شماره')}</SubmitButton>
+                        <p className="text-center text-xs text-muted-foreground">{t('کد نرسید؟ یک دقیقه بعد می‌توانید دوباره شماره را بفرستید.')}</p>
+                    </FieldGroup>
+                </form>
+            ) : (
+                <form onSubmit={sendCode} noValidate>
+                    <FieldGroup className="gap-4">
+                        <FormField label={t('شماره‌ی موبایل')} htmlFor="mobile" error={request.errors.mobile} description={t('برای یادآوری پیامکی و ورود با موبایل. یک کد تأیید پیامک می‌شود.')}>
+                            <Input id="mobile" type="tel" inputMode="tel" dir="ltr" className="text-start" autoComplete="tel" placeholder="09121234567" value={request.data.mobile} onChange={(event) => request.setData('mobile', event.target.value)} aria-invalid={request.errors.mobile ? true : undefined} />
+                        </FormField>
+                        <SubmitButton processing={request.processing}>{t('ارسال کد')}</SubmitButton>
+                    </FieldGroup>
+                </form>
+            )}
+        </div>
+    );
+}
+
 function DeleteAccount() {
     const [open, setOpen] = useState(false);
     const form = useForm({ password: '' });
@@ -123,7 +197,7 @@ function DeleteAccount() {
     );
 }
 
-export default function AccountSettings() {
+export default function AccountSettings({ mobile }: { mobile?: MobileState }) {
     return (
         <>
             <Head title={t('مشخصات و رمز عبور')} />
@@ -132,6 +206,11 @@ export default function AccountSettings() {
                 <section>
                     <SectionTitle>{t('مشخصات')}</SectionTitle>
                     <ProfileForm />
+                </section>
+
+                <section>
+                    <SectionTitle>{t('موبایل')}</SectionTitle>
+                    <MobileSection mobile={mobile} />
                 </section>
 
                 <section>

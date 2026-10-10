@@ -116,7 +116,7 @@ class AuthFlowTest extends TestCase
 
     public function test_sign_in_with_email_or_mobile(): void
     {
-        $this->owner(['mobile' => '09120000000']);
+        $this->owner(['mobile' => '09120000000', 'mobile_verified_at' => now()]);
 
         $this->post(route('login.store'), ['login' => 'OWNER@example.com', 'password' => 'password-password'])->assertRedirect(route('dashboard'));
         $this->assertAuthenticated();
