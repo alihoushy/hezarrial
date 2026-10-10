@@ -171,4 +171,35 @@ class SmsIngestTest extends TestCase
     {
         return ['Authorization' => "Bearer {$this->token}"];
     }
+
+    public function test_raw_message_is_encrypted_in_the_database(): void
+    {
+        $message = 'واریز مبلغ 500,000 ریال به حساب *1234 مانده: 1,500,000';
+
+        $this->postJson('/api/sms/ingest', ['message' => $message], $this->headers())->assertStatus(201);
+
+        $stored = \DB::table('incoming_sms')->value('raw_message');
+        $this->assertStringNotContainsString('500,000', $stored);
+        $this->assertSame($message, IncomingSms::first()->raw_message);
+    }
+
+    public function test_prune_clears_only_old_handled_messages(): void
+    {
+        $make = fn (string $status, int $daysOld) => tap(IncomingSms::create([
+            'user_id' => $this->user->id,
+            'status' => $status,
+            'raw_message' => 'text '.$status.$daysOld,
+            'idempotency_key' => hash('sha256', $status.$daysOld),
+        ]), fn ($sms) => $sms->forceFill(['created_at' => now()->subDays($daysOld)])->save());
+
+        $oldConfirmed = $make('confirmed', 40);
+        $newConfirmed = $make('confirmed', 5);
+        $oldPending = $make('pending', 40);
+
+        $this->artisan('app:prune-sms-text')->assertSuccessful();
+
+        $this->assertNull($oldConfirmed->fresh()->raw_message);
+        $this->assertNotNull($newConfirmed->fresh()->raw_message);
+        $this->assertNotNull($oldPending->fresh()->raw_message);
+    }
 }

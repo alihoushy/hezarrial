@@ -25,9 +25,10 @@
 
 ### کارهای دوره‌ای پروژه
 
-تنها دستور زمان‌بندی‌شده در [routes/console.php](../routes/console.php) این است:
+دستورهای زمان‌بندی‌شده در [routes/console.php](../routes/console.php) این است:
 
 - `app:process-recurring-transactions`: برای تراکنش‌های تکرارشونده‌ای که موعدشان رسیده، یادآور (Reminder) می‌سازد.
+- `app:prune-sms-text`: متن خام پیامک‌های بانکی که قبلاً بررسی شده‌اند را بعد از ۳۰ روز پاک می‌کند (مبلغ و تاریخ می‌ماند).
 
 دستور `app:recalculate-balances` زمان‌بندی نداشت، اما چون حالا راهی برای اجرای دستی‌اش نداری، به‌عنوان یک بررسی سلامت هفتگی اختیاری اضافه شده است.
 
@@ -38,6 +39,7 @@
 | `cron/deploy.php` | کارهای بعد از آپلود: بررسی پیش‌نیازها، `migrate --force`، `optimize:clear` و `optimize` |
 | `cron/process-recurring-transactions.php` | اجرای `app:process-recurring-transactions` |
 | `cron/check-balances.php` | بررسی هفتگی مانده حساب‌ها (فقط گزارش؛ با `--fix` اصلاح می‌کند) |
+| `cron/prune-sms-text.php` | پاک‌کردن متن خام پیامک‌های بررسی‌شده (روزانه) |
 | `cron/_runner.php`, `cron/_functions.php` | زیرساخت مشترک: بررسی نسخه PHP، قفل ضد همپوشانی، لاگ، ایمیل خطا |
 | `deploy/shared-hosting/build.sh` | ساخت zip آماده آپلود روی سیستم خودت |
 | `deploy/shared-hosting/env.example` | نمونه `.env` مخصوص هاست اشتراکی (داخل zip با نام `.env.example` قرار می‌گیرد) |
@@ -217,6 +219,7 @@ deploy: exit=0 in 1.4s
 | `cron/deploy.php` | `*/5 * * * *` (هر ۵ دقیقه) | بله | migrate و ساخت کش‌ها؛ فقط بعد از آپلود جدید یا تغییر `.env` کاری انجام می‌دهد |
 | `cron/process-recurring-transactions.php` | `0 * * * *` (هر ساعت) | بله | ساخت یادآور برای تراکنش‌های تکرارشونده سررسیدشده |
 | `cron/check-balances.php` | `30 4 * * 5` (جمعه ۴:۳۰) | اختیاری | اگر مانده حسابی با تراکنش‌هایش نخواند، ایمیل خطا می‌فرستد |
+| `cron/prune-sms-text.php` | `15 3 * * *` (روزی یک بار) | اختیاری | پاک‌کردن متن خام پیامک‌های بانکی بررسی‌شده؛ فقط اگر پیامک را به برنامه می‌فرستی لازم است |
 
 شکل دستور هر cron:
 
