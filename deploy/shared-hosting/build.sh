@@ -21,7 +21,7 @@ done
 ROOT="$(git -C "$(dirname "$0")" rev-parse --show-toplevel)"
 
 # The package is built from HEAD, so the shared-hosting files must be committed.
-REQUIRED=(cron/_runner.php cron/_functions.php cron/deploy.php cron/process-recurring-transactions.php deploy/shared-hosting/env.example deploy/shared-hosting/public_html-index.php)
+REQUIRED=(cron/_runner.php cron/_functions.php cron/deploy.php cron/process-recurring-transactions.php cron/schedule-run.php deploy/shared-hosting/env.example deploy/shared-hosting/public_html-index.php)
 MISSING=()
 for file in "${REQUIRED[@]}"; do
     git -C "$ROOT" cat-file -e "HEAD:$file" 2>/dev/null || MISSING+=("$file")
