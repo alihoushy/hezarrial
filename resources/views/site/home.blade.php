@@ -40,13 +40,13 @@
                     <p class="text-xs text-muted-foreground">جمع موجودی</p>
                     <p class="mt-1 text-3xl font-extrabold" dir="ltr">۱۲٬۴۵۰٬۰۰۰ <span class="text-sm font-medium text-muted-foreground">ریال</span></p>
                     <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
-                        <div class="rounded-xl bg-card p-3"><p class="text-xs text-muted-foreground">درآمد ماه</p><p class="mt-1 font-bold text-income">۸٬۰۰۰٬۰۰۰</p></div>
+                        <div class="rounded-xl bg-card p-3"><p class="text-xs text-muted-foreground">درآمد ماه</p><p class="mt-1 font-bold text-emerald-700 dark:text-emerald-400">۸٬۰۰۰٬۰۰۰</p></div>
                         <div class="rounded-xl bg-card p-3"><p class="text-xs text-muted-foreground">هزینه ماه</p><p class="mt-1 font-bold text-expense">۳٬۲۰۰٬۰۰۰</p></div>
                     </div>
                 </div>
                 <ul class="mt-3 divide-y divide-border/70 text-sm">
                     <li class="flex items-center justify-between py-3"><span class="flex items-center gap-3"><span class="grid size-9 place-items-center rounded-full bg-expense/10 text-expense">−</span>خوراک</span><span class="font-semibold text-expense">۴۵۰٬۰۰۰</span></li>
-                    <li class="flex items-center justify-between py-3"><span class="flex items-center gap-3"><span class="grid size-9 place-items-center rounded-full bg-income/10 text-income">+</span>حقوق</span><span class="font-semibold text-income">۸٬۰۰۰٬۰۰۰</span></li>
+                    <li class="flex items-center justify-between py-3"><span class="flex items-center gap-3"><span class="grid size-9 place-items-center rounded-full bg-income/10 text-income">+</span>حقوق</span><span class="font-semibold text-emerald-700 dark:text-emerald-400">۸٬۰۰۰٬۰۰۰</span></li>
                     <li class="flex items-center justify-between py-3"><span class="flex items-center gap-3"><span class="grid size-9 place-items-center rounded-full bg-warning/15 text-warning">!</span>چک سررسید ۱۵ آذر</span><span class="font-semibold">۵٬۰۰۰٬۰۰۰</span></li>
                 </ul>
             </div>
