@@ -21,7 +21,7 @@ done
 ROOT="$(git -C "$(dirname "$0")" rev-parse --show-toplevel)"
 
 # The package is built from HEAD, so the shared-hosting files must be committed.
-REQUIRED=(content/faq.php CHANGELOG.md public/images/og-default.png cron/_runner.php cron/_functions.php cron/deploy.php cron/process-recurring-transactions.php cron/schedule-run.php deploy/shared-hosting/env.example deploy/shared-hosting/public_html-index.php)
+REQUIRED=(content/faq.php CHANGELOG.md routes/site.php public/sw.js public/images/og-default.png cron/_runner.php cron/_functions.php cron/deploy.php cron/process-recurring-transactions.php cron/schedule-run.php deploy/shared-hosting/env.example deploy/shared-hosting/public_html-index.php)
 MISSING=()
 for file in "${REQUIRED[@]}"; do
     git -C "$ROOT" cat-file -e "HEAD:$file" 2>/dev/null || MISSING+=("$file")
@@ -46,6 +46,12 @@ APP="$WORK/hezarrial"
 echo "==> Exporting HEAD"
 mkdir -p "$APP"
 git -C "$ROOT" archive HEAD | tar -x -C "$APP"
+
+# `git archive` honours export-ignore in .gitattributes, so a file can be in HEAD and still be
+# missing from the package. Check what really got exported.
+for file in "${REQUIRED[@]}"; do
+    [[ -f "$APP/$file" ]] || { echo "Error: $file is in HEAD but was not exported (check export-ignore in .gitattributes)." >&2; exit 1; }
+done
 
 echo "==> Installing production Composer dependencies"
 (cd "$APP" && composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-progress)
