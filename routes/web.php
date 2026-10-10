@@ -13,6 +13,7 @@ use App\Http\Controllers\ReminderController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SimpleModuleController;
+use App\Http\Controllers\SmsTokenController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
 
@@ -87,6 +88,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/imports/sms-preview', [ImportController::class, 'smsPreview'])->name('imports.sms-preview');
     Route::post('/imports/sms-confirm', [ImportController::class, 'smsConfirm'])->name('imports.sms-confirm');
     Route::post('/imports/sms-patterns', [ImportController::class, 'storeSmsPattern'])->name('imports.sms-patterns.store');
+
+    Route::get('/settings/sms', [SmsTokenController::class, 'index'])->name('sms-tokens.index');
+    Route::post('/settings/sms/tokens', [SmsTokenController::class, 'store'])->middleware('throttle:10,1')->name('sms-tokens.store');
+    Route::delete('/settings/sms/tokens/{token}', [SmsTokenController::class, 'destroy'])->name('sms-tokens.destroy');
 
     Route::get('/settings/account', [AccountSettingsController::class, 'edit'])->name('account.edit');
     Route::get('/settings/security', [AccountSettingsController::class, 'security'])->middleware('password.confirm')->name('security.edit');
