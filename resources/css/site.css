@@ -1,0 +1,79 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/vazirmatn';
+@import '@fontsource-variable/inter';
+
+/* Only the public pages: no React, shadcn or animation styles. */
+@source '../views/site';
+@source '../views/components/site';
+
+@import './theme.css';
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+        -webkit-text-size-adjust: 100%;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        html {
+            scroll-behavior: auto;
+        }
+    }
+}
+
+/* Long-form text: articles, help pages, legal pages. */
+@layer components {
+    .prose-site {
+        @apply text-[1.02rem] leading-8 text-foreground/90;
+    }
+    .prose-site > * + * {
+        @apply mt-5;
+    }
+    .prose-site h2 {
+        @apply mt-10 text-2xl leading-10 font-extrabold text-foreground;
+    }
+    .prose-site h3 {
+        @apply mt-8 text-xl leading-9 font-bold text-foreground;
+    }
+    .prose-site a {
+        @apply font-medium text-brand underline underline-offset-4;
+    }
+    .prose-site ul {
+        @apply list-disc ps-6;
+    }
+    .prose-site ol {
+        @apply list-decimal ps-6;
+    }
+    .prose-site li + li {
+        @apply mt-2;
+    }
+    .prose-site blockquote {
+        @apply border-s-4 border-brand/40 ps-4 text-muted-foreground;
+    }
+    .prose-site code {
+        @apply rounded bg-muted px-1.5 py-0.5 text-[0.9em];
+        direction: ltr;
+        unicode-bidi: isolate;
+    }
+    .prose-site pre {
+        @apply overflow-x-auto rounded-xl bg-muted p-4 text-sm;
+        direction: ltr;
+        text-align: left;
+    }
+    .prose-site pre code {
+        @apply bg-transparent p-0;
+    }
+    .prose-site table {
+        @apply w-full border-collapse text-sm;
+    }
+    .prose-site th,
+    .prose-site td {
+        @apply border border-border px-3 py-2 text-start;
+    }
+    .prose-site th {
+        @apply bg-muted font-semibold;
+    }
+    .prose-site img {
+        @apply h-auto max-w-full rounded-xl;
+    }
+}
