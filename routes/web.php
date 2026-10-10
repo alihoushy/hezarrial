@@ -5,6 +5,7 @@ use App\Http\Controllers\AccountSettingsController;
 use App\Http\Controllers\BackupController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Site\ContactController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\LocaleController;
@@ -109,6 +110,10 @@ Route::prefix('app')->middleware(['auth', 'verified'])->group(function () {
     Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');
 });
 
+// The contact form is the one public page that needs a session (CSRF), so it lives in this group.
+Route::get('/contact', [ContactController::class, 'show'])->name('contact');
+Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:3,10')->name('contact.store');
+
 // Addresses of the single-user days, before the app moved under /app: bookmarks and the old
 // iOS home-screen icon keep working.
 Route::redirect('/dashboard', '/app', 301);
@@ -117,9 +122,6 @@ Route::get('/{section}/{rest?}', function (Request $request, string $section, ?s
 
     return redirect('/app/'.$section.($rest ? '/'.$rest : '').($query ? '?'.$query : ''), 301);
 })->where('section', 'transactions|accounts|categories|people|debts|loans|checks|budgets|reminders|recurring-transactions|reports|exports|backups|imports|settings')->where('rest', '.*');
-
-// The public website arrives with the landing page; until then the root leads to the app.
-Route::get('/', fn () => redirect()->route(auth()->check() ? 'dashboard' : 'login'))->name('home');
 
 // Unknown addresses go through the web group too, so the error page knows the language and theme.
 Route::fallback(fn () => abort(404));

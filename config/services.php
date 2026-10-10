@@ -35,6 +35,11 @@ return [
         ],
     ],
 
+    // Where messages from the public contact form are mailed (empty = saved only).
+    'contact' => [
+        'to' => env('CONTACT_TO_ADDRESS', env('MAIL_FROM_ADDRESS')),
+    ],
+
     // Outgoing SMS (reminders, mobile verification). "log" only writes to the log; "smsir" uses sms.ir.
     'sms' => [
         'driver' => env('SMS_DRIVER', 'log'),
