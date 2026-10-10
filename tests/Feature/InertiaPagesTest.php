@@ -123,6 +123,7 @@ class InertiaPagesTest extends TestCase
     public function test_a_fresh_install_sends_visitors_to_create_the_first_account(): void
     {
         User::query()->delete();
+        \Illuminate\Support\Facades\Cache::flush();
 
         $this->get(route('login'))->assertRedirect(route('register'));
         $this->get(route('register'))->assertOk()->assertInertia(fn (AssertableInertia $page) => $page->component('auth/register')->has('formToken'));

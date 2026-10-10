@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -89,6 +90,7 @@ class AccountSettingsController extends Controller
 
         Auth::guard('web')->logout();
         $user->delete();
+        Cache::forget('registration.has-users');
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

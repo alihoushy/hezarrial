@@ -45,9 +45,9 @@ class AppPrefixTest extends TestCase
         $this->get('/app/accounts')->assertRedirect(route('login'));
     }
 
-    public function test_the_root_leads_to_the_app_or_the_sign_in_page(): void
+    public function test_the_root_is_the_public_website_for_everybody(): void
     {
-        $this->get('/')->assertRedirect(route('login'));
-        $this->actingAs($this->user())->get('/')->assertRedirect(route('dashboard'));
+        $this->get('/')->assertOk()->assertSee('حسابداری شخصی');
+        $this->actingAs($this->user())->get('/')->assertOk()->assertSee('حسابداری شخصی');
     }
 }
