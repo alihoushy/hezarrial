@@ -514,5 +514,10 @@
   "مؤسسه اعتباری کوثر": "Kosar Credit Institution",
   "بانک مهر اقتصاد": "Mehr Eghtesad Bank",
   "بانک مرکزی": "Central Bank",
-  "استاندارد چارترد": "Standard Chartered"
+  "استاندارد چارترد": "Standard Chartered",
+  "انتخاب بانک": "Choose a bank",
+  "اگر بانک در فهرست نیست، نامش را بنویسید": "If the bank isn't listed, type its name",
+  "جست‌وجوی بانک": "Search banks",
+  "بانکی پیدا نشد. می‌توانید «سایر» را بزنید و نام را بنویسید.": "No bank found. Tap “Other” and type its name.",
+  "سایر / بدون بانک": "Other / no bank"
 }

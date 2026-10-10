@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { LandmarkIcon, PlusIcon } from 'lucide-react';
+import { BankLogo } from '@/components/bank-logo';
 import { EmptyState } from '@/components/empty-state';
 import { ListCard, ListRow } from '@/components/list';
 import { Money } from '@/components/money';
@@ -15,14 +16,14 @@ import { t } from '@/lib/i18n';
 function AccountRow({ account }: { account: Account }) {
     const format = useFormat();
     const type = accountTypes[account.type];
-    const details = [account.bank_name, account.card_last_four ? `•••• ${format.digits(account.card_last_four)}` : null].filter(Boolean).join(' · ');
+    const details = [account.bank_label ?? account.bank_name, account.card_last_four ? `•••• ${format.digits(account.card_last_four)}` : null].filter(Boolean).join(' · ');
 
     return (
         <ListRow
             href={route('accounts.show', account.id)}
             component="accounts/show"
             pageProps={{ account }}
-            icon={type.icon}
+            media={<BankLogo bank={account.bank} fallback={type.icon} />}
             title={
                 <span className="flex items-center gap-2">
                     {account.name}
