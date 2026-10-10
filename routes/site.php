@@ -37,5 +37,6 @@ Route::get('/help/{slug}', [ContentController::class, 'show'])->defaults('sectio
 Route::get('/learn', [ContentController::class, 'index'])->defaults('section', 'learn')->name('learn.index');
 Route::get('/learn/{slug}', [ContentController::class, 'show'])->defaults('section', 'learn')->name('learn.show');
 
+Route::view('/offline', 'site.offline')->name('offline');
 Route::get('/sitemap.xml', [SitemapController::class, 'sitemap'])->name('sitemap');
 Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots');

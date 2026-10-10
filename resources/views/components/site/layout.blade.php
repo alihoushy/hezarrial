@@ -75,6 +75,8 @@
     <script nonce="{{ Vite::cspNonce() }}">
         // Follows the visitor's system theme; there is nothing to flash because the page is static.
         if (matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.classList.add('dark');
+        // Offline page only (see public/sw.js); it never stores pages or data.
+        if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
     </script>
     @vite('resources/css/site.css')
     <script type="application/ld+json">{!! json_encode($jsonLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>

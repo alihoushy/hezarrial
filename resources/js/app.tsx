@@ -19,6 +19,11 @@ router.on('flash', (event) => {
     }
 });
 
+// Offline page only (public/sw.js): the service worker never stores pages or data.
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+    window.addEventListener('load', () => void navigator.serviceWorker.register('/sw.js').catch(() => undefined));
+}
+
 router.on('networkError', () => {
     toast.error(t('ارتباط با سرور برقرار نشد. اتصال اینترنت را بررسی کنید.'));
 });
