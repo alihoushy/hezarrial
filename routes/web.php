@@ -16,6 +16,7 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SimpleModuleController;
 use App\Http\Controllers\SmsTokenController;
 use App\Http\Controllers\TransactionController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/locale', [LocaleController::class, 'update'])->middleware('throttle:30,1')->name('locale.update');
@@ -23,9 +24,9 @@ Route::post('/locale', [LocaleController::class, 'update'])->middleware('throttl
 // The first-run page of the single-user days; sign-up (and a fresh install's first account) lives here now.
 Route::redirect('/setup', '/register', 301);
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/', DashboardController::class)->name('home');
-    Route::get('/dashboard', DashboardController::class)->name('dashboard');
+// The app lives under /app so the root can be the public website. Route names are unchanged.
+Route::prefix('app')->middleware(['auth', 'verified'])->group(function () {
+    Route::get('/', DashboardController::class)->name('dashboard');
 
     Route::resource('accounts', AccountController::class);
     Route::post('/accounts/{account}/recalculate', [AccountController::class, 'recalculate'])->name('accounts.recalculate');
@@ -107,6 +108,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/settings', [SettingsController::class, 'edit'])->name('settings.index');
     Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');
 });
+
+// Addresses of the single-user days, before the app moved under /app: bookmarks and the old
+// iOS home-screen icon keep working.
+Route::redirect('/dashboard', '/app', 301);
+Route::get('/{section}/{rest?}', function (Request $request, string $section, ?string $rest = null) {
+    $query = $request->getQueryString();
+
+    return redirect('/app/'.$section.($rest ? '/'.$rest : '').($query ? '?'.$query : ''), 301);
+})->where('section', 'transactions|accounts|categories|people|debts|loans|checks|budgets|reminders|recurring-transactions|reports|exports|backups|imports|settings')->where('rest', '.*');
+
+// The public website arrives with the landing page; until then the root leads to the app.
+Route::get('/', fn () => redirect()->route(auth()->check() ? 'dashboard' : 'login'))->name('home');
 
 // Unknown addresses go through the web group too, so the error page knows the language and theme.
 Route::fallback(fn () => abort(404));

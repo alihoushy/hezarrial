@@ -17,9 +17,9 @@ type TabKey = 'home' | 'transactions' | 'accounts' | 'more';
 function activeTab(url: string): TabKey {
     const path = url.split('?')[0];
 
-    if (path === '/' || path.startsWith('/dashboard')) return 'home';
-    if (path.startsWith('/transactions')) return 'transactions';
-    if (path.startsWith('/accounts')) return 'accounts';
+    if (path === '/app' || path === '/app/') return 'home';
+    if (path.startsWith('/app/transactions')) return 'transactions';
+    if (path.startsWith('/app/accounts')) return 'accounts';
 
     return 'more';
 }

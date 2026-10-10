@@ -54,7 +54,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                         {t('تلاش دوباره')}
                     </Button>
                     <Button size="lg" variant="outline" asChild>
-                        <a href="/">{t('بازگشت به خانه')}</a>
+                        <a href={route('dashboard')}>{t('بازگشت به خانه')}</a>
                     </Button>
                 </div>
             </div>
