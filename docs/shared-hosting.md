@@ -19,7 +19,7 @@
 | نصب وابستگی‌ها و build | داخل build image | روی سیستم خودت با `deploy/shared-hosting/build.sh` |
 | `migrate` و `optimize` | `deploy/deploy.sh` | `cron/deploy.php` (خودکار بعد از هر آپلود) |
 | زمان‌بندی (`schedule:run`) | cron سرور | یک cron جدا برای هر کار |
-| صف (queue) | worker | **لازم نیست**؛ هیچ jobی در کد dispatch نمی‌شود، پس `QUEUE_CONNECTION=sync` |
+| صف (queue) | worker | پیش‌فرض `QUEUE_CONNECTION=sync` است: ایمیل و اعلان‌ها هنگام همان درخواست ارسال می‌شوند و worker لازم نیست. برای ارسال پس‌زمینه، `database` بگذار و cron بخش ۶ (`schedule-run`) را اضافه کن |
 | `storage:link` | entrypoint | **لازم نیست**؛ دیسک `public` استفاده نمی‌شود و پشتیبان‌ها در `storage/app/private` هستند |
 | پاک‌سازی sessionها | — | لازم نیست؛ درایور database خودش با lottery پاک می‌کند |
 
@@ -40,6 +40,7 @@
 | `cron/process-recurring-transactions.php` | اجرای `app:process-recurring-transactions` |
 | `cron/check-balances.php` | بررسی هفتگی مانده حساب‌ها (فقط گزارش؛ با `--fix` اصلاح می‌کند) |
 | `cron/prune-sms-text.php` | پاک‌کردن متن خام پیامک‌های بررسی‌شده (روزانه) |
+| `cron/schedule-run.php` | اجرای زمان‌بند لاراول (`schedule:run`)؛ کارهای دوره‌ای و در صورت نیاز صف را اجرا می‌کند |
 | `cron/_runner.php`, `cron/_functions.php` | زیرساخت مشترک: بررسی نسخه PHP، قفل ضد همپوشانی، لاگ، ایمیل خطا |
 | `deploy/shared-hosting/build.sh` | ساخت zip آماده آپلود روی سیستم خودت |
 | `deploy/shared-hosting/env.example` | نمونه `.env` مخصوص هاست اشتراکی (داخل zip با نام `.env.example` قرار می‌گیرد) |
@@ -220,12 +221,33 @@ deploy: exit=0 in 1.4s
 | `cron/process-recurring-transactions.php` | `0 * * * *` (هر ساعت) | بله | ساخت یادآور برای تراکنش‌های تکرارشونده سررسیدشده |
 | `cron/check-balances.php` | `30 4 * * 5` (جمعه ۴:۳۰) | اختیاری | اگر مانده حسابی با تراکنش‌هایش نخواند، ایمیل خطا می‌فرستد |
 | `cron/prune-sms-text.php` | `15 3 * * *` (روزی یک بار) | اختیاری | پاک‌کردن متن خام پیامک‌های بانکی بررسی‌شده؛ فقط اگر پیامک را به برنامه می‌فرستی لازم است |
+| `cron/schedule-run.php` | `* * * * *` (هر دقیقه) | اختیاری | زمان‌بند لاراول. اگر آن را بگذاری، دو cron بالا (recurring و prune) دیگر لازم نیستند و ایمیل‌های صف‌شده هم ارسال می‌شوند |
 
 شکل دستور هر cron:
 
 ```text
 /PATH/TO/php /home/USER/hezarrial/cron/process-recurring-transactions.php
 ```
+
+### ایمیل خروجی (SMTP)
+
+برنامه برای تأیید ایمیل، بازیابی رمز و اعلان‌ها ایمیل می‌فرستد. بعد از ساخت صندوق `no-reply@hezarrial.ir` در پنل هاست، این کلیدها را در `.env` پر کن:
+
+```text
+MAIL_MAILER=smtp
+MAIL_SCHEME=smtps        # برای پورت 465؛ برای پورت 587 خالی بگذار
+MAIL_HOST=mail.hezarrial.ir
+MAIL_PORT=465
+MAIL_USERNAME=no-reply@hezarrial.ir
+MAIL_PASSWORD=رمز-صندوق
+MAIL_FROM_ADDRESS="no-reply@hezarrial.ir"
+```
+
+مقدار دقیق `MAIL_HOST` و پورت را از اطلاعات «Email Accounts» پنل بگیر. برای اینکه ایمیل‌ها به اسپم نروند، در DNS دامنه رکوردهای **SPF** و **DKIM** (و بهتر است **DMARC**) را هم فعال کن؛ در cPanel بخش «Email Deliverability» آن‌ها را می‌سازد.
+
+### ارسال پس‌زمینه‌ی ایمیل (اختیاری)
+
+با `QUEUE_CONNECTION=sync` ایمیل هنگام همان درخواست ارسال می‌شود و اگر SMTP کند باشد، کاربر چند ثانیه منتظر می‌ماند. برای ارسال پس‌زمینه `QUEUE_CONNECTION=database` بگذار و cron `schedule-run.php` را هر دقیقه اجرا کن. زمان‌بند، صف را هر دقیقه (حداکثر ۵۰ ثانیه) خالی می‌کند. کارهای زمان‌بندی‌شده درون‌پردازشی‌اند و به `exec`/`proc_open` نیاز ندارند.
 
 ### چرا recurring هر ساعت و نه روزی یک بار؟
 
