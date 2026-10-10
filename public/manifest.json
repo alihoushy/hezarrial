@@ -1,7 +1,8 @@
 {
     "name": "هزار ریال",
     "short_name": "هزار ریال",
-    "start_url": "/",
+    "start_url": "/app",
+    "scope": "/",
     "display": "standalone",
     "dir": "rtl",
     "lang": "fa",

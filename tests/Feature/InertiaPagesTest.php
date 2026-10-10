@@ -64,7 +64,6 @@ class InertiaPagesTest extends TestCase
 
         $pages = [
             [route('dashboard'), 'dashboard'],
-            [route('home'), 'dashboard'],
             [route('transactions.index'), 'transactions/index'],
             [route('transactions.create'), 'transactions/form'],
             [route('transactions.show', $this->transaction), 'transactions/show'],

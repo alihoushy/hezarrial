@@ -31,7 +31,7 @@ export default function ErrorPage({ status }: { status: number }) {
                     <p className="max-w-xs text-sm text-muted-foreground">{description}</p>
                 </div>
                 <Button size="lg" asChild>
-                    <Link href="/">{t('بازگشت به خانه')}</Link>
+                    <Link href={route('dashboard')}>{t('بازگشت به خانه')}</Link>
                 </Button>
             </main>
         </>
