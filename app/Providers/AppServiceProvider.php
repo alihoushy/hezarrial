@@ -19,6 +19,9 @@ use App\Policies\UserOwnedPolicy;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Inertia\ExceptionResponse;
@@ -48,6 +51,22 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
         }
+
+        // Laravel's built-in account mails are English; these follow the app's languages.
+        VerifyEmail::toMailUsing(fn (object $notifiable, string $url) => (new MailMessage)
+            ->subject(__('تأیید ایمیل :app', ['app' => config('app.name')]))
+            ->greeting(__('سلام :name', ['name' => $notifiable->name]))
+            ->line(__('برای فعال شدن حساب، ایمیل خود را تأیید کنید.'))
+            ->action(__('تأیید ایمیل'), $url)
+            ->line(__('اگر شما حساب نساخته‌اید، این پیام را نادیده بگیرید.')));
+
+        ResetPassword::toMailUsing(fn (object $notifiable, string $token) => (new MailMessage)
+            ->subject(__('بازیابی رمز عبور :app', ['app' => config('app.name')]))
+            ->greeting(__('سلام :name', ['name' => $notifiable->name]))
+            ->line(__('درخواست بازیابی رمز عبور حساب شما رسیده است.'))
+            ->action(__('تعیین رمز عبور تازه'), url(route('password.reset', ['token' => $token, 'email' => $notifiable->getEmailForPasswordReset()], false)))
+            ->line(__('این لینک تا :count دقیقه معتبر است.', ['count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire')]))
+            ->line(__('اگر شما درخواست نکرده‌اید، کاری لازم نیست؛ رمز عبور شما تغییری نمی‌کند.')));
 
         Inertia::handleExceptionsUsing(function (ExceptionResponse $response) {
             $request = $response->request;

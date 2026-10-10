@@ -20,7 +20,7 @@ class BankFieldTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::create(['name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password')]);
+        $this->user = User::forceCreate(['email_verified_at' => now(), 'name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password')]);
     }
 
     private function accountPayload(array $extra = []): array

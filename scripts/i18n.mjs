@@ -6,7 +6,7 @@
  *   node scripts/i18n.mjs --list   print every translatable key found in the code, one JSON line each
  *
  * Translatable text is any Persian string literal in resources/js (t('…'), tr('…'))
- * or passed to __('…') in app/. Translations live in resources/lang/{code}.json,
+ * or passed to __('…') / @lang('…') in app/ and resources/views/. Translations live in resources/lang/{code}.json,
  * keyed by that Persian text. To add a language, copy en.json to {code}.json,
  * translate the values, and add the language to config('app.supported_locales').
  */
@@ -24,7 +24,8 @@ function walk(dir, extensions) {
         const path = join(dir, name);
 
         if (statSync(path).isDirectory()) {
-            return name === 'node_modules' || name === 'vendor' ? [] : walk(path, extensions);
+            // Composer's vendor/ is skipped; resources/views/vendor holds our own published templates.
+            return name === 'node_modules' || (name === 'vendor' && !path.includes('resources/views')) ? [] : walk(path, extensions);
         }
 
         return extensions.some((extension) => name.endsWith(extension)) ? [path] : [];
@@ -58,11 +59,14 @@ function usedKeys() {
         }
     }
 
-    for (const path of walk(join(root, 'app'), ['.php'])) {
+    // PHP (__('…')) and Blade views (__('…'), @lang('…')).
+    const phpFiles = [...walk(join(root, 'app'), ['.php']), ...walk(join(root, 'resources/views'), ['.blade.php'])];
+
+    for (const path of phpFiles) {
         const file = relative(root, path);
         const source = readFileSync(path, 'utf8');
 
-        for (const match of source.matchAll(/__\(\s*'((?:[^'\\\n]|\\.)*)'/g)) {
+        for (const match of source.matchAll(/(?:__|@lang)\(\s*'((?:[^'\\\n]|\\.)*)'/g)) {
             add(unescape(match[1]), file, source, match.index);
         }
     }
@@ -83,7 +87,9 @@ if (process.argv.includes('--list')) {
 }
 
 const langDir = join(root, 'resources/lang');
-const locales = readdirSync(langDir).filter((name) => name.endsWith('.json')).map((name) => name.replace(/\.json$/, ''));
+// fa.json is not a translation of the Persian text: it holds Persian for the English messages of
+// third-party packages (Fortify, ...), so it is not checked against the keys found in the code.
+const locales = readdirSync(langDir).filter((name) => name.endsWith('.json') && name !== 'fa.json').map((name) => name.replace(/\.json$/, ''));
 let problems = 0;
 
 for (const code of locales) {

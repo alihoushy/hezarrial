@@ -26,7 +26,7 @@ class SmsIngestTest extends TestCase
             'services.sms_ingest.user_id' => null,
         ]);
 
-        $this->user = User::create([
+        $this->user = User::forceCreate(['email_verified_at' => now(), 
             'name' => 'مالک',
             'email' => 'owner@example.com',
             'password' => Hash::make('password-password'),
@@ -125,7 +125,7 @@ class SmsIngestTest extends TestCase
     public function test_same_message_from_two_users_is_not_a_duplicate(): void
     {
         $message = 'واریز مبلغ 500,000 ریال به حساب *1234 پیگیری: 123456';
-        $other = User::create(['name' => 'دیگری', 'email' => 'other@example.com', 'password' => Hash::make('password-password')]);
+        $other = User::forceCreate(['email_verified_at' => now(), 'name' => 'دیگری', 'email' => 'other@example.com', 'password' => Hash::make('password-password')]);
 
         $this->postJson('/api/sms/ingest', ['message' => $message], $this->headers())->assertStatus(201);
         config(['services.sms_ingest.user_id' => $other->id]);

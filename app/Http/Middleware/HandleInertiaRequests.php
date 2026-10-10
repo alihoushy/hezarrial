@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\Registration;
 use Closure;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -23,10 +24,25 @@ class HandleInertiaRequests extends Middleware
      * message as Inertia flash data so the client shows it once as a toast
      * instead of keeping it in browser history like a regular prop.
      */
+    /** Fortify reports outcomes as language-independent keys; these are the messages shown for them. */
+    private function statusMessage(string $status): string
+    {
+        return match ($status) {
+            'verification-link-sent' => __('لینک تأیید دوباره به ایمیل شما ارسال شد.'),
+            'profile-information-updated' => __('مشخصات حساب ذخیره شد.'),
+            'password-updated' => __('رمز عبور تغییر کرد.'),
+            'two-factor-authentication-enabled' => __('ورود دومرحله‌ای شروع شد؛ کد را تأیید کنید.'),
+            'two-factor-authentication-confirmed' => __('ورود دومرحله‌ای فعال شد.'),
+            'two-factor-authentication-disabled' => __('ورود دومرحله‌ای غیرفعال شد.'),
+            'recovery-codes-generated' => __('کدهای بازیابی تازه ساخته شد.'),
+            default => $status,
+        };
+    }
+
     public function handle(Request $request, Closure $next)
     {
         if ($request->hasSession() && filled($status = $request->session()->get('status'))) {
-            Inertia::flash('status', $status);
+            Inertia::flash('status', $this->statusMessage((string) $status));
         }
 
         return parent::handle($request, $next);
@@ -53,6 +69,7 @@ class HandleInertiaRequests extends Middleware
                 ->map(fn (array $locale, string $code) => ['code' => $code, 'name' => $locale['name']])
                 ->values()
                 ->all(),
+            'registration' => fn () => Registration::isOpen(),
             'auth' => [
                 'user' => $user?->only(['id', 'name', 'email', 'mobile']),
             ],

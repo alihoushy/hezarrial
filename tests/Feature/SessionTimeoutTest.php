@@ -14,7 +14,7 @@ class SessionTimeoutTest extends TestCase
 
     private function user(array $settings = []): User
     {
-        return User::create(['name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password'), 'settings' => $settings]);
+        return User::forceCreate(['email_verified_at' => now(), 'name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password'), 'settings' => $settings]);
     }
 
     private function inertiaGet(string $url): \Illuminate\Testing\TestResponse

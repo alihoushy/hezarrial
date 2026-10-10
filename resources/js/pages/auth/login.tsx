@@ -1,5 +1,6 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import type { FormEvent } from 'react';
+import { AuthCard } from '@/components/auth-card';
 import { FormField, SubmitButton } from '@/components/form-field';
 import { PasswordInput } from '@/components/password-input';
 import { FieldGroup } from '@/components/ui/field';
@@ -8,23 +9,33 @@ import { toLatinDigits } from '@/lib/format';
 import { t } from '@/lib/i18n';
 
 export default function Login() {
+    const { registration } = usePage().props;
     const form = useForm({ login: '', password: '' });
 
     const submit = (event: FormEvent) => {
         event.preventDefault();
         // A mobile number typed on a Persian keyboard arrives with Persian digits.
         form.transform((data) => ({ ...data, login: toLatinDigits(data.login.trim()) }));
-        form.post(route('login'), { onFinish: () => form.reset('password') });
+        form.post(route('login.store'), { onFinish: () => form.reset('password') });
     };
 
     return (
         <>
             <Head title={t('ورود')} />
-            <div className="flex flex-col gap-6 rounded-3xl bg-card p-6 ring-1 ring-foreground/5">
-                <div className="flex flex-col gap-1">
-                    <h1 className="text-xl font-extrabold">{t('ورود امن')}</h1>
-                    <p className="text-sm text-muted-foreground">{t('برای مدیریت مالی شخصی وارد شوید.')}</p>
-                </div>
+            <AuthCard
+                title={t('ورود امن')}
+                description={t('برای مدیریت مالی شخصی وارد شوید.')}
+                footer={
+                    registration && (
+                        <>
+                            {t('حساب ندارید؟')}{' '}
+                            <Link href={route('register')} className="font-semibold text-foreground">
+                                {t('ثبت‌نام')}
+                            </Link>
+                        </>
+                    )
+                }
+            >
                 <form onSubmit={submit} noValidate>
                     <FieldGroup className="gap-5">
                         <FormField label={t('ایمیل یا موبایل')} htmlFor="login" error={form.errors.login}>
@@ -54,9 +65,12 @@ export default function Login() {
                         <SubmitButton size="lg" processing={form.processing}>
                             {t('ورود')}
                         </SubmitButton>
+                        <Link href={route('password.request')} className="text-center text-sm text-muted-foreground">
+                            {t('رمز عبور را فراموش کرده‌ام')}
+                        </Link>
                     </FieldGroup>
                 </form>
-            </div>
+            </AuthCard>
         </>
     );
 }

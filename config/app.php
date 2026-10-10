@@ -93,6 +93,12 @@ return [
     |
     */
 
+    /*
+    | Public sign-up. Off by default so a deployment is not open to everyone until the
+    | owner turns it on. A fresh install can always create its first account.
+    */
+    'registration_enabled' => (bool) env('REGISTRATION_ENABLED', false),
+
     'supported_locales' => [
         'fa' => ['name' => 'فارسی', 'dir' => 'rtl'],
         'en' => ['name' => 'English', 'dir' => 'ltr'],
