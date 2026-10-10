@@ -59,7 +59,8 @@ class BackupService
         AppSetting::class,
     ];
 
-    public function create(User $user): Backup
+    /** Everything the user owns, as the array a backup file holds. */
+    public function payload(User $user): array
     {
         $payload = [
             'schema_version' => 1,
@@ -75,6 +76,13 @@ class BackupService
 
             $payload[$key] = $query->orderBy('id')->get();
         }
+
+        return $payload;
+    }
+
+    public function create(User $user): Backup
+    {
+        $payload = $this->payload($user);
 
         $fileName = 'hezarrial-backup-'.$user->id.'-'.now()->format('Ymd-His').'.json';
         $path = 'backups/'.$user->id.'/'.$fileName;

@@ -3,6 +3,7 @@
 namespace App\Actions\Fortify;
 
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -25,11 +26,14 @@ class UpdateUserPassword implements UpdatesUserPasswords
             'current_password' => ['required', 'string', 'current_password:web'],
             'password' => $this->passwordRules(),
         ], [
-            'current_password.current_password' => __('The provided password does not match your current password.'),
-        ])->validateWithBag('updatePassword');
+            'current_password.current_password' => __('رمز عبور فعلی درست نیست.'),
+        ])->validate();
 
         $user->forceFill([
             'password' => Hash::make($input['password']),
         ])->save();
+
+        // A changed password signs out every other device, the usual reason to change it.
+        DB::table('sessions')->where('user_id', $user->id)->where('id', '!=', session()->getId())->delete();
     }
 }

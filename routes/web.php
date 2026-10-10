@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AccountSettingsController;
 use App\Http\Controllers\BackupController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
@@ -86,6 +87,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/imports/sms-preview', [ImportController::class, 'smsPreview'])->name('imports.sms-preview');
     Route::post('/imports/sms-confirm', [ImportController::class, 'smsConfirm'])->name('imports.sms-confirm');
     Route::post('/imports/sms-patterns', [ImportController::class, 'storeSmsPattern'])->name('imports.sms-patterns.store');
+
+    Route::get('/settings/account', [AccountSettingsController::class, 'edit'])->name('account.edit');
+    Route::get('/settings/security', [AccountSettingsController::class, 'security'])->middleware('password.confirm')->name('security.edit');
+    Route::post('/settings/security/sign-out-others', [AccountSettingsController::class, 'signOutOtherDevices'])->middleware('throttle:6,1')->name('security.sign-out-others');
+    Route::get('/settings/account/export', [AccountSettingsController::class, 'export'])->middleware('password.confirm')->name('account.export');
+    Route::delete('/settings/account', [AccountSettingsController::class, 'destroy'])->middleware('throttle:6,1')->name('account.destroy');
 
     Route::get('/settings', [SettingsController::class, 'edit'])->name('settings.index');
     Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');
