@@ -53,6 +53,9 @@ jobs:
           cp .env.example .env
           php artisan key:generate --ansi
 
+      - name: Audit composer packages
+        run: composer audit --no-interaction
+
       - name: Run tests
         run: php artisan test
 
@@ -73,6 +76,9 @@ jobs:
 
       - name: Install npm dependencies
         run: npm ci --no-audit --no-fund
+
+      - name: Audit production npm packages
+        run: npm audit --omit=dev --audit-level=high
 
       - name: Type-check
         run: npm run typecheck
