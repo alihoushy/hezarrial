@@ -59,6 +59,8 @@ class AuthenticatedSessionController extends Controller
         Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+        // Without this the Back button would still show the last financial pages after signing out.
+        Inertia::clearHistory();
 
         return redirect()->route('login');
     }
