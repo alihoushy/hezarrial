@@ -25,6 +25,7 @@ export interface LocaleInfo {
 export interface SharedProps {
     locale: LocaleInfo;
     locales: { code: string; name: string }[];
+    registration: boolean;
     auth: { user: User | null };
     settings: Settings;
     csrf_token: string;
