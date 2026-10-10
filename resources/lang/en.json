@@ -468,5 +468,6 @@
   "زبان": "Language",
   "این صفحه درست نمایش داده نشد": "This page couldn't be displayed",
   "مشکلی در نمایش این صفحه پیش آمد. دوباره تلاش کنید یا به خانه برگردید.": "Something went wrong while showing this page. Try again or go back home.",
-  "تلاش دوباره": "Try again"
+  "تلاش دوباره": "Try again",
+  "به دلیل بی‌فعالیتی از حساب خارج شدید. دوباره وارد شوید.": "You were signed out because of inactivity. Please sign in again."
 }
