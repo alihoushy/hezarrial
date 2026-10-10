@@ -157,14 +157,14 @@ class SmsIngestTest extends TestCase
         $this->assertSame($message, $sms->raw_message);
     }
 
-    public function test_returns_503_when_token_not_configured(): void
+    public function test_the_old_shared_token_stops_working_once_it_is_removed_from_the_env(): void
     {
         config(['services.sms_ingest.token' => null]);
 
         $this->postJson('/api/sms/ingest', [
             'message' => 'واریز مبلغ 500,000 ریال',
         ], ['Authorization' => "Bearer {$this->token}"])
-            ->assertStatus(503);
+            ->assertStatus(401);
     }
 
     private function headers(): array
@@ -201,5 +201,64 @@ class SmsIngestTest extends TestCase
         $this->assertNull($oldConfirmed->fresh()->raw_message);
         $this->assertNotNull($newConfirmed->fresh()->raw_message);
         $this->assertNotNull($oldPending->fresh()->raw_message);
+    }
+
+    public function test_a_personal_token_ingests_for_its_own_user(): void
+    {
+        config(['services.sms_ingest.token' => null, 'services.sms_ingest.user_id' => null]);
+        $other = User::forceCreate(['email_verified_at' => now(), 'name' => 'دیگری', 'email' => 'other@example.com', 'password' => Hash::make('password-password')]);
+        $mine = $this->user->createToken('آیفون', ['sms:ingest'])->plainTextToken;
+        $theirs = $other->createToken('x', ['sms:ingest'])->plainTextToken;
+        $message = 'واریز مبلغ 500,000 ریال به حساب *1234 پیگیری: 123456';
+
+        $this->postJson('/api/sms/ingest', ['message' => $message], ['Authorization' => "Bearer {$mine}"])->assertStatus(201);
+        $this->postJson('/api/sms/ingest', ['message' => $message], ['X-Ingest-Token' => $theirs])->assertStatus(201);
+
+        $this->assertSame(1, IncomingSms::where('user_id', $this->user->id)->count());
+        $this->assertSame(1, IncomingSms::where('user_id', $other->id)->count());
+        $this->assertNotNull($this->user->tokens()->first()->last_used_at);
+    }
+
+    public function test_a_token_without_the_sms_ability_or_of_an_unverified_user_is_refused(): void
+    {
+        config(['services.sms_ingest.token' => null]);
+        $wrongAbility = $this->user->createToken('x', ['something-else'])->plainTextToken;
+        $this->postJson('/api/sms/ingest', ['message' => 'واریز مبلغ 500,000 ریال'], ['Authorization' => "Bearer {$wrongAbility}"])->assertStatus(401);
+
+        $this->user->forceFill(['email_verified_at' => null])->save();
+        $good = $this->user->createToken('y', ['sms:ingest'])->plainTextToken;
+        $this->postJson('/api/sms/ingest', ['message' => 'واریز مبلغ 500,000 ریال'], ['Authorization' => "Bearer {$good}"])->assertStatus(401);
+    }
+
+    public function test_tokens_are_managed_from_settings_and_shown_only_once(): void
+    {
+        $this->actingAs($this->user)->post(route('sms-tokens.store'), ['name' => 'آیفون من'])->assertRedirect()->assertSessionHas('status');
+
+        $row = $this->user->tokens()->first();
+        $this->assertSame('آیفون من', $row->name);
+        $this->assertSame(['sms:ingest'], $row->abilities);
+
+        $this->actingAs($this->user)->get(route('sms-tokens.index'))->assertInertia(fn ($page) => $page
+            ->component('settings/sms')
+            ->has('tokens', 1)
+            ->missing('tokens.0.token'));
+
+        $this->actingAs($this->user)->delete(route('sms-tokens.destroy', $row->id))->assertRedirect();
+        $this->assertSame(0, $this->user->tokens()->count());
+    }
+
+    public function test_one_user_cannot_delete_anothers_token_and_the_number_of_tokens_is_capped(): void
+    {
+        $other = User::forceCreate(['email_verified_at' => now(), 'name' => 'دیگری', 'email' => 'other@example.com', 'password' => Hash::make('password-password')]);
+        $theirs = $other->createToken('x', ['sms:ingest']);
+
+        $this->actingAs($this->user)->delete(route('sms-tokens.destroy', $theirs->accessToken->id));
+        $this->assertSame(1, $other->tokens()->count());
+
+        foreach (range(1, 5) as $i) {
+            $this->user->createToken("t{$i}", ['sms:ingest']);
+        }
+        $this->actingAs($this->user)->post(route('sms-tokens.store'), ['name' => 'یکی بیشتر'])->assertSessionHasErrors('name');
+        $this->assertSame(5, $this->user->tokens()->count());
     }
 }
