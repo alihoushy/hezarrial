@@ -14,6 +14,7 @@ import {
     ReceiptTextIcon,
     RepeatIcon,
     ShieldCheckIcon,
+    SmartphoneIcon,
     BellIcon,
     TagsIcon,
     UsersIcon,
@@ -64,6 +65,7 @@ const ACCOUNT_LINKS: typeof LINKS = [
 
 const DATA_LINKS: typeof LINKS = [
     { label: tr('وارد کردن داده'), route: 'imports.index', component: 'imports/index', icon: FileUpIcon },
+    { label: tr('اتصال پیامک بانکی'), route: 'sms-tokens.index', component: 'settings/sms', icon: SmartphoneIcon },
     { label: tr('پشتیبان‌گیری'), route: 'backups.index', component: 'backups/index', icon: DatabaseBackupIcon },
 ];
 

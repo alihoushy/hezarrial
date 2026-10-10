@@ -34,7 +34,7 @@ export interface SharedProps {
 declare module '@inertiajs/core' {
     export interface InertiaConfig {
         errorValueType: string;
-        flashDataType: { status?: string };
+        flashDataType: { status?: string; sms_token?: string };
         sharedPageProps: SharedProps;
     }
 }
