@@ -1,14 +1,26 @@
 {
+    "id": "/app",
     "name": "هزار ریال",
     "short_name": "هزار ریال",
+    "description": "حسابداری شخصی فارسی: حساب‌ها، تراکنش‌ها، چک‌ها و اقساط",
+    "lang": "fa",
+    "dir": "rtl",
     "start_url": "/app",
     "scope": "/",
     "display": "standalone",
-    "dir": "rtl",
-    "lang": "fa",
+    "orientation": "portrait",
     "theme_color": "#f7f8fb",
     "background_color": "#f7f8fb",
+    "categories": ["finance", "productivity"],
     "icons": [
-        {"src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+        {"src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+        {"src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+        {"src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"},
+        {"src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}
+    ],
+    "shortcuts": [
+        {"name": "ثبت هزینه", "short_name": "هزینه", "url": "/app/transactions/create?type=expense", "icons": [{"src": "/icons/icon-192.png", "sizes": "192x192"}]},
+        {"name": "ثبت درآمد", "short_name": "درآمد", "url": "/app/transactions/create?type=income", "icons": [{"src": "/icons/icon-192.png", "sizes": "192x192"}]},
+        {"name": "حساب‌ها", "short_name": "حساب‌ها", "url": "/app/accounts", "icons": [{"src": "/icons/icon-192.png", "sizes": "192x192"}]}
     ]
 }

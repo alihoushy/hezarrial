@@ -14,7 +14,7 @@
     <meta name="format-detection" content="telephone=no">
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icons/icon.svg">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 
     {{-- Apply the saved theme before first paint so a dark user never sees a light flash. --}}
     <script nonce="{{ Vite::cspNonce() }}">
