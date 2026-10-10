@@ -18,6 +18,8 @@ use App\Models\SmsPattern;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Support\Arr;
+use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
@@ -78,16 +80,49 @@ class BackupService
         $path = 'backups/'.$user->id.'/'.$fileName;
         $json = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
 
-        Storage::disk('local')->put($path, $json);
+        // Encrypted at rest with the app key. Downloads hand the user plain JSON (see contents()),
+        // so a backup stays restorable on any installation, whatever its key.
+        Storage::disk('local')->put($path, Crypt::encryptString($json));
 
         return Backup::create([
             'user_id' => $user->id,
             'file_path' => $path,
             'file_name' => $fileName,
             'file_size' => strlen($json),
-            'is_encrypted' => false,
+            'is_encrypted' => true,
             'created_at' => now(),
         ]);
+    }
+
+    /** The portable (plain JSON) content of a stored backup. */
+    public function contents(Backup $backup): string
+    {
+        $stored = Storage::disk('local')->get($backup->file_path);
+
+        return $backup->is_encrypted ? Crypt::decryptString($stored) : $stored;
+    }
+
+    /**
+     * Turns an uploaded backup into its payload. Accepts the plain JSON we hand out on
+     * download, and the encrypted form kept on disk.
+     */
+    public function decode(string $raw): array
+    {
+        $payload = json_decode($raw, true);
+
+        if (! is_array($payload)) {
+            try {
+                $payload = json_decode(Crypt::decryptString(trim($raw)), true);
+            } catch (DecryptException) {
+                $payload = null;
+            }
+        }
+
+        if (! is_array($payload)) {
+            throw ValidationException::withMessages(['backup' => __('فایل پشتیبان معتبر نیست.')]);
+        }
+
+        return $payload;
     }
 
     public function restore(User $user, array $payload): array

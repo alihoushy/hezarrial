@@ -30,12 +30,12 @@ class BackupController extends Controller
         return back()->with('status', __('پشتیبان ساخته شد.'));
     }
 
-    public function download(Request $request, Backup $backup): StreamedResponse
+    public function download(Request $request, Backup $backup, BackupService $backups): StreamedResponse
     {
         $this->authorize('view', $backup);
         $request->validate(['password' => ['required', 'current_password']]);
 
-        return Storage::disk('local')->download($backup->file_path, $backup->file_name);
+        return response()->streamDownload(fn () => print ($backups->contents($backup)), $backup->file_name, ['Content-Type' => 'application/json']);
     }
 
     public function restore(Request $request, BackupService $backups, AuditLogService $audit): RedirectResponse
@@ -49,7 +49,7 @@ class BackupController extends Controller
             return back()->withErrors(['password' => __('رمز عبور درست نیست.')]);
         }
 
-        $payload = json_decode($request->file('backup')->get(), true, flags: JSON_THROW_ON_ERROR);
+        $payload = $backups->decode($request->file('backup')->get());
         $restored = $backups->restore($request->user(), $payload);
 
         $audit->record('backup.restored', null, [], ['schema_version' => 1, 'restored' => $restored]);

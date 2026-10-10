@@ -17,7 +17,7 @@
     <link rel="apple-touch-icon" href="/icons/icon.svg">
 
     {{-- Apply the saved theme before first paint so a dark user never sees a light flash. --}}
-    <script>
+    <script nonce="{{ Vite::cspNonce() }}">
         (function () {
             var theme = @json($theme);
             var dark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -28,7 +28,7 @@
         })();
     </script>
 
-    @routes
+    @routes(null, Vite::cspNonce())
     @viteReactRefresh
     @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
     <x-inertia::head>

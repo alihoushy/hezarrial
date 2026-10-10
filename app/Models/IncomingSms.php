@@ -22,6 +22,7 @@ class IncomingSms extends Model
     {
         return [
             'occurred_at' => 'datetime',
+            'raw_message' => 'encrypted',
         ];
     }
 

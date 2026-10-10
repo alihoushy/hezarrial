@@ -1,0 +1,4 @@
+Contact: https://github.com/alihoushy/hezarrial/security/advisories/new
+Expires: 2027-06-30T00:00:00.000Z
+Preferred-Languages: fa, en
+Policy: https://github.com/alihoushy/hezarrial/blob/main/SECURITY.md
