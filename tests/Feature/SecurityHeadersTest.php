@@ -44,12 +44,26 @@ class SecurityHeadersTest extends TestCase
 
     public function test_hsts_is_sent_only_over_https_in_production(): void
     {
+        config(['app.url' => 'https://hezarrial.test']);
         $this->app['env'] = 'production';
 
         $this->get('https://hezarrial.test/login')->assertHeader('Strict-Transport-Security', 'max-age=31536000');
-        $this->get('http://hezarrial.test/login')->assertHeaderMissing('Strict-Transport-Security');
+        // Plain http is sent to https first (see CanonicalHost), and never gets the header.
+        $this->get('http://hezarrial.test/login')->assertRedirect('https://hezarrial.test/login')->assertHeaderMissing('Strict-Transport-Security');
 
         $this->app['env'] = 'testing';
         $this->get('https://hezarrial.test/login')->assertHeaderMissing('Strict-Transport-Security');
+    }
+
+    public function test_private_areas_are_not_indexed(): void
+    {
+        $user = \App\Models\User::forceCreate(['name' => 'مالک', 'email' => 'owner@example.com', 'password' => 'x', 'email_verified_at' => now()]);
+
+        foreach (['/login', '/register', '/forgot-password'] as $path) {
+            $this->get($path)->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+        }
+
+        $this->actingAs($user)->get('/app')->assertOk()->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+        $this->actingAs($user)->get('/app/accounts')->assertHeader('X-Robots-Tag', 'noindex, nofollow');
     }
 }

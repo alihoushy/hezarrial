@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Models\User;
 use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 
 /** Who may sign up, and the cheap bot checks on the sign-up form. */
@@ -20,7 +21,22 @@ class Registration
      */
     public static function isOpen(): bool
     {
-        return (bool) config('app.registration_enabled') || User::query()->doesntExist();
+        if (config('app.registration_enabled')) {
+            return true;
+        }
+
+        // Public pages ask on every visit; once somebody has an account the answer never changes back.
+        if (Cache::get('registration.has-users')) {
+            return false;
+        }
+
+        if (User::query()->exists()) {
+            Cache::forever('registration.has-users', true);
+
+            return false;
+        }
+
+        return true;
     }
 
     /** An opaque token carrying the time the form was rendered. */
