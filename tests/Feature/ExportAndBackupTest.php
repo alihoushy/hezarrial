@@ -19,7 +19,7 @@ class ExportAndBackupTest extends TestCase
 
     public function test_csv_export_prefixes_formula_values(): void
     {
-        $user = User::create(['name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password')]);
+        $user = User::forceCreate(['email_verified_at' => now(), 'name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password')]);
         $account = Account::create(['user_id' => $user->id, 'name' => '=SUM(A1:A2)', 'type' => 'bank', 'opening_balance' => 0, 'current_balance' => 0]);
         $category = Category::create(['user_id' => $user->id, 'name' => 'حقوق', 'type' => 'income']);
         Transaction::create(['user_id' => $user->id, 'account_id' => $account->id, 'category_id' => $category->id, 'type' => 'income', 'amount' => 1000, 'transaction_date' => '2026-05-26']);
@@ -37,7 +37,7 @@ class ExportAndBackupTest extends TestCase
     public function test_backup_is_stored_on_private_disk(): void
     {
         Storage::fake('local');
-        $user = User::create(['name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password')]);
+        $user = User::forceCreate(['email_verified_at' => now(), 'name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password')]);
 
         $backup = app(BackupService::class)->create($user);
 
@@ -48,7 +48,7 @@ class ExportAndBackupTest extends TestCase
     public function test_backup_restore_replaces_current_financial_data(): void
     {
         Storage::fake('local');
-        $user = User::create(['name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password')]);
+        $user = User::forceCreate(['email_verified_at' => now(), 'name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password')]);
         $account = Account::create(['user_id' => $user->id, 'name' => 'بانک اصلی', 'type' => 'bank', 'opening_balance' => 0, 'current_balance' => 0]);
         $category = Category::create(['user_id' => $user->id, 'name' => 'حقوق', 'type' => 'income']);
         Transaction::create(['user_id' => $user->id, 'account_id' => $account->id, 'category_id' => $category->id, 'type' => 'income', 'amount' => 1000, 'transaction_date' => '2026-05-26']);
@@ -71,7 +71,7 @@ class ExportAndBackupTest extends TestCase
     public function test_backup_is_encrypted_on_disk_but_downloaded_as_plain_json(): void
     {
         Storage::fake('local');
-        $user = User::create(['name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password')]);
+        $user = User::forceCreate(['email_verified_at' => now(), 'name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password')]);
         Account::create(['user_id' => $user->id, 'name' => 'بانک محرمانه', 'type' => 'bank', 'opening_balance' => 0, 'current_balance' => 0]);
         $backup = app(BackupService::class)->create($user);
 
@@ -90,7 +90,7 @@ class ExportAndBackupTest extends TestCase
     public function test_plain_json_backup_from_download_can_be_restored(): void
     {
         Storage::fake('local');
-        $user = User::create(['name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password')]);
+        $user = User::forceCreate(['email_verified_at' => now(), 'name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password')]);
         $account = Account::create(['user_id' => $user->id, 'name' => 'بانک اصلی', 'type' => 'bank', 'opening_balance' => 0, 'current_balance' => 0]);
         $backups = app(BackupService::class);
         $plain = $backups->contents($backups->create($user));
@@ -106,7 +106,7 @@ class ExportAndBackupTest extends TestCase
 
     public function test_invalid_backup_file_is_rejected(): void
     {
-        $user = User::create(['name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password')]);
+        $user = User::forceCreate(['email_verified_at' => now(), 'name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password')]);
 
         $this->actingAs($user)->post(route('backups.restore'), [
             'password' => 'password-password',

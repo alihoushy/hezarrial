@@ -14,7 +14,7 @@ class LocaleTest extends TestCase
 
     private function user(array $settings = []): User
     {
-        return User::create(['name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password'), 'settings' => $settings]);
+        return User::forceCreate(['email_verified_at' => now(), 'name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password'), 'settings' => $settings]);
     }
 
     public function test_persian_rtl_is_the_default(): void

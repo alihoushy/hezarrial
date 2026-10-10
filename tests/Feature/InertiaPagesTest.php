@@ -36,7 +36,7 @@ class InertiaPagesTest extends TestCase
 
         Storage::fake('local');
 
-        $this->user = User::create(['name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password')]);
+        $this->user = User::forceCreate(['email_verified_at' => now(), 'name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password')]);
         $this->account = Account::create(['user_id' => $this->user->id, 'name' => 'بانک', 'type' => 'bank', 'opening_balance' => 1000000, 'current_balance' => 1000000]);
         $this->category = Category::create(['user_id' => $this->user->id, 'name' => 'خوراک', 'type' => 'expense']);
         $this->person = Person::create(['user_id' => $this->user->id, 'full_name' => 'علی رضایی']);
@@ -110,14 +110,23 @@ class InertiaPagesTest extends TestCase
 
     public function test_auth_pages_render_for_guests(): void
     {
-        $this->get(route('setup'))->assertRedirect(route('login'));
+        config(['app.registration_enabled' => true]);
 
-        $this->get(route('login'))->assertOk()->assertInertia(fn (AssertableInertia $page) => $page->component('auth/login'));
+        foreach (['login' => 'auth/login', 'register' => 'auth/register', 'password.request' => 'auth/forgot-password'] as $name => $component) {
+            $this->get(route($name))->assertOk()->assertInertia(fn (AssertableInertia $page) => $page->component($component));
+        }
 
+        $this->get(route('password.reset', ['token' => 'abc', 'email' => 'a@example.com']))
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page->component('auth/reset-password')->where('token', 'abc'));
+    }
+
+    public function test_a_fresh_install_sends_visitors_to_create_the_first_account(): void
+    {
         User::query()->delete();
 
-        $this->get(route('setup'))->assertOk()->assertInertia(fn (AssertableInertia $page) => $page->component('auth/setup'));
-        $this->get(route('login'))->assertRedirect(route('setup'));
+        $this->get(route('login'))->assertRedirect(route('register'));
+        $this->get(route('register'))->assertOk()->assertInertia(fn (AssertableInertia $page) => $page->component('auth/register')->has('formToken'));
     }
 
     public function test_dashboard_defers_charts_and_upcoming_items(): void
@@ -198,7 +207,7 @@ class InertiaPagesTest extends TestCase
 
     public function test_forbidden_and_missing_pages_render_the_error_component(): void
     {
-        $other = User::create(['name' => 'دیگری', 'email' => 'other@example.com', 'password' => Hash::make('password-password')]);
+        $other = User::forceCreate(['email_verified_at' => now(), 'name' => 'دیگری', 'email' => 'other@example.com', 'password' => Hash::make('password-password')]);
         $foreign = Account::create(['user_id' => $other->id, 'name' => 'بانک', 'type' => 'bank', 'opening_balance' => 0, 'current_balance' => 0]);
 
         $this->actingAs($this->user)->get(route('accounts.show', $foreign))

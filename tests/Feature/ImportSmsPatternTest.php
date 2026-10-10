@@ -14,7 +14,7 @@ class ImportSmsPatternTest extends TestCase
 
     public function test_user_can_create_sms_pattern_and_preview_sms_with_it(): void
     {
-        $user = User::create(['name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password')]);
+        $user = User::forceCreate(['email_verified_at' => now(), 'name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password')]);
 
         $this->actingAs($user)->post(route('imports.sms-patterns.store'), [
             'name' => 'بانک نمونه',

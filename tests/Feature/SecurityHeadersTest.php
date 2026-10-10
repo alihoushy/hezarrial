@@ -23,7 +23,7 @@ class SecurityHeadersTest extends TestCase
 
     public function test_scripts_are_allowed_by_nonce_not_by_unsafe_inline(): void
     {
-        $response = $this->get('/setup');
+        $response = $this->get('/register');
 
         preg_match("/script-src ([^;]+);/", $response->headers->get('Content-Security-Policy'), $script);
         $this->assertStringNotContainsString('unsafe-inline', $script[1]);
@@ -36,8 +36,8 @@ class SecurityHeadersTest extends TestCase
 
     public function test_nonce_changes_on_every_request(): void
     {
-        $first = $this->get('/setup')->headers->get('Content-Security-Policy');
-        $second = $this->get('/setup')->headers->get('Content-Security-Policy');
+        $first = $this->get('/register')->headers->get('Content-Security-Policy');
+        $second = $this->get('/register')->headers->get('Content-Security-Policy');
 
         $this->assertNotSame($first, $second);
     }

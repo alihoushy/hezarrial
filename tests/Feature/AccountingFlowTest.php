@@ -24,7 +24,7 @@ class AccountingFlowTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::create(['name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password')]);
+        $this->user = User::forceCreate(['email_verified_at' => now(), 'name' => 'مالک', 'email' => 'owner@example.com', 'password' => Hash::make('password-password')]);
         $this->bank = Account::create(['user_id' => $this->user->id, 'name' => 'بانک', 'type' => 'bank', 'opening_balance' => 100000, 'current_balance' => 100000]);
         $this->cash = Account::create(['user_id' => $this->user->id, 'name' => 'نقد', 'type' => 'cash', 'opening_balance' => 0, 'current_balance' => 0]);
         $this->income = Category::create(['user_id' => $this->user->id, 'name' => 'حقوق', 'type' => 'income']);
