@@ -4,6 +4,7 @@ import {
     DatabaseBackupIcon,
     FileUpIcon,
     HandCoinsIcon,
+    KeyRoundIcon,
     LandmarkIcon,
     LogOutIcon,
     MonitorSmartphoneIcon,
@@ -12,6 +13,7 @@ import {
     PiggyBankIcon,
     ReceiptTextIcon,
     RepeatIcon,
+    ShieldCheckIcon,
     BellIcon,
     TagsIcon,
     UsersIcon,
@@ -42,7 +44,7 @@ interface Preferences {
     recurring_mode: string;
 }
 
-const LINKS: { label: string; route: string; component: string; icon: LucideIcon }[] = [
+const LINKS: { label: string; route: string; component?: string; icon: LucideIcon }[] = [
     { label: tr('گزارش‌ها'), route: 'reports.index', component: 'reports/index', icon: ChartPieIcon },
     { label: tr('دسته‌بندی‌ها'), route: 'categories.index', component: 'categories/index', icon: TagsIcon },
     { label: tr('اشخاص'), route: 'people.index', component: 'people/index', icon: UsersIcon },
@@ -52,6 +54,12 @@ const LINKS: { label: string; route: string; component: string; icon: LucideIcon
     { label: tr('بودجه‌بندی'), route: 'budgets.index', component: 'budgets/index', icon: PiggyBankIcon },
     { label: tr('یادآوری‌ها'), route: 'reminders.index', component: 'reminders/index', icon: BellIcon },
     { label: tr('تکرارشونده‌ها'), route: 'recurring.index', component: 'recurring/index', icon: RepeatIcon },
+];
+
+// The security page asks for the password first, so it is opened without an instant visit.
+const ACCOUNT_LINKS: typeof LINKS = [
+    { label: tr('مشخصات و رمز عبور'), route: 'account.edit', component: 'settings/account', icon: KeyRoundIcon },
+    { label: tr('امنیت و دستگاه‌ها'), route: 'security.edit', icon: ShieldCheckIcon },
 ];
 
 const DATA_LINKS: typeof LINKS = [
@@ -114,6 +122,11 @@ export default function Settings({ preferences }: { preferences?: Preferences })
                 )}
 
                 <Links links={LINKS} />
+
+                <section>
+                    <SectionTitle>{t('حساب کاربری')}</SectionTitle>
+                    <Links links={ACCOUNT_LINKS} />
+                </section>
 
                 <section>
                     <SectionTitle>{t('داده‌ها')}</SectionTitle>
